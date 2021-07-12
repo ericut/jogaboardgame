@@ -1,6 +1,6 @@
 import { Flex } from "@chakra-ui/react";
 
-const IndexPage = () => {
+const Desafio10x10 = () => {
   return (
     <Flex
       height="60vh"
@@ -9,9 +9,9 @@ const IndexPage = () => {
       justifyContent="center"
       padding="20px"
     >
-      Conteúdo...
+      Desafio 10x10...
     </Flex>
   );
 };
 
-export default IndexPage;
+export default Desafio10x10;

@@ -1,6 +1,6 @@
 import { Flex } from "@chakra-ui/react";
 
-const IndexPage = () => {
+const Pontuacoes = () => {
   return (
     <Flex
       height="60vh"
@@ -9,9 +9,9 @@ const IndexPage = () => {
       justifyContent="center"
       padding="20px"
     >
-      Conteúdo...
+      Pontuações...
     </Flex>
   );
 };
 
-export default IndexPage;
+export default Pontuacoes;

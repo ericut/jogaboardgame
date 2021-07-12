@@ -18,6 +18,10 @@
 # misc
 .DS_Store
 *.pem
+.editorconfig
+yarn-error.log
+yarn.lock
+/.layout/
 
 # debug
 npm-debug.log*
