@@ -8,7 +8,7 @@ const Pontuacoes = () => {
       justifyContent="center"
       padding="20px"
     >
-      Pontuações...
+      Em desenvolvimento...
     </Flex>
   );
 };

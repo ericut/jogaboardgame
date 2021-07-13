@@ -2,9 +2,9 @@ import { IJogosProps } from "../interfaces";
 
 export const jogosData: IJogosProps[] = [
   {
-    id: 101,
-    nome: "Castle of Burgundy",
+    id: 1,
+    nome: "Castle of Burgundy (Exemplo)",
     partidas: 1,
-    categoria: [1, 2], //badges
+    categoria: [4, 5, 11],
   },
 ];

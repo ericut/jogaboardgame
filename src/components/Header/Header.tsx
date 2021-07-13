@@ -34,9 +34,9 @@ const Header = () => {
         <Link href="/desafio10x10">
           <Button variant="ghost">Desafio 10x10</Button>
         </Link>
-        <Link href="/pontuacoes">
+        {/* <Link href="/pontuacoes">
           <Button variant="ghost">Pontuações</Button>
-        </Link>
+        </Link> */}
       </>
     );
   };

@@ -17,15 +17,12 @@ import {
   ButtonGroup,
   Button,
   IconButton,
-  Box,
   Flex,
   Heading,
   Badge,
   HStack,
   VStack,
   Input,
-  FormControl,
-  FormLabel,
   NumberInput,
   NumberInputField,
   Checkbox,
@@ -33,33 +30,38 @@ import {
 } from "@chakra-ui/react";
 import { GiMeeple } from "react-icons/gi";
 import { FaEdit, FaSave, FaPlus, FaMinus } from "react-icons/fa";
-
-import { IJogosProps } from "../interfaces";
+import { IJogosProps, ICategoriasProps } from "../interfaces";
+import { jogosData } from "../data/jogosData";
+import { categoriasData } from "../data/categoriasData";
 
 const Desafio10x10 = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const btnRef = useRef();
-
   const [jogosListados, setJogosListados] = useState<IJogosProps[] | undefined>(
-    [{ id: 1, nome: "Castle of Burgundy", partidas: 1, categoria: [1, 2] }]
+    jogosData
   );
-
   const [jogoEdicao, setJogoEdicao] = useState<IJogosProps | undefined>({
     id: 0,
     nome: "",
     partidas: "",
     categoria: [],
   });
-
-  const [categoriaListagem] = useState([
-    { id: 1, nome: "Colocação de peças" },
-    { id: 2, nome: "Colecionar componentes" },
-    { id: 3, nome: "Rolagem de dados" },
-  ]);
+  const [categoriaListagem] = useState<ICategoriasProps[] | undefined>(
+    categoriasData
+  );
 
   useEffect(() => {
-    console.log(jogoEdicao);
-  }, [jogoEdicao]);
+    if (localStorage.getItem("listagemJogos")) {
+      let jogosRecuperados = JSON.parse(localStorage.getItem("listagemJogos"));
+      setJogosListados(jogosRecuperados);
+    } else {
+      setJogosListados(jogosData);
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("listagemJogos", JSON.stringify(jogosListados));
+  }, [jogosListados]);
 
   function handleAbrirEdicaoJogo(item?) {
     onOpen();
@@ -167,7 +169,66 @@ const Desafio10x10 = () => {
     handleCloseDrawer();
   }
 
+  const NumeroPartidas = (partidas) => {
+    // partidas calculadas
+    let partidasASeremJogadas = 10;
+    let partidasNaoJogadas = Array.from(
+      { length: partidasASeremJogadas - partidas },
+      (v, k) => k + 1
+    );
+    let partidasJogadas = Array.from({ length: partidas }, (v, k) => k + 1);
+    // partidas mapeadas
+    let partidasJogadasRender = partidasJogadas.map((item) => {
+      return (
+        <Text color="green.500" key={item}>
+          <GiMeeple />
+        </Text>
+      );
+    });
+    let partidasNaoJogadasRender = partidasNaoJogadas.map((item) => {
+      return (
+        <Text color="gray.500" key={item}>
+          <GiMeeple />
+        </Text>
+      );
+    });
+    //
+    return (
+      <>
+        {partidasJogadasRender}
+        {partidasNaoJogadasRender}
+      </>
+    );
+  };
+
   const ListagemJogos = useMemo(() => {
+    const ListagemCategorias = (categoria) => {
+      function corPorCategoria(item) {
+        if (item === "Cooperativo") {
+          return "green";
+        } else if (item === "Duelo") {
+          return "red";
+        }
+      }
+      return (
+        <>
+          {categoriaListagem
+            .filter((item) => categoria.indexOf(item.id) > -1)
+            .map((item) => {
+              return (
+                <Badge
+                  fontSize="9px"
+                  mr="5px"
+                  colorScheme={corPorCategoria(item.nome)}
+                >
+                  {item.nome}
+                </Badge>
+              );
+            })}
+        </>
+      );
+    };
+
     return jogosListados.length !== 0 ? (
       jogosListados.map((item) => {
         return (
@@ -181,31 +242,29 @@ const Desafio10x10 = () => {
               >
                 {item.nome}
               </Text>
-              <HStack>
-                {item.categoria.map((subItem) => {
-                  return <Badge fontSize="9px">{subItem}</Badge>;
-                })}
-              </HStack>
+              <Stack shouldWrapChildren={true}>
+                {ListagemCategorias(item.categoria)}
+              </Stack>
             </Td>
-            <Td w="60%">
-              <Flex fontSize="34px">
-                {item.partidas}
-                <GiMeeple />
+            <Td w="50%">
+              <Flex fontSize="34px" alignItems="center">
+                {NumeroPartidas(item.partidas)}
               </Flex>
             </Td>
             <Td w="10%">
               <ButtonGroup size="md" isAttached>
                 <IconButton
-                  aria-label="Acrescentar Jogada"
-                  colorScheme="green"
-                  icon={<FaPlus />}
-                  onClick={() => handleAcrescentarPartida(item)}
-                />
-                <IconButton
                   aria-label="Retirar Jogada"
                   colorScheme="orange"
                   icon={<FaMinus />}
                   onClick={() => handleRetirarPartida(item)}
+                />
+                <Button isDisabled>{item.partidas}</Button>
+                <IconButton
+                  aria-label="Acrescentar Jogada"
+                  colorScheme="green"
+                  icon={<FaPlus />}
+                  onClick={() => handleAcrescentarPartida(item)}
                 />
               </ButtonGroup>
             </Td>
@@ -230,7 +289,7 @@ const Desafio10x10 = () => {
         </Td>
       </Tr>
     );
-  }, [jogosListados]);
+  }, [jogosListados, categoriaListagem]);
 
   const EdicaoJogo = useMemo(() => {
     return (
@@ -348,7 +407,9 @@ const Desafio10x10 = () => {
               <Tr>
                 <Th w="30%">Jogo</Th>
                 <Th w="50%">Partidas</Th>
-                <Th w="10%"></Th>
+                <Th w="10%">
+                  <Flex justifyContent="center">Controle</Flex>
+                </Th>
                 <Th w="10%">
                   <Flex justifyContent="center">Ações</Flex>
                 </Th>

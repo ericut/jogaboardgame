@@ -4,3 +4,8 @@ export interface IJogosProps {
   partidas: number | string;
   categoria: Array<number>;
 }
+
+export interface ICategoriasProps {
+  id: number;
+  nome: string;
+}
