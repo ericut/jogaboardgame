@@ -1,12 +1,13 @@
 import { useMemo, useRef, useState, useEffect } from "react";
 import {
-  Text,
   Table,
   Thead,
   Tr,
   Th,
   Td,
   Tbody,
+  Text,
+  Box,
   Drawer,
   DrawerBody,
   DrawerHeader,
@@ -419,21 +420,23 @@ const Desafio10x10 = () => {
           </Flex>
         </Flex>
         <Flex mt="40px" w="100%">
-          <Table>
-            <Thead>
-              <Tr>
-                <Th w="30%">Jogo</Th>
-                <Th w="50%">Partidas</Th>
-                <Th w="15%">
-                  <Flex justifyContent="center">Controle</Flex>
-                </Th>
-                <Th w="5%">
-                  <Flex justifyContent="center">Ações</Flex>
-                </Th>
-              </Tr>
-            </Thead>
-            <Tbody>{ListagemJogos}</Tbody>
-          </Table>
+          <Box overflowX="auto" w="100%">
+            <Table>
+              <Thead>
+                <Tr>
+                  <Th w="30%">Jogo</Th>
+                  <Th w="50%">Partidas</Th>
+                  <Th w="15%">
+                    <Flex justifyContent="center">Controle</Flex>
+                  </Th>
+                  <Th w="5%">
+                    <Flex justifyContent="center">Ações</Flex>
+                  </Th>
+                </Tr>
+              </Thead>
+              <Tbody>{ListagemJogos}</Tbody>
+            </Table>
+          </Box>
         </Flex>
       </Flex>
     </>
