@@ -9,7 +9,7 @@ const Footer = () => {
         textTransform="uppercase"
         color="gray.400"
       >
-        Desenvolvido em React & NextJS
+        Feito em NextJS & ChakraUi
         <Text color="red" p="0 5px">
           ❤
         </Text>

@@ -62,7 +62,7 @@ const Header = () => {
       </Drawer>
       <Flex
         as="header"
-        m="0"
+        m="0 0 20px"
         p="0 20px"
         maxW="100%"
         justifyContent="center"
