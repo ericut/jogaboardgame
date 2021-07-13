@@ -30,6 +30,7 @@ import {
 } from "@chakra-ui/react";
 import { GiMeeple } from "react-icons/gi";
 import { FaEdit, FaSave, FaPlus, FaMinus } from "react-icons/fa";
+import { AiTwotoneCrown } from "react-icons/ai";
 import { IJogosProps, ICategoriasProps } from "../interfaces";
 import { jogosData } from "../data/jogosData";
 import { categoriasData } from "../data/categoriasData";
@@ -233,7 +234,7 @@ const Desafio10x10 = () => {
       jogosListados.map((item) => {
         return (
           <Tr key={item.id}>
-            <Td w="30%">
+            <Td>
               <Text
                 fontSize="22px"
                 fontWeight="bold"
@@ -246,29 +247,45 @@ const Desafio10x10 = () => {
                 {ListagemCategorias(item.categoria)}
               </Stack>
             </Td>
-            <Td w="50%">
+            <Td>
               <Flex fontSize="34px" alignItems="center">
                 {NumeroPartidas(item.partidas)}
+                {item.partidas === 10 ? (
+                  <Flex color="yellow.500" ml="10px" alignItems="center">
+                    <AiTwotoneCrown />
+                    <Text fontSize="10px" textTransform="uppercase">
+                      Finalizado!
+                    </Text>
+                  </Flex>
+                ) : (
+                  <></>
+                )}
               </Flex>
             </Td>
-            <Td w="10%">
-              <ButtonGroup size="md" isAttached>
-                <IconButton
-                  aria-label="Retirar Jogada"
-                  colorScheme="orange"
-                  icon={<FaMinus />}
-                  onClick={() => handleRetirarPartida(item)}
-                />
-                <Button isDisabled>{item.partidas}</Button>
-                <IconButton
-                  aria-label="Acrescentar Jogada"
-                  colorScheme="green"
-                  icon={<FaPlus />}
-                  onClick={() => handleAcrescentarPartida(item)}
-                />
-              </ButtonGroup>
+            <Td>
+              <Flex justifyContent="center" w="100%">
+                <ButtonGroup size="md" isAttached>
+                  <IconButton
+                    aria-label="Retirar Jogada"
+                    colorScheme="orange"
+                    icon={<FaMinus />}
+                    onClick={() => handleRetirarPartida(item)}
+                    isDisabled={item.partidas === 0}
+                  />
+                  <Button w="52px" isDisabled>
+                    {item.partidas}
+                  </Button>
+                  <IconButton
+                    aria-label="Acrescentar Jogada"
+                    colorScheme="green"
+                    icon={<FaPlus />}
+                    onClick={() => handleAcrescentarPartida(item)}
+                    isDisabled={item.partidas === 10}
+                  />
+                </ButtonGroup>
+              </Flex>
             </Td>
-            <Td w="10%">
+            <Td>
               <Flex justifyContent="center">
                 <IconButton
                   colorScheme="blue"
@@ -407,10 +424,10 @@ const Desafio10x10 = () => {
               <Tr>
                 <Th w="30%">Jogo</Th>
                 <Th w="50%">Partidas</Th>
-                <Th w="10%">
+                <Th w="15%">
                   <Flex justifyContent="center">Controle</Flex>
                 </Th>
-                <Th w="10%">
+                <Th w="5%">
                   <Flex justifyContent="center">Ações</Flex>
                 </Th>
               </Tr>
