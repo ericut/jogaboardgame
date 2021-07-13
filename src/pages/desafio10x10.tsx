@@ -24,6 +24,8 @@ import {
   HStack,
   VStack,
   Input,
+  FormControl,
+  FormLabel,
   NumberInput,
   NumberInputField,
   Checkbox,
@@ -45,11 +47,11 @@ const Desafio10x10 = () => {
   const [jogoEdicao, setJogoEdicao] = useState<IJogosProps | undefined>({
     id: 0,
     nome: "",
-    partidas: 0,
+    partidas: "",
     categoria: [],
   });
 
-  const [categoriaListagem, setCategoriaListagem] = useState([
+  const [categoriaListagem] = useState([
     { id: 1, nome: "Colocação de peças" },
     { id: 2, nome: "Colecionar componentes" },
     { id: 3, nome: "Rolagem de dados" },
@@ -73,7 +75,7 @@ const Desafio10x10 = () => {
     setJogoEdicao({
       id: 0,
       nome: "",
-      partidas: 0,
+      partidas: "",
       categoria: [],
     });
   }
@@ -89,6 +91,50 @@ const Desafio10x10 = () => {
         ...jogoEdicao,
         categoria: categorias.filter((item) => item !== value),
       });
+    }
+  }
+
+  function handleAcrescentarPartida(item) {
+    let jogoAddPartida = jogosListados.find(
+      (findItem) => findItem.id === item.id
+    );
+    if (jogoAddPartida.partidas < 10) {
+      // mutation + increment
+      jogoAddPartida.partidas = +jogoAddPartida.partidas;
+      jogoAddPartida.partidas += 1;
+      setJogosListados(
+        jogosListados.map((itemAdded) => {
+          if (itemAdded.id === jogoAddPartida.id) {
+            itemAdded.id = jogoAddPartida.id;
+            itemAdded.nome = jogoAddPartida.nome;
+            itemAdded.partidas = jogoAddPartida.partidas;
+            itemAdded.categoria = jogoAddPartida.categoria;
+          }
+          return itemAdded;
+        })
+      );
+    }
+  }
+
+  function handleRetirarPartida(item) {
+    let jogoAddPartida = jogosListados.find(
+      (findItem) => findItem.id === item.id
+    );
+    if (jogoAddPartida.partidas > 0) {
+      // mutation + decrement
+      jogoAddPartida.partidas = +jogoAddPartida.partidas;
+      jogoAddPartida.partidas -= 1;
+      setJogosListados(
+        jogosListados.map((itemAdded) => {
+          if (itemAdded.id === jogoAddPartida.id) {
+            itemAdded.id = jogoAddPartida.id;
+            itemAdded.nome = jogoAddPartida.nome;
+            itemAdded.partidas = jogoAddPartida.partidas;
+            itemAdded.categoria = jogoAddPartida.categoria;
+          }
+          return itemAdded;
+        })
+      );
     }
   }
 
@@ -109,69 +155,81 @@ const Desafio10x10 = () => {
     } else {
       if (jogoEdicao.nome !== "") {
         jogoEdicao.id = jogosListados.length + 1;
+        jogoEdicao.partidas = jogoEdicao.partidas ? jogoEdicao.partidas : 0;
         setJogosListados([...jogosListados, jogoEdicao]);
       }
     }
-    onClose();
+    handleCloseDrawer();
   }
 
   function handleRemoverJogo() {
     setJogosListados(jogosListados.filter((item) => item.id !== jogoEdicao.id));
-    onClose();
+    handleCloseDrawer();
   }
 
   const ListagemJogos = useMemo(() => {
-    return jogosListados.map((item) => {
-      return (
-        <Tr key={item.id}>
-          <Td w="30%">
-            <Text
-              fontSize="22px"
-              fontWeight="bold"
-              letterSpacing="-0.7px"
-              pb="5px"
-            >
-              {item.nome}
-            </Text>
-            <HStack>
-              {item.categoria.map((subItem) => {
-                return <Badge fontSize="9px">{subItem}</Badge>;
-              })}
-            </HStack>
-          </Td>
-          <Td w="60%">
-            <Flex fontSize="34px">
-              {item.partidas}
-              <GiMeeple />
-            </Flex>
-          </Td>
-          <Td w="10%">
-            <ButtonGroup size="md" isAttached>
-              <IconButton
-                aria-label="Adicionar Jogada"
-                colorScheme="green"
-                icon={<FaPlus />}
-              />
-              <IconButton
-                aria-label="Retirar Jogada"
-                colorScheme="orange"
-                icon={<FaMinus />}
-              />
-            </ButtonGroup>
-          </Td>
-          <Td w="10%">
-            <Flex justifyContent="center">
-              <IconButton
-                colorScheme="blue"
-                aria-label="Editar Jogo"
-                icon={<FaEdit />}
-                onClick={() => handleAbrirEdicaoJogo(item)}
-              />
-            </Flex>
-          </Td>
-        </Tr>
-      );
-    });
+    return jogosListados.length !== 0 ? (
+      jogosListados.map((item) => {
+        return (
+          <Tr key={item.id}>
+            <Td w="30%">
+              <Text
+                fontSize="22px"
+                fontWeight="bold"
+                letterSpacing="-0.7px"
+                pb="5px"
+              >
+                {item.nome}
+              </Text>
+              <HStack>
+                {item.categoria.map((subItem) => {
+                  return <Badge fontSize="9px">{subItem}</Badge>;
+                })}
+              </HStack>
+            </Td>
+            <Td w="60%">
+              <Flex fontSize="34px">
+                {item.partidas}
+                <GiMeeple />
+              </Flex>
+            </Td>
+            <Td w="10%">
+              <ButtonGroup size="md" isAttached>
+                <IconButton
+                  aria-label="Acrescentar Jogada"
+                  colorScheme="green"
+                  icon={<FaPlus />}
+                  onClick={() => handleAcrescentarPartida(item)}
+                />
+                <IconButton
+                  aria-label="Retirar Jogada"
+                  colorScheme="orange"
+                  icon={<FaMinus />}
+                  onClick={() => handleRetirarPartida(item)}
+                />
+              </ButtonGroup>
+            </Td>
+            <Td w="10%">
+              <Flex justifyContent="center">
+                <IconButton
+                  colorScheme="blue"
+                  aria-label="Editar Jogo"
+                  icon={<FaEdit />}
+                  onClick={() => handleAbrirEdicaoJogo(item)}
+                />
+              </Flex>
+            </Td>
+          </Tr>
+        );
+      })
+    ) : (
+      <Tr>
+        <Td w="100%" colSpan={4} color="gray.400" fontSize="12px">
+          Nenhum jogo encontrado. Clique no botão "Adicionar Jogo" para
+          cadastrar!
+        </Td>
+      </Tr>
+    );
   }, [jogosListados]);
 
   const EdicaoJogo = useMemo(() => {
@@ -193,7 +251,7 @@ const Desafio10x10 = () => {
             setJogoEdicao({ ...jogoEdicao, partidas: +value })
           }
         >
-          <NumberInputField placeholder="Partida Inicial" />
+          <NumberInputField placeholder="Número de Partidas Iniciais" />
         </NumberInput>
         <Stack w="100%">
           <Text>Categoria:</Text>
@@ -215,28 +273,20 @@ const Desafio10x10 = () => {
             colorScheme="green"
             leftIcon={<FaSave />}
             onClick={() => handleSalvarJogo()}
-            w="30%"
-            isDisabled={jogosListados.length === 10}
+            w="50%"
           >
-            Salvar
+            Salvar Jogo
           </Button>
           <Button
             colorScheme="orange"
             leftIcon={<FaSave />}
             onClick={() => handleRemoverJogo()}
-            w="30%"
+            w="50%"
             isDisabled={jogoEdicao.id === 0}
           >
             Remover Jogo
           </Button>
         </HStack>
-        {jogosListados.length === 10 ? (
-          <Text color="orange.500" fontSize="12px" w="100%">
-            Número máximo de jogos listados
-          </Text>
-        ) : (
-          ""
-        )}
       </VStack>
     );
   }, [jogoEdicao]);
@@ -253,32 +303,44 @@ const Desafio10x10 = () => {
         <DrawerOverlay onClick={handleCloseDrawer} />
         <DrawerContent>
           <DrawerCloseButton />
-          <DrawerHeader>Adicionar Jogo</DrawerHeader>
+          <DrawerHeader>
+            {jogoEdicao.id === 0 ? "Adicionar" : "Editar"} Jogo
+          </DrawerHeader>
           <DrawerBody>{EdicaoJogo}</DrawerBody>
         </DrawerContent>
       </Drawer>
       <Flex
         w={{ lg: "1300px", md: "100%", sm: "100%" }}
         maxW="100%"
+        minH="60vh"
         alignItems="center"
         flexDirection="column"
-        height="60vh"
         py="20px"
         m="0 auto"
       >
         <Flex justifyContent="space-between" align="center" w="100%">
-          <Heading size="lg">Desafio 10x10</Heading>
-          <Box>
-            <Button
-              leftIcon={<FaPlus />}
-              colorScheme="blue"
-              size="sm"
-              ref={btnRef}
-              onClick={() => handleAbrirEdicaoJogo()}
-            >
-              Adicionar Jogo
-            </Button>
-          </Box>
+          <Heading fontSize={{ md: "32px", sm: "22px" }}>Desafio 10x10</Heading>
+          <Flex alignItems="center" justifyContent="flex-end" w="50%">
+            <ButtonGroup>
+              <Button
+                display={{ md: "block", sm: "none" }}
+                size="sm"
+                isDisabled
+              >
+                {jogosListados.length}/10
+              </Button>
+              <Button
+                leftIcon={<FaPlus />}
+                colorScheme="blue"
+                size="sm"
+                ref={btnRef}
+                onClick={() => handleAbrirEdicaoJogo()}
+                isDisabled={jogosListados.length >= 10}
+              >
+                Adicionar Jogo
+              </Button>
+            </ButtonGroup>
+          </Flex>
         </Flex>
         <Flex mt="40px" w="100%">
           <Table>

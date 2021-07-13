@@ -1,6 +1,6 @@
 export interface IJogosProps {
   id: number;
   nome: string;
-  partidas: number;
+  partidas: number | string;
   categoria: Array<number>;
 }

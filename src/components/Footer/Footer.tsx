@@ -2,7 +2,7 @@ import { Text, Flex } from "@chakra-ui/react";
 
 const Footer = () => {
   return (
-    <Flex as="footer" justifyContent="center" p="20px 20px">
+    <Flex as="footer" justifyContent="center" p="40px 20px">
       <Flex
         fontSize="9px"
         letterSpacing="1.2px"
