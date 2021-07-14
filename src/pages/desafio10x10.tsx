@@ -316,7 +316,7 @@ const Desafio10x10 = () => {
             </TColumn>
             <TColumnButtons w="20%" alignItems="center">
               <HStack
-                pt={{ md: "", sm: "10px" }}
+                pt={{ md: "0px", sm: "10px" }}
                 spacing="20px"
                 justifyContent={{ md: "center", sm: "space-between" }}
                 w="100%"
