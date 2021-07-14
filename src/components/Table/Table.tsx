@@ -89,7 +89,7 @@ export function TRow({ children, ...rest }) {
       minH="40px"
       fontSize="14px"
       transition="0.5s all"
-      padding="10px 0"
+      padding={{ md: "10px 0", sm: "2px 0" }}
       flexDirection={{ md: "initial", sm: "column" }}
       alignItems={{ md: "stretch", sm: "flex-start" }}
       justifyContent={{ md: "initial", sm: "flex-start" }}

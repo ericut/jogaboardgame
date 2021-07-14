@@ -22,10 +22,10 @@ const TermosDeUso = () => {
       <Flex mt={{ md: "40px", sm: "10px" }} w="100%" flexDirection="column">
         <Text pb="10px">
           Esta aplicação utiliza "localStorage" do navegador para armezenar
-          todos os dados da listagem.
+          todos os dados cadastrados.
           <br />
-          Estes dados podem ser perdidos caso o usuário limpe o cache do
-          navegador.
+          Estes dados podem ser perdidos caso o usuário limpe o cache ou o
+          armazenamento local do navegador.
         </Text>
         <Text pb="10px">
           Esta aplicação possui aberto, com repositório no Github do seu

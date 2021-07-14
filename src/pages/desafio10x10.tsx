@@ -18,7 +18,6 @@ import {
   Checkbox,
   Stack,
   useToast,
-  useBreakpointValue,
   useDisclosure,
 } from "@chakra-ui/react";
 import {
@@ -56,7 +55,14 @@ import {
 } from "../components/Table/Table";
 //icones
 import { GiMeeple } from "react-icons/gi";
-import { FaEdit, FaSave, FaPlus, FaMinus } from "react-icons/fa";
+import {
+  FaEdit,
+  FaSave,
+  FaPlus,
+  FaMinus,
+  FaEye,
+  FaEyeSlash,
+} from "react-icons/fa";
 import { AiTwotoneCrown } from "react-icons/ai";
 import { MdHelp } from "react-icons/md";
 //props
@@ -70,6 +76,7 @@ const Desafio10x10 = () => {
   const toast = useToast();
   const [drawerEdicaoJogo, setDrawerEdicaoJogo] = useState(false);
   const [modalEdicaoJogo, setModalEdicaoJogo] = useState(false);
+  const [showHUD, setShowHUD] = useState(true);
 
   const [jogosListados, setJogosListados] = useState<IJogosProps[] | undefined>(
     jogosData
@@ -285,7 +292,11 @@ const Desafio10x10 = () => {
         return (
           <TRow key={item.id}>
             <TColumn w="30%" flexDirection="column" justifyContent="center">
-              <Text fontSize="22px" fontWeight="bold" letterSpacing="-0.7px">
+              <Text
+                fontSize={{ md: "22px", sm: "16px" }}
+                fontWeight="bold"
+                letterSpacing="-0.7px"
+              >
                 {item.nome}
               </Text>
               <Stack
@@ -296,7 +307,7 @@ const Desafio10x10 = () => {
               </Stack>
             </TColumn>
             <TColumn w="50%" alignItems="center">
-              <Flex fontSize={{ md: "34px", sm: "25px" }} alignItems="center">
+              <Flex fontSize={{ md: "34px", sm: "22px" }} alignItems="center">
                 {NumeroPartidas(item.partidas)}
                 {item.partidas === 10 ? (
                   <Flex color="yellow.500" ml="10px" alignItems="center">
@@ -315,46 +326,50 @@ const Desafio10x10 = () => {
               </Flex>
             </TColumn>
             <TColumnButtons w="20%" alignItems="center">
-              <HStack
-                pt={{ md: "0px", sm: "10px" }}
-                spacing="20px"
-                justifyContent={{ md: "center", sm: "space-between" }}
-                w="100%"
-              >
-                <Flex>
-                  <ButtonGroup size="sm" isAttached>
+              {showHUD ? (
+                <HStack
+                  pt={{ md: "0px", sm: "5px" }}
+                  spacing="20px"
+                  justifyContent={{ md: "center", sm: "space-between" }}
+                  w="100%"
+                >
+                  <Flex>
+                    <ButtonGroup size="sm" isAttached>
+                      <IconButton
+                        aria-label="Retirar Jogada"
+                        colorScheme="orange"
+                        variant="ghost"
+                        icon={<FaMinus />}
+                        onClick={() => handleRetirarPartida(item)}
+                        isDisabled={item.partidas === 0}
+                      />
+                      <Button w="52px" isDisabled>
+                        {item.partidas}
+                      </Button>
+                      <IconButton
+                        aria-label="Acrescentar Jogada"
+                        colorScheme="green"
+                        variant="ghost"
+                        icon={<FaPlus />}
+                        onClick={() => handleAcrescentarPartida(item)}
+                        isDisabled={item.partidas === 10}
+                      />
+                    </ButtonGroup>
+                  </Flex>
+                  <Flex>
                     <IconButton
-                      aria-label="Retirar Jogada"
-                      colorScheme="orange"
+                      size="sm"
+                      colorScheme="blue"
                       variant="ghost"
-                      icon={<FaMinus />}
-                      onClick={() => handleRetirarPartida(item)}
-                      isDisabled={item.partidas === 0}
+                      aria-label="Editar Jogo"
+                      icon={<FaEdit />}
+                      onClick={() => handleAbrirEdicaoJogo(item)}
                     />
-                    <Button w="52px" isDisabled>
-                      {item.partidas}
-                    </Button>
-                    <IconButton
-                      aria-label="Acrescentar Jogada"
-                      colorScheme="green"
-                      variant="ghost"
-                      icon={<FaPlus />}
-                      onClick={() => handleAcrescentarPartida(item)}
-                      isDisabled={item.partidas === 10}
-                    />
-                  </ButtonGroup>
-                </Flex>
-                <Flex>
-                  <IconButton
-                    size="sm"
-                    colorScheme="blue"
-                    variant="ghost"
-                    aria-label="Editar Jogo"
-                    icon={<FaEdit />}
-                    onClick={() => handleAbrirEdicaoJogo(item)}
-                  />
-                </Flex>
-              </HStack>
+                  </Flex>
+                </HStack>
+              ) : (
+                ""
+              )}
             </TColumnButtons>
           </TRow>
         );
@@ -367,7 +382,7 @@ const Desafio10x10 = () => {
         </TColumn>
       </TRow>
     );
-  }, [jogosListados, categoriaListagem]);
+  }, [jogosListados, categoriaListagem, showHUD]);
 
   const EdicaoJogo = useMemo(() => {
     return (
@@ -559,6 +574,14 @@ const Desafio10x10 = () => {
           </Flex>
           <Flex alignItems="center" justifyContent="flex-end" w="40%">
             <ButtonGroup>
+              <IconButton
+                aria-label="Adicionar Jogo"
+                icon={showHUD ? <FaEye /> : <FaEyeSlash />}
+                colorScheme="gray"
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowHUD(!showHUD)}
+              />
               <Button
                 display={{ md: "block", sm: "none" }}
                 size="sm"
@@ -567,6 +590,7 @@ const Desafio10x10 = () => {
                 {jogosListados.length}/10
               </Button>
               <Button
+                display={{ md: "flex", sm: "none" }}
                 leftIcon={<FaPlus />}
                 colorScheme="blue"
                 size="sm"
@@ -575,6 +599,15 @@ const Desafio10x10 = () => {
               >
                 Adicionar Jogo
               </Button>
+              <IconButton
+                display={{ md: "none", sm: "flex" }}
+                aria-label="Adicionar Jogo"
+                icon={<FaPlus />}
+                colorScheme="blue"
+                size="sm"
+                onClick={() => handleAbrirEdicaoJogo()}
+                isDisabled={jogosListados.length >= 10}
+              />
             </ButtonGroup>
           </Flex>
         </Flex>
@@ -584,7 +617,9 @@ const Desafio10x10 = () => {
               <THeader display={{ md: "flex", sm: "none" }}>
                 <THead w="30%">Jogos</THead>
                 <THead w="50%">Partidas</THead>
-                <THeadButtons w="20%">Controle | Editar</THeadButtons>
+                <THeadButtons w="20%">
+                  {showHUD ? "Controle | Editar" : ""}
+                </THeadButtons>
               </THeader>
               <TBody>{ListagemJogos}</TBody>
             </Table>
