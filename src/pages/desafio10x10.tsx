@@ -34,12 +34,21 @@ import {
   DrawerContent,
   DrawerCloseButton,
   useDisclosure,
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverHeader,
+  PopoverBody,
+  PopoverFooter,
+  PopoverArrow,
+  PopoverCloseButton,
 } from "@chakra-ui/react";
 import { Table, Thead, Tr, Th, Td, Tbody } from "@chakra-ui/react";
 //icones
 import { GiMeeple } from "react-icons/gi";
 import { FaEdit, FaSave, FaPlus, FaMinus } from "react-icons/fa";
 import { AiTwotoneCrown } from "react-icons/ai";
+import { MdHelp } from "react-icons/md";
 //props
 import { IJogosProps, ICategoriasProps } from "../interfaces";
 //data
@@ -442,6 +451,45 @@ const Desafio10x10 = () => {
     );
   };
 
+  const Informacoes = (tipo) => {
+    let informacao = <></>;
+    if (tipo === "desafio10x10") {
+      informacao = (
+        <>
+          <PopoverArrow />
+          <PopoverCloseButton />
+          <PopoverHeader fontWeight="bold">
+            O que é o Desafio 10x10?
+          </PopoverHeader>
+          <PopoverBody>
+            Basicamente é a escolha de 10 jogos e jogar cada um 10 vezes, o
+            período padrão para as 100 sessões é de um ano, e avança na trilha
+            conforme finaliza cada sessão, até completar todas.
+            <br />O desafio pode ser feito de forma leve, podendo mudar qualquer
+            um dos jogos, ou de forma pesada, onde não poderá alterar a lista
+            após finalizar todas as sessões.
+          </PopoverBody>
+        </>
+      );
+    }
+    return (
+      <>
+        <PopoverTrigger>
+          <Text
+            fontSize="16px"
+            px="10px"
+            cursor="pointer"
+            position="relative"
+            color="blue.200"
+          >
+            <MdHelp />
+          </Text>
+        </PopoverTrigger>
+        <PopoverContent>{informacao}</PopoverContent>
+      </>
+    );
+  };
+
   return (
     <>
       {modalEdicaoJogo ? (
@@ -482,9 +530,12 @@ const Desafio10x10 = () => {
         m="0 auto"
       >
         <Flex justifyContent="space-between" align="center" w="100%">
-          <Heading fontWeight="bold" fontSize={{ md: "32px", sm: "22px" }}>
-            Desafio 10x10
-          </Heading>
+          <Flex alignItems="center">
+            <Heading fontWeight="bold" fontSize={{ md: "32px", sm: "22px" }}>
+              Desafio 10x10
+            </Heading>
+            <Popover placement="bottom">{Informacoes("desafio10x10")}</Popover>
+          </Flex>
           <Flex alignItems="center" justifyContent="flex-end" w="50%">
             <ButtonGroup>
               <Button

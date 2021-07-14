@@ -54,7 +54,7 @@ const Footer = () => {
           href="https://github.com/ericut/boardgame10"
           target="_blank"
         >
-          Eric Li
+          Eric Frank Li
         </a>
       </Flex>
     </Flex>
