@@ -1,4 +1,4 @@
-import { Text, Flex, Icon, HStack } from "@chakra-ui/react";
+import { Text, Flex, HStack } from "@chakra-ui/react";
 import { FaGithub, FaLinkedin, FaInstagram } from "react-icons/fa";
 
 const Footer = () => {
@@ -26,7 +26,12 @@ const Footer = () => {
         <HStack pb="20px">
           {redesSociais.map((item) => {
             return (
-              <a className="socialIcons" href={item.link} target="_blank">
+              <a
+                key={item.nome}
+                className="socialIcons"
+                href={item.link}
+                target="_blank"
+              >
                 <Text fontSize="24px">{item.icone}</Text>
               </a>
             );

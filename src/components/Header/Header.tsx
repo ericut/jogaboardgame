@@ -28,10 +28,14 @@ const Header = () => {
   const btnRef = useRef();
   const MenuBGColor = useColorModeValue("gray.100", "gray.700");
 
+  // function handleLimparDados() {
+  //   localStorage.removeItem("listagemJogos");
+  // }
+
   const MenuItens = () => {
     return (
       <>
-        <Link href="/desafio10x10">
+        <Link href="/desafio10x10" passHref>
           <Button variant="ghost">Desafio 10x10</Button>
         </Link>
         {/* <Link href="/pontuacoes">
@@ -56,6 +60,16 @@ const Header = () => {
           <DrawerBody>
             <VStack justifyContent="" alignItems="">
               <MenuItens />
+              {/* <Flex pt="100px" w="100%">
+                <Button
+                  variant="outline"
+                  colorScheme="red"
+                  w="100%"
+                  onClick={() => handleLimparDados()}
+                >
+                  Limpar Dados
+                </Button>
+              </Flex> */}
             </VStack>
           </DrawerBody>
         </DrawerContent>

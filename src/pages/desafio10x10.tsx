@@ -1,20 +1,9 @@
-import { useMemo, useRef, useState, useEffect } from "react";
+import { useMemo, useState, useEffect } from "react";
+import { v4 as uuidv4 } from "uuid";
+//chakra
 import {
-  Table,
-  Thead,
-  Tr,
-  Th,
-  Td,
-  Tbody,
   Text,
   Box,
-  Drawer,
-  DrawerBody,
-  DrawerHeader,
-  DrawerOverlay,
-  DrawerContent,
-  DrawerCloseButton,
-  useDisclosure,
   ButtonGroup,
   Button,
   IconButton,
@@ -28,17 +17,41 @@ import {
   NumberInputField,
   Checkbox,
   Stack,
+  useToast,
 } from "@chakra-ui/react";
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  Drawer,
+  DrawerBody,
+  DrawerHeader,
+  DrawerOverlay,
+  DrawerContent,
+  DrawerCloseButton,
+  useDisclosure,
+} from "@chakra-ui/react";
+import { Table, Thead, Tr, Th, Td, Tbody } from "@chakra-ui/react";
+//icones
 import { GiMeeple } from "react-icons/gi";
 import { FaEdit, FaSave, FaPlus, FaMinus } from "react-icons/fa";
 import { AiTwotoneCrown } from "react-icons/ai";
+//props
 import { IJogosProps, ICategoriasProps } from "../interfaces";
+//data
 import { jogosData } from "../data/jogosData";
 import { categoriasData } from "../data/categoriasData";
 
 const Desafio10x10 = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const btnRef = useRef();
+  const toast = useToast();
+  const [drawerEdicaoJogo, setDrawerEdicaoJogo] = useState(false);
+  const [modalEdicaoJogo, setModalEdicaoJogo] = useState(false);
+
   const [jogosListados, setJogosListados] = useState<IJogosProps[] | undefined>(
     jogosData
   );
@@ -67,6 +80,7 @@ const Desafio10x10 = () => {
 
   function handleAbrirEdicaoJogo(item?) {
     onOpen();
+    setDrawerEdicaoJogo(true);
     if (item) {
       setJogoEdicao(item);
     } else {
@@ -74,14 +88,21 @@ const Desafio10x10 = () => {
     }
   }
 
-  function handleCloseDrawer() {
+  function handleFecharDrawer() {
     onClose();
+    setTimeout(() => {
+      setDrawerEdicaoJogo(false);
+    }, 100);
     setJogoEdicao({
       id: 0,
       nome: "",
       partidas: "",
       categoria: [],
     });
+  }
+
+  function handleFecharModal() {
+    setModalEdicaoJogo(false);
   }
 
   function handleEditarCategorias(event) {
@@ -156,51 +177,59 @@ const Desafio10x10 = () => {
           return item;
         })
       );
+      toast({
+        title: `Jogo atualizado: ${jogoEdicao.nome}`,
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+      handleFecharDrawer();
     } else {
       if (jogoEdicao.nome !== "") {
-        jogoEdicao.id = jogosListados.length + 1;
+        jogoEdicao.id = uuidv4();
         jogoEdicao.partidas = jogoEdicao.partidas ? jogoEdicao.partidas : 0;
         setJogosListados([...jogosListados, jogoEdicao]);
+        toast({
+          title: `Jogo adicionado: ${jogoEdicao.nome}`,
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+        handleFecharDrawer();
+      } else {
+        toast({
+          title: "Insira um nome para o jogo!",
+          status: "warning",
+          duration: 3000,
+          isClosable: true,
+        });
       }
     }
-    handleCloseDrawer();
+  }
+
+  function handleConfirmarRemocaoJogo() {
+    setModalEdicaoJogo(true);
   }
 
   function handleRemoverJogo() {
     setJogosListados(jogosListados.filter((item) => item.id !== jogoEdicao.id));
-    handleCloseDrawer();
+    handleFecharModal();
+    handleFecharDrawer();
   }
 
   const NumeroPartidas = (partidas) => {
-    // partidas calculadas
-    let partidasASeremJogadas = 10;
-    let partidasNaoJogadas = Array.from(
-      { length: partidasASeremJogadas - partidas },
-      (v, k) => k + 1
-    );
-    let partidasJogadas = Array.from({ length: partidas }, (v, k) => k + 1);
-    // partidas mapeadas
-    let partidasJogadasRender = partidasJogadas.map((item) => {
+    let partidasTotais = Array.from({ length: 10 }, (v, k) => k + 1);
+    let partidasJogadas = partidasTotais.map((item, index) => {
       return (
-        <Text color="green.500" key={item}>
+        <Text
+          color={index + 1 <= partidas ? "green.500" : "gray.500"}
+          key={item}
+        >
           <GiMeeple />
         </Text>
       );
     });
-    let partidasNaoJogadasRender = partidasNaoJogadas.map((item) => {
-      return (
-        <Text color="gray.500" key={item}>
-          <GiMeeple />
-        </Text>
-      );
-    });
-    //
-    return (
-      <>
-        {partidasJogadasRender}
-        {partidasNaoJogadasRender}
-      </>
-    );
+    return <>{partidasJogadas}</>;
   };
 
   const ListagemJogos = useMemo(() => {
@@ -219,6 +248,7 @@ const Desafio10x10 = () => {
             .map((item) => {
               return (
                 <Badge
+                  key={item.nome}
                   fontSize="9px"
                   mr="5px"
                   colorScheme={corPorCategoria(item.nome)}
@@ -311,81 +341,137 @@ const Desafio10x10 = () => {
 
   const EdicaoJogo = useMemo(() => {
     return (
-      <VStack>
-        <Input
-          placeholder="Nome do Jogo"
-          value={jogoEdicao.nome}
-          onChange={(event) =>
-            setJogoEdicao({ ...jogoEdicao, nome: event.target.value })
-          }
-        />
-        <NumberInput
-          w="100%"
-          value={jogoEdicao.partidas}
-          min={0}
-          max={10}
-          onChange={(value) =>
-            setJogoEdicao({ ...jogoEdicao, partidas: +value })
-          }
-        >
-          <NumberInputField placeholder="Número de Partidas Iniciais" />
-        </NumberInput>
-        <Stack w="100%">
-          <Text>Categoria:</Text>
-          {categoriaListagem.map((item) => {
-            return (
-              <Checkbox
-                key={item.id}
-                value={item.id}
-                isChecked={jogoEdicao.categoria.includes(item.id)}
-                onChange={(event) => handleEditarCategorias(event)}
+      <>
+        <DrawerCloseButton />
+        <DrawerHeader>
+          {jogoEdicao.id === 0 ? "Adicionar" : "Editar"} Jogo
+        </DrawerHeader>
+        <DrawerBody>
+          <VStack>
+            <Input
+              placeholder="Nome do Jogo"
+              value={jogoEdicao.nome}
+              onChange={(event) =>
+                setJogoEdicao({ ...jogoEdicao, nome: event.target.value })
+              }
+            />
+            <NumberInput
+              w="100%"
+              value={jogoEdicao.partidas}
+              min={0}
+              max={10}
+              onChange={(value) =>
+                setJogoEdicao({ ...jogoEdicao, partidas: +value })
+              }
+            >
+              <NumberInputField placeholder="Número de Partidas Iniciais" />
+            </NumberInput>
+            <Stack w="100%" shouldWrapChildren={true}>
+              <Text mt="10px">Categorias:</Text>
+              <>
+                {categoriaListagem.map((item) => {
+                  return (
+                    <Checkbox
+                      w="50%"
+                      key={item.id}
+                      value={item.id}
+                      isChecked={jogoEdicao.categoria.includes(item.id)}
+                      onChange={(event) => handleEditarCategorias(event)}
+                      mb="5px"
+                    >
+                      {item.nome}
+                    </Checkbox>
+                  );
+                })}
+              </>
+            </Stack>
+            <HStack w="100%" pt="30px">
+              <Button
+                colorScheme="green"
+                leftIcon={<FaSave />}
+                onClick={() => handleSalvarJogo()}
+                w="50%"
               >
-                {item.nome}
-              </Checkbox>
-            );
-          })}
-        </Stack>
-        <HStack w="100%" pt="30px">
-          <Button
-            colorScheme="green"
-            leftIcon={<FaSave />}
-            onClick={() => handleSalvarJogo()}
-            w="50%"
-          >
-            Salvar Jogo
-          </Button>
-          <Button
-            colorScheme="orange"
-            leftIcon={<FaSave />}
-            onClick={() => handleRemoverJogo()}
-            w="50%"
-            isDisabled={jogoEdicao.id === 0}
-          >
-            Remover Jogo
-          </Button>
-        </HStack>
-      </VStack>
+                Salvar Jogo
+              </Button>
+              <Button
+                colorScheme="orange"
+                leftIcon={<FaSave />}
+                onClick={() => handleConfirmarRemocaoJogo()}
+                w="50%"
+                isDisabled={jogoEdicao.id === 0}
+              >
+                Remover Jogo
+              </Button>
+            </HStack>
+          </VStack>
+        </DrawerBody>
+      </>
     );
   }, [jogoEdicao]);
 
+  const RemoverJogo = () => {
+    return (
+      <>
+        <ModalHeader>Remover Jogo da Lista</ModalHeader>
+        <ModalCloseButton />
+        <ModalBody>
+          <Text>Deseja remover este jogo da sua lista?</Text>
+          <Text fontWeight="bold">{jogoEdicao.nome}</Text>
+        </ModalBody>
+        <ModalFooter>
+          <HStack w="100%">
+            <Button
+              variant="outline"
+              colorScheme="orange"
+              w="50%"
+              onClick={() => handleRemoverJogo()}
+            >
+              Remover Jogo
+            </Button>
+            <Button
+              colorScheme="blue"
+              w="50%"
+              onClick={() => handleFecharModal()}
+            >
+              Cancelar
+            </Button>
+          </HStack>
+        </ModalFooter>
+      </>
+    );
+  };
+
   return (
     <>
-      <Drawer
-        isOpen={isOpen}
-        placement="right"
-        onClose={handleCloseDrawer}
-        finalFocusRef={btnRef}
-        size="lg"
-      >
-        <DrawerOverlay onClick={handleCloseDrawer} />
-        <DrawerContent>
-          <DrawerCloseButton />
-          <DrawerHeader>
-            {jogoEdicao.id === 0 ? "Adicionar" : "Editar"} Jogo
-          </DrawerHeader>
-          <DrawerBody>{EdicaoJogo}</DrawerBody>
-        </DrawerContent>
-      </Drawer>
+      {modalEdicaoJogo ? (
+        <Modal
+          isOpen={isOpen}
+          onClose={onClose}
+          motionPreset="slideInBottom"
+          isCentered
+        >
+          <ModalOverlay />
+          <ModalContent>{RemoverJogo()}</ModalContent>
+        </Modal>
+      ) : (
+        ""
+      )}
+
+      {drawerEdicaoJogo ? (
+        <Drawer
+          isOpen={isOpen}
+          placement="right"
+          onClose={handleFecharDrawer}
+          size="lg"
+        >
+          <DrawerOverlay onClick={handleFecharDrawer} />
+          <DrawerContent>{EdicaoJogo}</DrawerContent>
+        </Drawer>
+      ) : (
+        ""
+      )}
+
       <Flex
         w={{ lg: "1300px", md: "100%", sm: "100%" }}
         maxW="100%"
@@ -396,7 +482,9 @@ const Desafio10x10 = () => {
         m="0 auto"
       >
         <Flex justifyContent="space-between" align="center" w="100%">
-          <Heading fontSize={{ md: "32px", sm: "22px" }}>Desafio 10x10</Heading>
+          <Heading fontWeight="bold" fontSize={{ md: "32px", sm: "22px" }}>
+            Desafio 10x10
+          </Heading>
           <Flex alignItems="center" justifyContent="flex-end" w="50%">
             <ButtonGroup>
               <Button
@@ -410,7 +498,6 @@ const Desafio10x10 = () => {
                 leftIcon={<FaPlus />}
                 colorScheme="blue"
                 size="sm"
-                ref={btnRef}
                 onClick={() => handleAbrirEdicaoJogo()}
                 isDisabled={jogosListados.length >= 10}
               >
