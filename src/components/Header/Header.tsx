@@ -27,11 +27,6 @@ const Header = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const btnRef = useRef();
   const MenuBGColor = useColorModeValue("gray.100", "gray.700");
-
-  // function handleLimparDados() {
-  //   localStorage.removeItem("listagemJogos");
-  // }
-
   const MenuItens = () => {
     return (
       <>
@@ -60,23 +55,13 @@ const Header = () => {
           <DrawerBody>
             <VStack justifyContent="" alignItems="">
               <MenuItens />
-              {/* <Flex pt="100px" w="100%">
-                <Button
-                  variant="outline"
-                  colorScheme="red"
-                  w="100%"
-                  onClick={() => handleLimparDados()}
-                >
-                  Limpar Dados
-                </Button>
-              </Flex> */}
             </VStack>
           </DrawerBody>
         </DrawerContent>
       </Drawer>
       <Flex
         as="header"
-        m="0 0 20px"
+        m={{ md: "0 0 20px", sm: "0 0 5px" }}
         p="0 20px"
         maxW="100%"
         justifyContent="center"
@@ -86,9 +71,13 @@ const Header = () => {
           w={{ lg: "1300px", sm: "100%" }}
           justifyContent="space-between"
           alignItems="center"
-          h="90px"
+          h={{ md: "90px", sm: "60px" }}
         >
-          <Flex w="200px" alignItems="center" cursor="pointer">
+          <Flex
+            w={{ md: "200px", sm: "120px" }}
+            alignItems="center"
+            cursor="pointer"
+          >
             <Link href="/">
               <Image
                 src={colorMode === "light" ? Logo : LogoWhite}

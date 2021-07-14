@@ -18,6 +18,8 @@ import {
   Checkbox,
   Stack,
   useToast,
+  useBreakpointValue,
+  useDisclosure,
 } from "@chakra-ui/react";
 import {
   Modal,
@@ -33,7 +35,6 @@ import {
   DrawerOverlay,
   DrawerContent,
   DrawerCloseButton,
-  useDisclosure,
   Popover,
   PopoverTrigger,
   PopoverContent,
@@ -287,17 +288,24 @@ const Desafio10x10 = () => {
               <Text fontSize="22px" fontWeight="bold" letterSpacing="-0.7px">
                 {item.nome}
               </Text>
-              <Stack shouldWrapChildren={true}>
+              <Stack
+                display={{ md: "flex", sm: "none" }}
+                shouldWrapChildren={true}
+              >
                 {ListagemCategorias(item.categoria)}
               </Stack>
             </TColumn>
             <TColumn w="50%" alignItems="center">
-              <Flex fontSize="34px" alignItems="center">
+              <Flex fontSize={{ md: "34px", sm: "25px" }} alignItems="center">
                 {NumeroPartidas(item.partidas)}
                 {item.partidas === 10 ? (
                   <Flex color="yellow.500" ml="10px" alignItems="center">
                     <AiTwotoneCrown />
-                    <Text fontSize="10px" textTransform="uppercase">
+                    <Text
+                      display={{ md: "flex", sm: "none" }}
+                      fontSize="10px"
+                      textTransform="uppercase"
+                    >
                       Finalizado!
                     </Text>
                   </Flex>
@@ -306,38 +314,47 @@ const Desafio10x10 = () => {
                 )}
               </Flex>
             </TColumn>
-            <TColumnButtons w="15%" alignItems="center">
-              <Flex justifyContent="center" w="100%">
-                <ButtonGroup size="md" isAttached>
+            <TColumnButtons w="20%" alignItems="center">
+              <HStack
+                pt={{ md: "", sm: "10px" }}
+                spacing="20px"
+                justifyContent={{ md: "center", sm: "space-between" }}
+                w="100%"
+              >
+                <Flex>
+                  <ButtonGroup size="sm" isAttached>
+                    <IconButton
+                      aria-label="Retirar Jogada"
+                      colorScheme="orange"
+                      variant="ghost"
+                      icon={<FaMinus />}
+                      onClick={() => handleRetirarPartida(item)}
+                      isDisabled={item.partidas === 0}
+                    />
+                    <Button w="52px" isDisabled>
+                      {item.partidas}
+                    </Button>
+                    <IconButton
+                      aria-label="Acrescentar Jogada"
+                      colorScheme="green"
+                      variant="ghost"
+                      icon={<FaPlus />}
+                      onClick={() => handleAcrescentarPartida(item)}
+                      isDisabled={item.partidas === 10}
+                    />
+                  </ButtonGroup>
+                </Flex>
+                <Flex>
                   <IconButton
-                    aria-label="Retirar Jogada"
-                    colorScheme="orange"
-                    icon={<FaMinus />}
-                    onClick={() => handleRetirarPartida(item)}
-                    isDisabled={item.partidas === 0}
+                    size="sm"
+                    colorScheme="blue"
+                    variant="ghost"
+                    aria-label="Editar Jogo"
+                    icon={<FaEdit />}
+                    onClick={() => handleAbrirEdicaoJogo(item)}
                   />
-                  <Button w="52px" isDisabled>
-                    {item.partidas}
-                  </Button>
-                  <IconButton
-                    aria-label="Acrescentar Jogada"
-                    colorScheme="green"
-                    icon={<FaPlus />}
-                    onClick={() => handleAcrescentarPartida(item)}
-                    isDisabled={item.partidas === 10}
-                  />
-                </ButtonGroup>
-              </Flex>
-            </TColumnButtons>
-            <TColumnButtons w="5%" alignItems="center">
-              <Flex justifyContent="center">
-                <IconButton
-                  colorScheme="blue"
-                  aria-label="Editar Jogo"
-                  icon={<FaEdit />}
-                  onClick={() => handleAbrirEdicaoJogo(item)}
-                />
-              </Flex>
+                </Flex>
+              </HStack>
             </TColumnButtons>
           </TRow>
         );
@@ -530,17 +547,17 @@ const Desafio10x10 = () => {
         minH="60vh"
         alignItems="center"
         flexDirection="column"
-        py="20px"
+        py={{ md: "20px", sm: "10px" }}
         m="0 auto"
       >
         <Flex justifyContent="space-between" align="center" w="100%">
-          <Flex alignItems="center">
-            <Heading fontWeight="bold" fontSize={{ md: "32px", sm: "22px" }}>
+          <Flex alignItems="center" w="60%">
+            <Heading fontWeight="bold" fontSize={{ md: "32px", sm: "20px" }}>
               Desafio 10x10
             </Heading>
             <Popover placement="bottom">{Informacoes("desafio10x10")}</Popover>
           </Flex>
-          <Flex alignItems="center" justifyContent="flex-end" w="50%">
+          <Flex alignItems="center" justifyContent="flex-end" w="40%">
             <ButtonGroup>
               <Button
                 display={{ md: "block", sm: "none" }}
@@ -561,18 +578,13 @@ const Desafio10x10 = () => {
             </ButtonGroup>
           </Flex>
         </Flex>
-        <Flex mt="40px" w="100%">
+        <Flex mt={{ md: "40px", sm: "10px" }} w="100%">
           <Box overflowX="auto" w="100%">
             <Table>
-              <THeader>
-                <THead w="30%">Jogo</THead>
+              <THeader display={{ md: "flex", sm: "none" }}>
+                <THead w="30%">Jogos</THead>
                 <THead w="50%">Partidas</THead>
-                <THead w="15%">
-                  <Flex justifyContent="center">Controle</Flex>
-                </THead>
-                <THeadButtons w="5%">
-                  <Flex justifyContent="center">Ações</Flex>
-                </THeadButtons>
+                <THeadButtons w="20%">Controle | Editar</THeadButtons>
               </THeader>
               <TBody>{ListagemJogos}</TBody>
             </Table>
