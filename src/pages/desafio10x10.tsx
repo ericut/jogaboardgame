@@ -19,6 +19,7 @@ import {
   Stack,
   useToast,
   useDisclosure,
+  DrawerFooter,
 } from "@chakra-ui/react";
 import {
   Modal,
@@ -430,27 +431,29 @@ const Desafio10x10 = () => {
                 })}
               </>
             </Stack>
-            <HStack w="100%" pt="30px">
-              <Button
-                colorScheme="green"
-                leftIcon={<FaSave />}
-                onClick={() => handleSalvarJogo()}
-                w="50%"
-              >
-                Salvar Jogo
-              </Button>
-              <Button
-                colorScheme="orange"
-                leftIcon={<FaSave />}
-                onClick={() => handleConfirmarRemocaoJogo()}
-                w="50%"
-                isDisabled={jogoEdicao.id === 0}
-              >
-                Remover Jogo
-              </Button>
-            </HStack>
           </VStack>
         </DrawerBody>
+        <DrawerFooter>
+          <HStack w="100%">
+            <Button
+              colorScheme="orange"
+              leftIcon={<FaSave />}
+              onClick={() => handleConfirmarRemocaoJogo()}
+              w="50%"
+              isDisabled={jogoEdicao.id === 0}
+            >
+              Remover Jogo
+            </Button>
+            <Button
+              colorScheme="green"
+              leftIcon={<FaSave />}
+              onClick={() => handleSalvarJogo()}
+              w="50%"
+            >
+              Salvar Jogo
+            </Button>
+          </HStack>
+        </DrawerFooter>
       </>
     );
   }, [jogoEdicao]);
