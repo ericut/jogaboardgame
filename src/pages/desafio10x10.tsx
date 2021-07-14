@@ -462,12 +462,12 @@ const Desafio10x10 = () => {
             O que é o Desafio 10x10?
           </PopoverHeader>
           <PopoverBody>
-            Basicamente é a escolha de 10 jogos e jogar cada um 10 vezes, o
-            período padrão para as 100 sessões é de um ano, e avança na trilha
-            conforme finaliza cada sessão, até completar todas.
+            Escolha de 10 jogos e jogue cada um 10 vezes, o período padrão para
+            as 100 sessões é de um ano, e avança na trilha conforme finaliza
+            cada sessão.
             <br />O desafio pode ser feito de forma leve, podendo mudar qualquer
-            um dos jogos, ou de forma pesada, onde não poderá alterar a lista
-            após finalizar todas as sessões.
+            um dos jogos, ou de forma pesada onde não poderá alterar a lista dos
+            jogos no período.
           </PopoverBody>
         </>
       );
