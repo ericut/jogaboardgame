@@ -39,11 +39,20 @@ import {
   PopoverContent,
   PopoverHeader,
   PopoverBody,
-  PopoverFooter,
   PopoverArrow,
   PopoverCloseButton,
 } from "@chakra-ui/react";
-import { Table, Thead, Tr, Th, Td, Tbody } from "@chakra-ui/react";
+//componentes
+import {
+  Table,
+  THeader,
+  THead,
+  THeadButtons,
+  TBody,
+  TRow,
+  TColumn,
+  TColumnButtons,
+} from "../components/Table/Table";
 //icones
 import { GiMeeple } from "react-icons/gi";
 import { FaEdit, FaSave, FaPlus, FaMinus } from "react-icons/fa";
@@ -273,21 +282,16 @@ const Desafio10x10 = () => {
     return jogosListados.length !== 0 ? (
       jogosListados.map((item) => {
         return (
-          <Tr key={item.id}>
-            <Td>
-              <Text
-                fontSize="22px"
-                fontWeight="bold"
-                letterSpacing="-0.7px"
-                pb="5px"
-              >
+          <TRow key={item.id}>
+            <TColumn w="30%" flexDirection="column" justifyContent="center">
+              <Text fontSize="22px" fontWeight="bold" letterSpacing="-0.7px">
                 {item.nome}
               </Text>
               <Stack shouldWrapChildren={true}>
                 {ListagemCategorias(item.categoria)}
               </Stack>
-            </Td>
-            <Td>
+            </TColumn>
+            <TColumn w="50%" alignItems="center">
               <Flex fontSize="34px" alignItems="center">
                 {NumeroPartidas(item.partidas)}
                 {item.partidas === 10 ? (
@@ -301,8 +305,8 @@ const Desafio10x10 = () => {
                   <></>
                 )}
               </Flex>
-            </Td>
-            <Td>
+            </TColumn>
+            <TColumnButtons w="15%" alignItems="center">
               <Flex justifyContent="center" w="100%">
                 <ButtonGroup size="md" isAttached>
                   <IconButton
@@ -324,8 +328,8 @@ const Desafio10x10 = () => {
                   />
                 </ButtonGroup>
               </Flex>
-            </Td>
-            <Td>
+            </TColumnButtons>
+            <TColumnButtons w="5%" alignItems="center">
               <Flex justifyContent="center">
                 <IconButton
                   colorScheme="blue"
@@ -334,17 +338,17 @@ const Desafio10x10 = () => {
                   onClick={() => handleAbrirEdicaoJogo(item)}
                 />
               </Flex>
-            </Td>
-          </Tr>
+            </TColumnButtons>
+          </TRow>
         );
       })
     ) : (
-      <Tr>
-        <Td w="100%" colSpan={4} color="gray.400" fontSize="12px">
+      <TRow>
+        <TColumn w="100%" color="gray.400" fontSize="12px">
           Nenhum jogo encontrado. Clique no botão "Adicionar Jogo" para
           cadastrar!
-        </Td>
-      </Tr>
+        </TColumn>
+      </TRow>
     );
   }, [jogosListados, categoriaListagem]);
 
@@ -560,19 +564,17 @@ const Desafio10x10 = () => {
         <Flex mt="40px" w="100%">
           <Box overflowX="auto" w="100%">
             <Table>
-              <Thead>
-                <Tr>
-                  <Th w="30%">Jogo</Th>
-                  <Th w="50%">Partidas</Th>
-                  <Th w="15%">
-                    <Flex justifyContent="center">Controle</Flex>
-                  </Th>
-                  <Th w="5%">
-                    <Flex justifyContent="center">Ações</Flex>
-                  </Th>
-                </Tr>
-              </Thead>
-              <Tbody>{ListagemJogos}</Tbody>
+              <THeader>
+                <THead w="30%">Jogo</THead>
+                <THead w="50%">Partidas</THead>
+                <THead w="15%">
+                  <Flex justifyContent="center">Controle</Flex>
+                </THead>
+                <THeadButtons w="5%">
+                  <Flex justifyContent="center">Ações</Flex>
+                </THeadButtons>
+              </THeader>
+              <TBody>{ListagemJogos}</TBody>
             </Table>
           </Box>
         </Flex>
