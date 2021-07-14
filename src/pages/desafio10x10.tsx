@@ -303,7 +303,7 @@ const Desafio10x10 = () => {
                 display={{ md: "flex", sm: "none" }}
                 shouldWrapChildren={true}
               >
-                {ListagemCategorias(item.categoria)}
+                {showHUD ? ListagemCategorias(item.categoria) : ""}
               </Stack>
             </TColumn>
             <TColumn w="50%" alignItems="center">
@@ -576,7 +576,7 @@ const Desafio10x10 = () => {
             <ButtonGroup>
               <IconButton
                 aria-label="Adicionar Jogo"
-                icon={showHUD ? <FaEye /> : <FaEyeSlash />}
+                icon={showHUD ? <FaEyeSlash /> : <FaEye />}
                 colorScheme="gray"
                 variant="ghost"
                 size="sm"
