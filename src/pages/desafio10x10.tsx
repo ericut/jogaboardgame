@@ -19,7 +19,7 @@ import {
   Stack,
   useToast,
   useDisclosure,
-  DrawerFooter,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import {
   Modal,
@@ -35,6 +35,7 @@ import {
   DrawerOverlay,
   DrawerContent,
   DrawerCloseButton,
+  DrawerFooter,
   Popover,
   PopoverTrigger,
   PopoverContent,
@@ -326,7 +327,7 @@ const Desafio10x10 = () => {
     let partidasJogadas = partidasTotais.map((item, index) => {
       return (
         <Text
-          color={index + 1 <= partidas ? "green.500" : "gray.500"}
+          color={index + 1 <= partidas ? "green.500" : "#DDDDDD22"}
           key={item}
         >
           <GiMeeple />
