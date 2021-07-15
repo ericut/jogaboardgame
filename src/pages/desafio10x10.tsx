@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
-//chakra
+// chakra
 import {
   Text,
   Box,
@@ -43,7 +43,7 @@ import {
   PopoverArrow,
   PopoverCloseButton,
 } from "@chakra-ui/react";
-//componentes
+// componentes
 import {
   Table,
   THeader,
@@ -54,7 +54,7 @@ import {
   TColumn,
   TColumnButtons,
 } from "../components/Table/Table";
-//icones
+// icones
 import { GiMeeple } from "react-icons/gi";
 import {
   FaEdit,
@@ -66,32 +66,38 @@ import {
 } from "react-icons/fa";
 import { AiTwotoneCrown } from "react-icons/ai";
 import { MdHelp } from "react-icons/md";
-//props
+// props
 import { IJogosProps, ICategoriasProps } from "../interfaces";
-//data
+// data
 import { jogosData } from "../data/jogosData";
 import { categoriasData } from "../data/categoriasData";
 
 const Desafio10x10 = () => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  // hooks chakra
   const toast = useToast();
-  const [drawerEdicaoJogo, setDrawerEdicaoJogo] = useState(false);
-  const [modalEdicaoJogo, setModalEdicaoJogo] = useState(false);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  // estados de controles
   const [showHUD, setShowHUD] = useState(true);
+  const [drawerEdicaoJogo, setDrawerEdicaoJogo] = useState(false);
+  const [modalTelaDesafio, setModalTelaDesafio] = useState(false);
 
+  // estado de listagem dos jogos
   const [jogosListados, setJogosListados] = useState<IJogosProps[] | undefined>(
     jogosData
   );
+  // estado da edição e adição de jogo
   const [jogoEdicao, setJogoEdicao] = useState<IJogosProps | undefined>({
     id: 0,
     nome: "",
     partidas: "",
     categoria: [],
   });
+  // estado das categorias
   const [categoriaListagem] = useState<ICategoriasProps[] | undefined>(
     categoriasData
   );
 
+  // recuperação do jogo na localstorage
   useEffect(() => {
     if (localStorage.getItem("listagemJogos")) {
       let jogosRecuperados = JSON.parse(localStorage.getItem("listagemJogos"));
@@ -101,10 +107,12 @@ const Desafio10x10 = () => {
     }
   }, []);
 
+  // aplicando localstorage quando há alguma atualização na listagem
   useEffect(() => {
     localStorage.setItem("listagemJogos", JSON.stringify(jogosListados));
   }, [jogosListados]);
 
+  // controles edição e adição de jogo
   function handleAbrirEdicaoJogo(item?) {
     onOpen();
     setDrawerEdicaoJogo(true);
@@ -114,24 +122,7 @@ const Desafio10x10 = () => {
       return;
     }
   }
-
-  function handleFecharDrawer() {
-    onClose();
-    setTimeout(() => {
-      setDrawerEdicaoJogo(false);
-    }, 100);
-    setJogoEdicao({
-      id: 0,
-      nome: "",
-      partidas: "",
-      categoria: [],
-    });
-  }
-
-  function handleFecharModal() {
-    setModalEdicaoJogo(false);
-  }
-
+  // controle checkbox das categorias
   function handleEditarCategorias(event) {
     let value = +event.target.value;
     let checked = event.target.checked;
@@ -145,7 +136,7 @@ const Desafio10x10 = () => {
       });
     }
   }
-
+  // controles -/+ das linhas da tabela
   function handleAcrescentarPartida(item) {
     let jogoAddPartida = jogosListados.find(
       (findItem) => findItem.id === item.id
@@ -167,7 +158,6 @@ const Desafio10x10 = () => {
       );
     }
   }
-
   function handleRetirarPartida(item) {
     let jogoAddPartida = jogosListados.find(
       (findItem) => findItem.id === item.id
@@ -189,7 +179,7 @@ const Desafio10x10 = () => {
       );
     }
   }
-
+  // controle salvar jogo
   function handleSalvarJogo() {
     let jogoExistente = jogosListados.find((item) => item.id === jogoEdicao.id);
     if (jogoExistente) {
@@ -233,17 +223,104 @@ const Desafio10x10 = () => {
       }
     }
   }
-
-  function handleConfirmarRemocaoJogo() {
-    setModalEdicaoJogo(true);
+  // controles dos componentes do chakra
+  function handleFecharDrawer() {
+    onClose();
+    setTimeout(() => {
+      setDrawerEdicaoJogo(false);
+    }, 100);
+    setJogoEdicao({
+      id: 0,
+      nome: "",
+      partidas: "",
+      categoria: [],
+    });
   }
-
+  function handleFecharModal() {
+    setModalTelaDesafio(false);
+  }
+  // controles remoção do jogo da lista
+  function handleConfirmarRemocaoJogo() {
+    setModalTelaDesafio(true);
+  }
   function handleRemoverJogo() {
     setJogosListados(jogosListados.filter((item) => item.id !== jogoEdicao.id));
     handleFecharModal();
     handleFecharDrawer();
   }
 
+  // modal remoção do jogo
+  const RemoverJogo = () => {
+    return (
+      <>
+        <ModalHeader>Remover Jogo da Lista</ModalHeader>
+        <ModalCloseButton />
+        <ModalBody>
+          <Text>Deseja remover este jogo da sua lista?</Text>
+          <Text fontWeight="bold">{jogoEdicao.nome}</Text>
+        </ModalBody>
+        <ModalFooter>
+          <HStack w="100%">
+            <Button
+              variant="outline"
+              colorScheme="orange"
+              w="50%"
+              onClick={() => handleRemoverJogo()}
+            >
+              Remover Jogo
+            </Button>
+            <Button
+              colorScheme="blue"
+              w="50%"
+              onClick={() => handleFecharModal()}
+            >
+              Cancelar
+            </Button>
+          </HStack>
+        </ModalFooter>
+      </>
+    );
+  };
+  // popover informações sobre o desafio
+  const Informacoes = (tipo) => {
+    let informacao = <></>;
+    if (tipo === "desafio10x10") {
+      informacao = (
+        <>
+          <PopoverArrow />
+          <PopoverCloseButton />
+          <PopoverHeader fontWeight="bold">
+            O que é o Desafio 10x10?
+          </PopoverHeader>
+          <PopoverBody>
+            Escolha de 10 jogos e jogue cada um 10 vezes, o período padrão para
+            as 100 sessões é de um ano, e avança na trilha conforme finaliza
+            cada sessão.
+            <br />O desafio pode ser feito de forma leve, podendo mudar qualquer
+            um dos jogos, ou de forma pesada onde não poderá alterar a lista dos
+            jogos no período.
+          </PopoverBody>
+        </>
+      );
+    }
+    return (
+      <>
+        <PopoverTrigger>
+          <Text
+            fontSize="16px"
+            px="10px"
+            cursor="pointer"
+            position="relative"
+            color="blue.200"
+          >
+            <MdHelp />
+          </Text>
+        </PopoverTrigger>
+        <PopoverContent>{informacao}</PopoverContent>
+      </>
+    );
+  };
+  // renderização dos meeples de número de partidas
   const NumeroPartidas = (partidas) => {
     let partidasTotais = Array.from({ length: 10 }, (v, k) => k + 1);
     let partidasJogadas = partidasTotais.map((item, index) => {
@@ -259,6 +336,7 @@ const Desafio10x10 = () => {
     return <>{partidasJogadas}</>;
   };
 
+  // renderização da listagem de jogos
   const ListagemJogos = useMemo(() => {
     const ListagemCategorias = (categoria) => {
       function corPorCategoria(item) {
@@ -385,6 +463,7 @@ const Desafio10x10 = () => {
     );
   }, [jogosListados, categoriaListagem, showHUD]);
 
+  // renderização da tela de edição e adição de jogo
   const EdicaoJogo = useMemo(() => {
     return (
       <>
@@ -458,80 +537,10 @@ const Desafio10x10 = () => {
     );
   }, [jogoEdicao]);
 
-  const RemoverJogo = () => {
-    return (
-      <>
-        <ModalHeader>Remover Jogo da Lista</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody>
-          <Text>Deseja remover este jogo da sua lista?</Text>
-          <Text fontWeight="bold">{jogoEdicao.nome}</Text>
-        </ModalBody>
-        <ModalFooter>
-          <HStack w="100%">
-            <Button
-              variant="outline"
-              colorScheme="orange"
-              w="50%"
-              onClick={() => handleRemoverJogo()}
-            >
-              Remover Jogo
-            </Button>
-            <Button
-              colorScheme="blue"
-              w="50%"
-              onClick={() => handleFecharModal()}
-            >
-              Cancelar
-            </Button>
-          </HStack>
-        </ModalFooter>
-      </>
-    );
-  };
-
-  const Informacoes = (tipo) => {
-    let informacao = <></>;
-    if (tipo === "desafio10x10") {
-      informacao = (
-        <>
-          <PopoverArrow />
-          <PopoverCloseButton />
-          <PopoverHeader fontWeight="bold">
-            O que é o Desafio 10x10?
-          </PopoverHeader>
-          <PopoverBody>
-            Escolha de 10 jogos e jogue cada um 10 vezes, o período padrão para
-            as 100 sessões é de um ano, e avança na trilha conforme finaliza
-            cada sessão.
-            <br />O desafio pode ser feito de forma leve, podendo mudar qualquer
-            um dos jogos, ou de forma pesada onde não poderá alterar a lista dos
-            jogos no período.
-          </PopoverBody>
-        </>
-      );
-    }
-    return (
-      <>
-        <PopoverTrigger>
-          <Text
-            fontSize="16px"
-            px="10px"
-            cursor="pointer"
-            position="relative"
-            color="blue.200"
-          >
-            <MdHelp />
-          </Text>
-        </PopoverTrigger>
-        <PopoverContent>{informacao}</PopoverContent>
-      </>
-    );
-  };
-
+  // renderização geral
   return (
     <>
-      {modalEdicaoJogo ? (
+      {modalTelaDesafio ? (
         <Modal
           isOpen={isOpen}
           onClose={onClose}
