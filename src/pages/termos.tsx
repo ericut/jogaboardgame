@@ -28,7 +28,7 @@ const TermosDeUso = () => {
           armazenamento local do navegador.
         </Text>
         <Text pb="10px">
-          Esta aplicação possui aberto, com repositório no Github do seu
+          Esta aplicação possui código aberto, com repositório no Github do seu
           criador, e sua utilização é gratuíta e livre de licença.
         </Text>
         <a
