@@ -13,13 +13,16 @@ import {
   HStack,
   VStack,
   Input,
+  FormControl,
+  FormLabel,
+  InputGroup,
+  InputRightAddon,
   NumberInput,
   NumberInputField,
   Checkbox,
   Stack,
   useToast,
   useDisclosure,
-  useColorModeValue,
 } from "@chakra-ui/react";
 import {
   Modal,
@@ -64,11 +67,16 @@ import {
   FaMinus,
   FaEye,
   FaEyeSlash,
+  FaCog,
 } from "react-icons/fa";
 import { AiTwotoneCrown } from "react-icons/ai";
 import { MdHelp } from "react-icons/md";
 // props
-import { IJogosProps, ICategoriasProps } from "../interfaces";
+import {
+  IJogosProps,
+  ICategoriasProps,
+  IConfiguracoesProps,
+} from "../interfaces";
 // data
 import { jogosData } from "../data/jogosData";
 import { categoriasData } from "../data/categoriasData";
@@ -79,9 +87,26 @@ const Desafio10x10 = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   // estados de controles
   const [showHUD, setShowHUD] = useState(true);
+  // drawers
+  const [drawerConfiguracaoDesafio, setDrawerConfiguracaoDesafio] =
+    useState(false);
   const [drawerEdicaoJogo, setDrawerEdicaoJogo] = useState(false);
-  const [modalTelaDesafio, setModalTelaDesafio] = useState(false);
+  // modals
+  const [modalSalvarConfiguracoes, setModalSalvarConfiguracoes] =
+    useState(false);
+  const [modalRemoverJogo, setModalRemoverJogo] = useState(false);
 
+  // estado de configurações do desafio
+  const [configuracoesDesafio, setConfiguracoesDesafio] = useState<
+    IConfiguracoesProps | undefined
+  >({
+    qtdJogos: 10,
+    qtdPartidas: 10,
+  });
+  const [jogosTotais, setJogosTotais] = useState(configuracoesDesafio.qtdJogos);
+  const [partidasTotais, setPartidasTotais] = useState(
+    configuracoesDesafio.qtdPartidas
+  );
   // estado de listagem dos jogos
   const [jogosListados, setJogosListados] = useState<IJogosProps[] | undefined>(
     jogosData
@@ -106,6 +131,16 @@ const Desafio10x10 = () => {
     } else {
       setJogosListados(jogosData);
     }
+    if (localStorage.getItem("configuracoesDesafio")) {
+      let configuracoesRecuperadas = JSON.parse(
+        localStorage.getItem("configuracoesDesafio")
+      );
+      setConfiguracoesDesafio(configuracoesRecuperadas);
+      setJogosTotais(configuracoesRecuperadas.qtdJogos);
+      setPartidasTotais(configuracoesRecuperadas.qtdPartidas);
+    } else {
+      setConfiguracoesDesafio({ qtdJogos: 10, qtdPartidas: 10 });
+    }
   }, []);
 
   // aplicando localstorage quando há alguma atualização na listagem
@@ -113,6 +148,11 @@ const Desafio10x10 = () => {
     localStorage.setItem("listagemJogos", JSON.stringify(jogosListados));
   }, [jogosListados]);
 
+  // controles configuração do desafio
+  function handleAbrirConfiguracaoDesafio() {
+    onOpen();
+    setDrawerConfiguracaoDesafio(true);
+  }
   // controles edição e adição de jogo
   function handleAbrirEdicaoJogo(item?) {
     onOpen();
@@ -180,56 +220,23 @@ const Desafio10x10 = () => {
       );
     }
   }
-  // controle salvar jogo
-  function handleSalvarJogo() {
-    let jogoExistente = jogosListados.find((item) => item.id === jogoEdicao.id);
-    if (jogoExistente) {
-      setJogosListados(
-        jogosListados.map((item) => {
-          if (item.id === jogoEdicao.id) {
-            item.id = jogoEdicao.id;
-            item.nome = jogoEdicao.nome;
-            item.partidas = jogoEdicao.partidas;
-            item.categoria = jogoEdicao.categoria;
-          }
-          return item;
-        })
-      );
+  // controles dos componentes do chakra
+  function handleFecharDrawer() {
+    if (
+      configuracoesDesafio.qtdJogos !== jogosTotais ||
+      configuracoesDesafio.qtdPartidas !== partidasTotais
+    ) {
       toast({
-        title: `Jogo atualizado: ${jogoEdicao.nome}`,
-        status: "success",
+        title: "Você alterou as configurações, salve para continuar.",
+        status: "warning",
         duration: 3000,
         isClosable: true,
       });
-      handleFecharDrawer();
     } else {
-      if (jogoEdicao.nome !== "") {
-        jogoEdicao.id = uuidv4();
-        jogoEdicao.partidas = jogoEdicao.partidas ? jogoEdicao.partidas : 0;
-        setJogosListados([...jogosListados, jogoEdicao]);
-        toast({
-          title: `Jogo adicionado: ${jogoEdicao.nome}`,
-          status: "success",
-          duration: 3000,
-          isClosable: true,
-        });
-        handleFecharDrawer();
-      } else {
-        toast({
-          title: "Insira um nome para o jogo!",
-          status: "warning",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      setDrawerConfiguracaoDesafio(false);
+      onClose();
     }
-  }
-  // controles dos componentes do chakra
-  function handleFecharDrawer() {
-    onClose();
-    setTimeout(() => {
-      setDrawerEdicaoJogo(false);
-    }, 100);
+    setDrawerEdicaoJogo(false);
     setJogoEdicao({
       id: 0,
       nome: "",
@@ -238,50 +245,10 @@ const Desafio10x10 = () => {
     });
   }
   function handleFecharModal() {
-    setModalTelaDesafio(false);
-  }
-  // controles remoção do jogo da lista
-  function handleConfirmarRemocaoJogo() {
-    setModalTelaDesafio(true);
-  }
-  function handleRemoverJogo() {
-    setJogosListados(jogosListados.filter((item) => item.id !== jogoEdicao.id));
-    handleFecharModal();
-    handleFecharDrawer();
+    setModalRemoverJogo(false);
+    setModalSalvarConfiguracoes(false);
   }
 
-  // modal remoção do jogo
-  const RemoverJogo = () => {
-    return (
-      <>
-        <ModalHeader>Remover Jogo da Lista</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody>
-          <Text>Deseja remover este jogo da sua lista?</Text>
-          <Text fontWeight="bold">{jogoEdicao.nome}</Text>
-        </ModalBody>
-        <ModalFooter>
-          <HStack w="100%">
-            <Button
-              variant="outline"
-              colorScheme="orange"
-              w="50%"
-              onClick={() => handleRemoverJogo()}
-            >
-              Remover Jogo
-            </Button>
-            <Button
-              colorScheme="blue"
-              w="50%"
-              onClick={() => handleFecharModal()}
-            >
-              Cancelar
-            </Button>
-          </HStack>
-        </ModalFooter>
-      </>
-    );
-  };
   // popover informações sobre o desafio
   const Informacoes = (tipo) => {
     let informacao = <></>;
@@ -291,15 +258,17 @@ const Desafio10x10 = () => {
           <PopoverArrow />
           <PopoverCloseButton />
           <PopoverHeader fontWeight="bold">
-            O que é o Desafio 10x10?
+            O que é o Desafio {jogosTotais}x{partidasTotais}?
           </PopoverHeader>
           <PopoverBody>
-            Escolha de 10 jogos e jogue cada um 10 vezes, o período padrão para
-            as 100 sessões é de um ano, e avança na trilha conforme finaliza
-            cada sessão.
+            Escolha <strong>{jogosTotais} jogos</strong> e jogue cada um deles{" "}
+            <strong>{partidasTotais} vezes</strong>, o período padrão para as{" "}
+            <strong>{jogosTotais * partidasTotais} partidas</strong> é de um
+            ano. Avance na trilha dos meeples conforme finalizar as partidas de
+            cada jogo.
             <br />O desafio pode ser feito de forma leve, podendo mudar qualquer
             um dos jogos, ou de forma pesada onde não poderá alterar a lista dos
-            jogos no período.
+            jogos no período ou até finalizar todas as partidas.
           </PopoverBody>
         </>
       );
@@ -321,24 +290,367 @@ const Desafio10x10 = () => {
       </>
     );
   };
-  // renderização dos meeples de número de partidas
-  const NumeroPartidas = (partidas) => {
-    let partidasTotais = Array.from({ length: 10 }, (v, k) => k + 1);
-    let partidasJogadas = partidasTotais.map((item, index) => {
-      return (
-        <Text
-          color={index + 1 <= partidas ? "green.500" : "#DDDDDD22"}
-          key={item}
-        >
-          <GiMeeple />
-        </Text>
+
+  // renderização modal remoção do jogo
+  const ModalDesafio = () => {
+    // controles remoção do jogo da lista
+    function handleRemoverJogo() {
+      setJogosListados(
+        jogosListados.filter((item) => item.id !== jogoEdicao.id)
       );
-    });
-    return <>{partidasJogadas}</>;
+      handleFecharModal();
+      handleFecharDrawer();
+    }
+    // controle salvar configuracoes
+    function handleSalvarConfiguracoes() {
+      setJogosListados(
+        jogosListados.map((item) => {
+          if (item.partidas >= configuracoesDesafio.qtdPartidas) {
+            item.partidas = configuracoesDesafio.qtdPartidas;
+          }
+          return item;
+        })
+      );
+      localStorage.setItem(
+        "configuracoesDesafio",
+        JSON.stringify(configuracoesDesafio)
+      );
+      setJogosTotais(configuracoesDesafio.qtdJogos);
+      setPartidasTotais(configuracoesDesafio.qtdPartidas);
+      setDrawerConfiguracaoDesafio(false);
+      setModalSalvarConfiguracoes(false);
+      onClose();
+    }
+
+    // renders
+    const renderModalRemoverJogo = () => {
+      return (
+        <>
+          <ModalHeader>Remover Jogo da Lista</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Text>Deseja remover este jogo da sua lista?</Text>
+            <Text fontWeight="bold">{jogoEdicao.nome}</Text>
+          </ModalBody>
+          <ModalFooter>
+            <HStack w="100%">
+              <Button
+                variant="outline"
+                colorScheme="orange"
+                w="50%"
+                onClick={() => handleRemoverJogo()}
+              >
+                Confirmar
+              </Button>
+              <Button
+                colorScheme="blue"
+                w="50%"
+                onClick={() => handleFecharModal()}
+              >
+                Cancelar
+              </Button>
+            </HStack>
+          </ModalFooter>
+        </>
+      );
+    };
+
+    const renderModalSalvarConfiguracoes = () => {
+      return (
+        <>
+          <ModalHeader>Confirmação da nova configuração</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Text>Deseja salvar estas configurações?</Text>
+            <Text fontWeight="bold">
+              Quantidade de Jogos: {configuracoesDesafio.qtdJogos}
+            </Text>
+            <Text fontWeight="bold" pb="20px">
+              Quantidade de Partidas: {configuracoesDesafio.qtdPartidas}
+            </Text>
+            <Text
+              color="red.400"
+              fontSize="14px"
+              p="5px"
+              border="1px solid"
+              borderColor="red.400"
+            >
+              <strong>ATENÇÃO:</strong>
+              <br />• Se já tiver partidas computadas excedendo ao novo número
+              de total de partidas, será aplicado o novo valor finalizando o
+              desafio do jogo.
+              <br />• Se o número de jogos cadastros for maior que de jogos
+              totais do desafio, eles não serão listados na listagem.
+            </Text>
+          </ModalBody>
+          <ModalFooter>
+            <HStack w="100%">
+              <Button
+                variant="outline"
+                colorScheme="green"
+                w="50%"
+                onClick={() => handleSalvarConfiguracoes()}
+              >
+                Confirmar
+              </Button>
+              <Button
+                colorScheme="blue"
+                w="50%"
+                onClick={() => handleFecharModal()}
+              >
+                Cancelar
+              </Button>
+            </HStack>
+          </ModalFooter>
+        </>
+      );
+    };
+
+    return modalRemoverJogo
+      ? renderModalRemoverJogo()
+      : renderModalSalvarConfiguracoes();
+  };
+
+  // renderização drawer de edição e adição de jogo // configurações do desafio
+  const DrawerDesafio = () => {
+    // controle salvar configurações
+    function handleConfirmaSalvarConfiguracoes() {
+      if (
+        configuracoesDesafio.qtdJogos !== jogosTotais ||
+        configuracoesDesafio.qtdPartidas !== partidasTotais
+      ) {
+        setModalSalvarConfiguracoes(true);
+      }
+    }
+    // controle salvar jogo
+    function handleSalvarJogo() {
+      let jogoExistente = jogosListados.find(
+        (item) => item.id === jogoEdicao.id
+      );
+      if (jogoExistente) {
+        setJogosListados(
+          jogosListados.map((item) => {
+            if (item.id === jogoEdicao.id) {
+              item.id = jogoEdicao.id;
+              item.nome = jogoEdicao.nome;
+              item.partidas = jogoEdicao.partidas;
+              item.categoria = jogoEdicao.categoria;
+            }
+            return item;
+          })
+        );
+        toast({
+          title: `Jogo atualizado: ${jogoEdicao.nome}`,
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+        handleFecharDrawer();
+      } else {
+        if (jogoEdicao.nome !== "") {
+          jogoEdicao.id = uuidv4();
+          jogoEdicao.partidas = jogoEdicao.partidas ? jogoEdicao.partidas : 0;
+          setJogosListados([...jogosListados, jogoEdicao]);
+          toast({
+            title: `Jogo adicionado: ${jogoEdicao.nome}`,
+            status: "success",
+            duration: 3000,
+            isClosable: true,
+          });
+          handleFecharDrawer();
+        } else {
+          toast({
+            title: "Insira o nome do jogo para salvar!",
+            status: "warning",
+            duration: 3000,
+            isClosable: true,
+          });
+        }
+      }
+    }
+    // controles remoção do jogo da lista
+    function handleConfirmarRemocaoJogo() {
+      setModalRemoverJogo(true);
+    }
+
+    // renders
+    const renderDrawerEdicao = () => {
+      return (
+        <>
+          <DrawerCloseButton />
+          <DrawerHeader>
+            {jogoEdicao.id === 0 ? "Adicionar" : "Editar"} Jogo
+          </DrawerHeader>
+          <DrawerBody>
+            <VStack>
+              <Input
+                placeholder="Nome do Jogo"
+                value={jogoEdicao.nome}
+                onChange={(event) =>
+                  setJogoEdicao({ ...jogoEdicao, nome: event.target.value })
+                }
+              />
+              <InputGroup>
+                <NumberInput
+                  w="100%"
+                  value={jogoEdicao.partidas}
+                  min={0}
+                  max={partidasTotais}
+                  onChange={(value) =>
+                    setJogoEdicao({ ...jogoEdicao, partidas: +value })
+                  }
+                >
+                  <NumberInputField placeholder="Número de Partidas Iniciais" />
+                </NumberInput>
+                <InputRightAddon
+                  fontSize="10px"
+                  textTransform="uppercase"
+                  children={`Max ${partidasTotais}`}
+                />
+              </InputGroup>
+              <Stack w="100%" shouldWrapChildren={true}>
+                <Text mt="10px">Categorias:</Text>
+                <>
+                  {categoriaListagem.map((item) => {
+                    return (
+                      <Checkbox
+                        w="50%"
+                        key={item.id}
+                        value={item.id}
+                        isChecked={jogoEdicao.categoria.includes(item.id)}
+                        onChange={(event) => handleEditarCategorias(event)}
+                        mb="5px"
+                      >
+                        {item.nome}
+                      </Checkbox>
+                    );
+                  })}
+                </>
+              </Stack>
+            </VStack>
+          </DrawerBody>
+          <DrawerFooter>
+            <HStack w="100%">
+              <Button
+                colorScheme="orange"
+                leftIcon={<FaSave />}
+                onClick={() => handleConfirmarRemocaoJogo()}
+                w="50%"
+                isDisabled={jogoEdicao.id === 0}
+              >
+                Remover Jogo
+              </Button>
+              <Button
+                colorScheme="green"
+                leftIcon={<FaSave />}
+                onClick={() => handleSalvarJogo()}
+                w="50%"
+              >
+                Salvar Jogo
+              </Button>
+            </HStack>
+          </DrawerFooter>
+        </>
+      );
+    };
+
+    const renderDrawerConfiguracao = () => {
+      return (
+        <>
+          <DrawerCloseButton />
+          <DrawerHeader>Configurações do Desafio</DrawerHeader>
+          <DrawerBody>
+            <VStack alignItems="flex-start">
+              <FormControl w="100%" mb="10px">
+                <FormLabel>Quantidade de Jogos do Desafio:</FormLabel>
+                <InputGroup>
+                  <NumberInput
+                    w="100%"
+                    value={configuracoesDesafio.qtdJogos}
+                    min={0}
+                    max={10}
+                    onChange={(value) =>
+                      setConfiguracoesDesafio({
+                        ...configuracoesDesafio,
+                        qtdJogos: +value,
+                      })
+                    }
+                  >
+                    <NumberInputField placeholder="Quantidade de Jogos do Desafio" />
+                  </NumberInput>
+                  <InputRightAddon
+                    fontSize="10px"
+                    textTransform="uppercase"
+                    children="Max 10"
+                  />
+                </InputGroup>
+              </FormControl>
+              <FormControl w="100%">
+                <FormLabel>Quantidade de Partidas do Desafio:</FormLabel>
+                <InputGroup>
+                  <NumberInput
+                    w="100%"
+                    value={configuracoesDesafio.qtdPartidas}
+                    min={0}
+                    max={10}
+                    onChange={(value) =>
+                      setConfiguracoesDesafio({
+                        ...configuracoesDesafio,
+                        qtdPartidas: +value,
+                      })
+                    }
+                  >
+                    <NumberInputField placeholder="Quantidade de Partidas do Desafio" />
+                  </NumberInput>
+                  <InputRightAddon
+                    fontSize="10px"
+                    textTransform="uppercase"
+                    children="Max 10"
+                  />
+                </InputGroup>
+              </FormControl>
+            </VStack>
+          </DrawerBody>
+          <DrawerFooter>
+            <HStack w="100%" justifyContent="flex-end">
+              <Button
+                colorScheme="green"
+                leftIcon={<FaSave />}
+                onClick={() => handleConfirmaSalvarConfiguracoes()}
+                w={{ md: "50%", sm: "100%" }}
+              >
+                Salvar Configurações
+              </Button>
+            </HStack>
+          </DrawerFooter>
+        </>
+      );
+    };
+
+    return drawerEdicaoJogo ? renderDrawerEdicao() : renderDrawerConfiguracao();
   };
 
   // renderização da listagem de jogos
   const ListagemJogos = useMemo(() => {
+    // render dos meeples de número de partidas
+    const NumeroPartidas = (partidas) => {
+      let partidasTotaisMontadas = Array.from(
+        { length: partidasTotais },
+        (v, k) => k + 1
+      );
+      let partidasJogadas = partidasTotaisMontadas.map((item, index) => {
+        return (
+          <Text
+            color={index + 1 <= partidas ? "green.500" : "#DDDDDD22"}
+            key={item}
+          >
+            <GiMeeple />
+          </Text>
+        );
+      });
+      return <>{partidasJogadas}</>;
+    };
+    // render listagem de categorias
     const ListagemCategorias = (categoria) => {
       function corPorCategoria(item) {
         if (item === "Cooperativo") {
@@ -368,7 +680,7 @@ const Desafio10x10 = () => {
     };
 
     return jogosListados.length !== 0 ? (
-      jogosListados.map((item) => {
+      jogosListados.slice(0, jogosTotais).map((item, index) => {
         return (
           <TRow key={item.id}>
             <TColumn w="30%" flexDirection="column" justifyContent="center">
@@ -389,7 +701,7 @@ const Desafio10x10 = () => {
             <TColumn w="50%" alignItems="center">
               <Flex fontSize={{ md: "34px", sm: "22px" }} alignItems="center">
                 {NumeroPartidas(item.partidas)}
-                {item.partidas === 10 ? (
+                {item.partidas === partidasTotais ? (
                   <Flex color="yellow.500" ml="10px" alignItems="center">
                     <AiTwotoneCrown />
                     <Text
@@ -432,7 +744,7 @@ const Desafio10x10 = () => {
                         variant="ghost"
                         icon={<FaPlus />}
                         onClick={() => handleAcrescentarPartida(item)}
-                        isDisabled={item.partidas === 10}
+                        isDisabled={item.partidas >= partidasTotais}
                       />
                     </ButtonGroup>
                   </Flex>
@@ -462,108 +774,39 @@ const Desafio10x10 = () => {
         </TColumn>
       </TRow>
     );
-  }, [jogosListados, categoriaListagem, showHUD]);
-
-  // renderização da tela de edição e adição de jogo
-  const EdicaoJogo = useMemo(() => {
-    return (
-      <>
-        <DrawerCloseButton />
-        <DrawerHeader>
-          {jogoEdicao.id === 0 ? "Adicionar" : "Editar"} Jogo
-        </DrawerHeader>
-        <DrawerBody>
-          <VStack>
-            <Input
-              placeholder="Nome do Jogo"
-              value={jogoEdicao.nome}
-              onChange={(event) =>
-                setJogoEdicao({ ...jogoEdicao, nome: event.target.value })
-              }
-            />
-            <NumberInput
-              w="100%"
-              value={jogoEdicao.partidas}
-              min={0}
-              max={10}
-              onChange={(value) =>
-                setJogoEdicao({ ...jogoEdicao, partidas: +value })
-              }
-            >
-              <NumberInputField placeholder="Número de Partidas Iniciais" />
-            </NumberInput>
-            <Stack w="100%" shouldWrapChildren={true}>
-              <Text mt="10px">Categorias:</Text>
-              <>
-                {categoriaListagem.map((item) => {
-                  return (
-                    <Checkbox
-                      w="50%"
-                      key={item.id}
-                      value={item.id}
-                      isChecked={jogoEdicao.categoria.includes(item.id)}
-                      onChange={(event) => handleEditarCategorias(event)}
-                      mb="5px"
-                    >
-                      {item.nome}
-                    </Checkbox>
-                  );
-                })}
-              </>
-            </Stack>
-          </VStack>
-        </DrawerBody>
-        <DrawerFooter>
-          <HStack w="100%">
-            <Button
-              colorScheme="orange"
-              leftIcon={<FaSave />}
-              onClick={() => handleConfirmarRemocaoJogo()}
-              w="50%"
-              isDisabled={jogoEdicao.id === 0}
-            >
-              Remover Jogo
-            </Button>
-            <Button
-              colorScheme="green"
-              leftIcon={<FaSave />}
-              onClick={() => handleSalvarJogo()}
-              w="50%"
-            >
-              Salvar Jogo
-            </Button>
-          </HStack>
-        </DrawerFooter>
-      </>
-    );
-  }, [jogoEdicao]);
+  }, [jogosListados, categoriaListagem, showHUD, partidasTotais, jogosTotais]);
 
   // renderização geral
   return (
     <>
-      {modalTelaDesafio ? (
+      {modalRemoverJogo || modalSalvarConfiguracoes ? (
         <Modal
           isOpen={isOpen}
-          onClose={onClose}
+          onClose={handleFecharModal}
           motionPreset="slideInBottom"
           isCentered
         >
-          <ModalOverlay />
-          <ModalContent>{RemoverJogo()}</ModalContent>
+          <ModalOverlay
+            onClick={() => {
+              handleFecharModal;
+              onClose();
+            }}
+          />
+          <ModalContent>{ModalDesafio()}</ModalContent>
         </Modal>
       ) : (
         ""
       )}
 
-      {drawerEdicaoJogo ? (
+      {drawerEdicaoJogo || drawerConfiguracaoDesafio ? (
         <Drawer
           isOpen={isOpen}
-          placement="right"
           onClose={handleFecharDrawer}
+          placement="right"
           size="lg"
         >
           <DrawerOverlay onClick={handleFecharDrawer} />
-          <DrawerContent>{EdicaoJogo}</DrawerContent>
+          <DrawerContent>{DrawerDesafio()}</DrawerContent>
         </Drawer>
       ) : (
         ""
@@ -581,46 +824,71 @@ const Desafio10x10 = () => {
         <Flex justifyContent="space-between" align="center" w="100%">
           <Flex alignItems="center" w="60%">
             <Heading fontWeight="bold" fontSize={{ md: "32px", sm: "20px" }}>
-              Desafio 10x10
+              Desafio {jogosTotais}x{partidasTotais}
             </Heading>
             <Popover placement="bottom">{Informacoes("desafio10x10")}</Popover>
           </Flex>
           <Flex alignItems="center" justifyContent="flex-end" w="40%">
             <ButtonGroup>
-              <IconButton
-                aria-label="Adicionar Jogo"
-                icon={showHUD ? <FaEyeSlash /> : <FaEye />}
-                colorScheme="gray"
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowHUD(!showHUD)}
-              />
-              <Button
-                display={{ md: "block", sm: "none" }}
-                size="sm"
-                isDisabled
-              >
-                {jogosListados.length}/10
-              </Button>
-              <Button
-                display={{ md: "flex", sm: "none" }}
-                leftIcon={<FaPlus />}
-                colorScheme="blue"
-                size="sm"
-                onClick={() => handleAbrirEdicaoJogo()}
-                isDisabled={jogosListados.length >= 10}
-              >
-                Adicionar Jogo
-              </Button>
-              <IconButton
-                display={{ md: "none", sm: "flex" }}
-                aria-label="Adicionar Jogo"
-                icon={<FaPlus />}
-                colorScheme="blue"
-                size="sm"
-                onClick={() => handleAbrirEdicaoJogo()}
-                isDisabled={jogosListados.length >= 10}
-              />
+              <Flex>
+                <IconButton
+                  aria-label="Adicionar Jogo"
+                  icon={showHUD ? <FaEyeSlash /> : <FaEye />}
+                  colorScheme="gray"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowHUD(!showHUD)}
+                />
+              </Flex>
+              <Flex>
+                <IconButton
+                  display={{ md: "none", sm: "flex" }}
+                  aria-label="Configurações do Desafio"
+                  icon={<FaCog />}
+                  colorScheme="gray"
+                  size="sm"
+                  onClick={() => handleAbrirConfiguracaoDesafio()}
+                />
+                <Button
+                  display={{ md: "flex", sm: "none" }}
+                  leftIcon={<FaCog />}
+                  colorScheme="gray"
+                  size="sm"
+                  onClick={() => handleAbrirConfiguracaoDesafio()}
+                >
+                  Configurações
+                </Button>
+              </Flex>
+              <Flex>
+                <ButtonGroup size="sm" isAttached>
+                  <Button
+                    display={{ md: "block", sm: "none" }}
+                    size="sm"
+                    isDisabled
+                  >
+                    {jogosListados.length}/{jogosTotais}
+                  </Button>
+                  <IconButton
+                    display={{ md: "none", sm: "flex" }}
+                    aria-label="Adicionar Jogo"
+                    icon={<FaPlus />}
+                    colorScheme="blue"
+                    size="sm"
+                    onClick={() => handleAbrirEdicaoJogo()}
+                    isDisabled={jogosListados.length >= jogosTotais}
+                  />
+                  <Button
+                    display={{ md: "flex", sm: "none" }}
+                    leftIcon={<FaPlus />}
+                    colorScheme="blue"
+                    size="sm"
+                    onClick={() => handleAbrirEdicaoJogo()}
+                    isDisabled={jogosListados.length >= jogosTotais}
+                  >
+                    Adicionar Jogo
+                  </Button>
+                </ButtonGroup>
+              </Flex>
             </ButtonGroup>
           </Flex>
         </Flex>

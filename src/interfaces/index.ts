@@ -9,3 +9,8 @@ export interface ICategoriasProps {
   id: number;
   nome: string;
 }
+
+export interface IConfiguracoesProps {
+  qtdJogos: number;
+  qtdPartidas: number;
+}

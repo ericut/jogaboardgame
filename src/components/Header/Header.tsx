@@ -27,14 +27,19 @@ const Header = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const btnRef = useRef();
   const MenuBGColor = useColorModeValue("gray.100", "gray.700");
+
   const MenuItens = () => {
     return (
       <>
         <Link href="/desafio10x10" passHref>
-          <Button variant="ghost">Desafio 10x10</Button>
+          <a>
+            <Button variant="ghost">Desafio 10x10</Button>
+          </a>
         </Link>
-        <Link href="/termos">
-          <Button variant="ghost">Termos de Uso</Button>
+        <Link href="/termos" passHref>
+          <a>
+            <Button variant="ghost">Termos de Uso</Button>
+          </a>
         </Link>
       </>
     );
@@ -78,11 +83,13 @@ const Header = () => {
             alignItems="center"
             cursor="pointer"
           >
-            <Link href="/">
-              <Image
-                src={colorMode === "light" ? Logo : LogoWhite}
-                alt="bg10 <3"
-              />
+            <Link href="/" passHref>
+              <a>
+                <Image
+                  src={colorMode === "light" ? Logo : LogoWhite}
+                  alt="bg10 <3"
+                />
+              </a>
             </Link>
           </Flex>
           <Flex>
