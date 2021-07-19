@@ -567,7 +567,7 @@ const Desafio10x10 = () => {
                   <NumberInput
                     w="100%"
                     value={configuracoesDesafio.qtdJogos}
-                    min={0}
+                    min={1}
                     max={10}
                     onChange={(value) =>
                       setConfiguracoesDesafio({
@@ -591,7 +591,7 @@ const Desafio10x10 = () => {
                   <NumberInput
                     w="100%"
                     value={configuracoesDesafio.qtdPartidas}
-                    min={0}
+                    min={1}
                     max={10}
                     onChange={(value) =>
                       setConfiguracoesDesafio({
