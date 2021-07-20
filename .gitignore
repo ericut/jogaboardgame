@@ -23,6 +23,7 @@ yarn-error.log
 yarn.lock
 /.layout/
 .prettierrc
+package-lock.json
 
 # debug
 npm-debug.log*
