@@ -1,5 +1,5 @@
-import { useMemo, useState, useEffect } from "react";
-import { v4 as uuidv4 } from "uuid";
+import { useMemo, useState, useEffect } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 // chakra
 import {
   Text,
@@ -23,7 +23,7 @@ import {
   Stack,
   useToast,
   useDisclosure,
-} from "@chakra-ui/react";
+} from '@chakra-ui/react';
 import {
   Modal,
   ModalOverlay,
@@ -46,40 +46,19 @@ import {
   PopoverBody,
   PopoverArrow,
   PopoverCloseButton,
-} from "@chakra-ui/react";
+} from '@chakra-ui/react';
 // componentes
-import {
-  Table,
-  THeader,
-  THead,
-  THeadButtons,
-  TBody,
-  TRow,
-  TColumn,
-  TColumnButtons,
-} from "../components/Table/Table";
+import { Table, THeader, THead, THeadButtons, TBody, TRow, TColumn, TColumnButtons } from '../components/Table/Table';
 // icones
-import { GiMeeple } from "react-icons/gi";
-import {
-  FaEdit,
-  FaSave,
-  FaPlus,
-  FaMinus,
-  FaEye,
-  FaEyeSlash,
-  FaCog,
-} from "react-icons/fa";
-import { AiTwotoneCrown } from "react-icons/ai";
-import { MdHelp } from "react-icons/md";
+import { GiMeeple } from 'react-icons/gi';
+import { FaEdit, FaSave, FaPlus, FaMinus, FaEye, FaEyeSlash, FaCog } from 'react-icons/fa';
+import { AiTwotoneCrown } from 'react-icons/ai';
+import { MdHelp } from 'react-icons/md';
 // props
-import {
-  IJogosProps,
-  ICategoriasProps,
-  IConfiguracoesProps,
-} from "../interfaces";
+import { IJogosProps, ICategoriasProps, IConfiguracoesProps } from '../interfaces';
 // data
-import { jogosData } from "../data/jogosData";
-import { categoriasData } from "../data/categoriasData";
+import { jogosData } from '../data/jogosData';
+import { categoriasData } from '../data/categoriasData';
 
 const Desafio10x10 = () => {
   // hooks chakra
@@ -88,53 +67,44 @@ const Desafio10x10 = () => {
   // estados de controles
   const [showHUD, setShowHUD] = useState(true);
   // drawers
-  const [drawerConfiguracaoDesafio, setDrawerConfiguracaoDesafio] =
-    useState(false);
+  const [drawerConfiguracaoDesafio, setDrawerConfiguracaoDesafio] = useState(false);
   const [drawerEdicaoJogo, setDrawerEdicaoJogo] = useState(false);
   // modals
-  const [modalSalvarConfiguracoes, setModalSalvarConfiguracoes] =
-    useState(false);
+  const [modalSalvarConfiguracoes, setModalSalvarConfiguracoes] = useState(false);
   const [modalRemoverJogo, setModalRemoverJogo] = useState(false);
 
   // estado de configurações do desafio
-  const [configuracoesDesafio, setConfiguracoesDesafio] = useState<
-    IConfiguracoesProps | undefined
-  >({
+  const [configuracoesDesafio, setConfiguracoesDesafio] = useState<IConfiguracoesProps | undefined>({
     qtdJogos: 10,
     qtdPartidas: 10,
   });
+
   const [jogosTotais, setJogosTotais] = useState(configuracoesDesafio.qtdJogos);
-  const [partidasTotais, setPartidasTotais] = useState(
-    configuracoesDesafio.qtdPartidas
-  );
+  const [partidasTotais, setPartidasTotais] = useState(configuracoesDesafio.qtdPartidas);
   // estado de listagem dos jogos
-  const [jogosListados, setJogosListados] = useState<IJogosProps[] | undefined>(
-    jogosData
-  );
+  const [jogosListados, setJogosListados] = useState<IJogosProps[] | undefined>(jogosData);
   // estado da edição e adição de jogo
   const [jogoEdicao, setJogoEdicao] = useState<IJogosProps | undefined>({
     id: 0,
-    nome: "",
-    partidas: "",
+    nome: '',
+    partidas: '',
     categoria: [],
   });
   // estado das categorias
-  const [categoriaListagem] = useState<ICategoriasProps[] | undefined>(
-    categoriasData
-  );
+  const [categoriaListagem] = useState<ICategoriasProps[] | undefined>(categoriasData);
 
   // recuperação do jogo na localstorage
   useEffect(() => {
-    if (localStorage.getItem("listagemJogos")) {
-      let jogosRecuperados = JSON.parse(localStorage.getItem("listagemJogos"));
+    // recuperação de jogos
+    if (localStorage.getItem('listagemJogos')) {
+      let jogosRecuperados = JSON.parse(localStorage.getItem('listagemJogos'));
       setJogosListados(jogosRecuperados);
     } else {
       setJogosListados(jogosData);
     }
-    if (localStorage.getItem("configuracoesDesafio")) {
-      let configuracoesRecuperadas = JSON.parse(
-        localStorage.getItem("configuracoesDesafio")
-      );
+    // recuperação de configurações
+    if (localStorage.getItem('configuracoesDesafio')) {
+      let configuracoesRecuperadas = JSON.parse(localStorage.getItem('configuracoesDesafio'));
       setConfiguracoesDesafio(configuracoesRecuperadas);
       setJogosTotais(configuracoesRecuperadas.qtdJogos);
       setPartidasTotais(configuracoesRecuperadas.qtdPartidas);
@@ -145,7 +115,7 @@ const Desafio10x10 = () => {
 
   // aplicando localstorage quando há alguma atualização na listagem
   useEffect(() => {
-    localStorage.setItem("listagemJogos", JSON.stringify(jogosListados));
+    localStorage.setItem('listagemJogos', JSON.stringify(jogosListados));
   }, [jogosListados]);
 
   // controles configuração do desafio
@@ -179,9 +149,7 @@ const Desafio10x10 = () => {
   }
   // controles -/+ das linhas da tabela
   function handleAcrescentarPartida(item) {
-    let jogoAddPartida = jogosListados.find(
-      (findItem) => findItem.id === item.id
-    );
+    let jogoAddPartida = jogosListados.find((findItem) => findItem.id === item.id);
     if (jogoAddPartida.partidas < 10) {
       // mutation + increment
       jogoAddPartida.partidas = +jogoAddPartida.partidas;
@@ -200,9 +168,7 @@ const Desafio10x10 = () => {
     }
   }
   function handleRetirarPartida(item) {
-    let jogoAddPartida = jogosListados.find(
-      (findItem) => findItem.id === item.id
-    );
+    let jogoAddPartida = jogosListados.find((findItem) => findItem.id === item.id);
     if (jogoAddPartida.partidas > 0) {
       // mutation + decrement
       jogoAddPartida.partidas = +jogoAddPartida.partidas;
@@ -222,13 +188,10 @@ const Desafio10x10 = () => {
   }
   // controles dos componentes do chakra
   function handleFecharDrawer() {
-    if (
-      configuracoesDesafio.qtdJogos !== jogosTotais ||
-      configuracoesDesafio.qtdPartidas !== partidasTotais
-    ) {
+    if (configuracoesDesafio.qtdJogos !== jogosTotais || configuracoesDesafio.qtdPartidas !== partidasTotais) {
       toast({
-        title: "Você alterou as configurações, salve para continuar.",
-        status: "warning",
+        title: 'Você alterou as configurações, salve para continuar.',
+        status: 'warning',
         duration: 3000,
         isClosable: true,
       });
@@ -239,8 +202,8 @@ const Desafio10x10 = () => {
     setDrawerEdicaoJogo(false);
     setJogoEdicao({
       id: 0,
-      nome: "",
-      partidas: "",
+      nome: '',
+      partidas: '',
       categoria: [],
     });
   }
@@ -252,7 +215,7 @@ const Desafio10x10 = () => {
   // popover informações sobre o desafio
   const Informacoes = (tipo) => {
     let informacao = <></>;
-    if (tipo === "desafio10x10") {
+    if (tipo === 'desafio10x10') {
       informacao = (
         <>
           <PopoverArrow />
@@ -261,14 +224,11 @@ const Desafio10x10 = () => {
             O que é o Desafio {jogosTotais}x{partidasTotais}?
           </PopoverHeader>
           <PopoverBody>
-            Escolha <strong>{jogosTotais} jogos</strong> e jogue cada um deles{" "}
-            <strong>{partidasTotais} vezes</strong>, o período padrão para as{" "}
-            <strong>{jogosTotais * partidasTotais} partidas</strong> é de um
-            ano. Avance na trilha dos meeples conforme finalizar as partidas de
-            cada jogo.
-            <br />O desafio pode ser feito de forma leve, podendo mudar qualquer
-            um dos jogos, ou de forma pesada onde não poderá alterar a lista dos
-            jogos no período ou até finalizar todas as partidas.
+            Escolha <strong>{jogosTotais} jogos</strong> e jogue cada um deles <strong>{partidasTotais} vezes</strong>,
+            o período padrão para as <strong>{jogosTotais * partidasTotais} partidas</strong> é de um ano. Avance na
+            trilha dos meeples conforme finalizar as partidas de cada jogo.
+            <br />O desafio pode ser feito de forma leve, podendo mudar qualquer um dos jogos, ou de forma pesada onde
+            não poderá alterar a lista dos jogos no período ou até finalizar todas as partidas.
           </PopoverBody>
         </>
       );
@@ -276,13 +236,7 @@ const Desafio10x10 = () => {
     return (
       <>
         <PopoverTrigger>
-          <Text
-            fontSize="16px"
-            px="10px"
-            cursor="pointer"
-            position="relative"
-            color="blue.200"
-          >
+          <Text fontSize="16px" px="10px" cursor="pointer" position="relative" color="blue.200">
             <MdHelp />
           </Text>
         </PopoverTrigger>
@@ -295,9 +249,7 @@ const Desafio10x10 = () => {
   const ModalDesafio = () => {
     // controles remoção do jogo da lista
     function handleRemoverJogo() {
-      setJogosListados(
-        jogosListados.filter((item) => item.id !== jogoEdicao.id)
-      );
+      setJogosListados(jogosListados.filter((item) => item.id !== jogoEdicao.id));
       handleFecharModal();
       handleFecharDrawer();
     }
@@ -311,10 +263,7 @@ const Desafio10x10 = () => {
           return item;
         })
       );
-      localStorage.setItem(
-        "configuracoesDesafio",
-        JSON.stringify(configuracoesDesafio)
-      );
+      localStorage.setItem('configuracoesDesafio', JSON.stringify(configuracoesDesafio));
       setJogosTotais(configuracoesDesafio.qtdJogos);
       setPartidasTotais(configuracoesDesafio.qtdPartidas);
       setDrawerConfiguracaoDesafio(false);
@@ -334,19 +283,10 @@ const Desafio10x10 = () => {
           </ModalBody>
           <ModalFooter>
             <HStack w="100%">
-              <Button
-                variant="outline"
-                colorScheme="orange"
-                w="50%"
-                onClick={() => handleRemoverJogo()}
-              >
+              <Button variant="outline" colorScheme="orange" w="50%" onClick={() => handleRemoverJogo()}>
                 Confirmar
               </Button>
-              <Button
-                colorScheme="blue"
-                w="50%"
-                onClick={() => handleFecharModal()}
-              >
+              <Button colorScheme="blue" w="50%" onClick={() => handleFecharModal()}>
                 Cancelar
               </Button>
             </HStack>
@@ -362,42 +302,24 @@ const Desafio10x10 = () => {
           <ModalCloseButton />
           <ModalBody>
             <Text>Deseja salvar estas configurações?</Text>
-            <Text fontWeight="bold">
-              Quantidade de Jogos: {configuracoesDesafio.qtdJogos}
-            </Text>
+            <Text fontWeight="bold">Quantidade de Jogos: {configuracoesDesafio.qtdJogos}</Text>
             <Text fontWeight="bold" pb="20px">
               Quantidade de Partidas: {configuracoesDesafio.qtdPartidas}
             </Text>
-            <Text
-              color="red.400"
-              fontSize="14px"
-              p="5px"
-              border="1px solid"
-              borderColor="red.400"
-            >
+            <Text color="red.400" fontSize="14px" p="5px" border="1px solid" borderColor="red.400">
               <strong>ATENÇÃO:</strong>
-              <br />• Se já tiver partidas computadas excedendo ao novo número
-              de total de partidas, será aplicado o novo valor finalizando o
-              desafio do jogo.
-              <br />• Se o número de jogos cadastros for maior que de jogos
-              totais do desafio, eles não serão listados na listagem.
+              <br />• Se já tiver partidas computadas excedendo ao novo número de total de partidas, será aplicado o
+              novo valor finalizando o desafio do jogo.
+              <br />• Se o número de jogos cadastros for maior que de jogos totais do desafio, eles não serão listados
+              na listagem.
             </Text>
           </ModalBody>
           <ModalFooter>
             <HStack w="100%">
-              <Button
-                variant="outline"
-                colorScheme="green"
-                w="50%"
-                onClick={() => handleSalvarConfiguracoes()}
-              >
+              <Button variant="outline" colorScheme="green" w="50%" onClick={() => handleSalvarConfiguracoes()}>
                 Confirmar
               </Button>
-              <Button
-                colorScheme="blue"
-                w="50%"
-                onClick={() => handleFecharModal()}
-              >
+              <Button colorScheme="blue" w="50%" onClick={() => handleFecharModal()}>
                 Cancelar
               </Button>
             </HStack>
@@ -406,27 +328,20 @@ const Desafio10x10 = () => {
       );
     };
 
-    return modalRemoverJogo
-      ? renderModalRemoverJogo()
-      : renderModalSalvarConfiguracoes();
+    return modalRemoverJogo ? renderModalRemoverJogo() : renderModalSalvarConfiguracoes();
   };
 
   // renderização drawer de edição e adição de jogo // configurações do desafio
   const DrawerDesafio = () => {
     // controle salvar configurações
     function handleConfirmaSalvarConfiguracoes() {
-      if (
-        configuracoesDesafio.qtdJogos !== jogosTotais ||
-        configuracoesDesafio.qtdPartidas !== partidasTotais
-      ) {
+      if (configuracoesDesafio.qtdJogos !== jogosTotais || configuracoesDesafio.qtdPartidas !== partidasTotais) {
         setModalSalvarConfiguracoes(true);
       }
     }
     // controle salvar jogo
     function handleSalvarJogo() {
-      let jogoExistente = jogosListados.find(
-        (item) => item.id === jogoEdicao.id
-      );
+      let jogoExistente = jogosListados.find((item) => item.id === jogoEdicao.id);
       if (jogoExistente) {
         setJogosListados(
           jogosListados.map((item) => {
@@ -441,27 +356,27 @@ const Desafio10x10 = () => {
         );
         toast({
           title: `Jogo atualizado: ${jogoEdicao.nome}`,
-          status: "success",
+          status: 'success',
           duration: 3000,
           isClosable: true,
         });
         handleFecharDrawer();
       } else {
-        if (jogoEdicao.nome !== "") {
+        if (jogoEdicao.nome !== '') {
           jogoEdicao.id = uuidv4();
           jogoEdicao.partidas = jogoEdicao.partidas ? jogoEdicao.partidas : 0;
           setJogosListados([...jogosListados, jogoEdicao]);
           toast({
             title: `Jogo adicionado: ${jogoEdicao.nome}`,
-            status: "success",
+            status: 'success',
             duration: 3000,
             isClosable: true,
           });
           handleFecharDrawer();
         } else {
           toast({
-            title: "Insira o nome do jogo para salvar!",
-            status: "warning",
+            title: 'Insira o nome do jogo para salvar!',
+            status: 'warning',
             duration: 3000,
             isClosable: true,
           });
@@ -478,17 +393,13 @@ const Desafio10x10 = () => {
       return (
         <>
           <DrawerCloseButton />
-          <DrawerHeader>
-            {jogoEdicao.id === 0 ? "Adicionar" : "Editar"} Jogo
-          </DrawerHeader>
+          <DrawerHeader>{jogoEdicao.id === 0 ? 'Adicionar' : 'Editar'} Jogo</DrawerHeader>
           <DrawerBody>
             <VStack>
               <Input
                 placeholder="Nome do Jogo"
                 value={jogoEdicao.nome}
-                onChange={(event) =>
-                  setJogoEdicao({ ...jogoEdicao, nome: event.target.value })
-                }
+                onChange={(event) => setJogoEdicao({ ...jogoEdicao, nome: event.target.value })}
               />
               <InputGroup>
                 <NumberInput
@@ -496,17 +407,11 @@ const Desafio10x10 = () => {
                   value={jogoEdicao.partidas}
                   min={0}
                   max={partidasTotais}
-                  onChange={(value) =>
-                    setJogoEdicao({ ...jogoEdicao, partidas: +value })
-                  }
+                  onChange={(value) => setJogoEdicao({ ...jogoEdicao, partidas: +value })}
                 >
                   <NumberInputField placeholder="Número de Partidas Iniciais" />
                 </NumberInput>
-                <InputRightAddon
-                  fontSize="10px"
-                  textTransform="uppercase"
-                  children={`Max ${partidasTotais}`}
-                />
+                <InputRightAddon fontSize="10px" textTransform="uppercase" children={`Max ${partidasTotais}`} />
               </InputGroup>
               <Stack w="100%" shouldWrapChildren={true}>
                 <Text mt="10px">Categorias:</Text>
@@ -540,12 +445,7 @@ const Desafio10x10 = () => {
               >
                 Remover Jogo
               </Button>
-              <Button
-                colorScheme="green"
-                leftIcon={<FaSave />}
-                onClick={() => handleSalvarJogo()}
-                w="50%"
-              >
+              <Button colorScheme="green" leftIcon={<FaSave />} onClick={() => handleSalvarJogo()} w="50%">
                 Salvar Jogo
               </Button>
             </HStack>
@@ -578,15 +478,11 @@ const Desafio10x10 = () => {
                   >
                     <NumberInputField placeholder="Quantidade de Jogos do Desafio" />
                   </NumberInput>
-                  <InputRightAddon
-                    fontSize="10px"
-                    textTransform="uppercase"
-                    children="Max 10"
-                  />
+                  <InputRightAddon fontSize="10px" textTransform="uppercase" children="Max 10" />
                 </InputGroup>
               </FormControl>
               <FormControl w="100%">
-                <FormLabel>Quantidade de Partidas do Desafio:</FormLabel>
+                <FormLabel>Quantidade de Partidas por Jogo:</FormLabel>
                 <InputGroup>
                   <NumberInput
                     w="100%"
@@ -602,11 +498,7 @@ const Desafio10x10 = () => {
                   >
                     <NumberInputField placeholder="Quantidade de Partidas do Desafio" />
                   </NumberInput>
-                  <InputRightAddon
-                    fontSize="10px"
-                    textTransform="uppercase"
-                    children="Max 10"
-                  />
+                  <InputRightAddon fontSize="10px" textTransform="uppercase" children="Max 10" />
                 </InputGroup>
               </FormControl>
             </VStack>
@@ -617,7 +509,7 @@ const Desafio10x10 = () => {
                 colorScheme="green"
                 leftIcon={<FaSave />}
                 onClick={() => handleConfirmaSalvarConfiguracoes()}
-                w={{ md: "50%", sm: "100%" }}
+                w={{ md: '50%', sm: '100%' }}
               >
                 Salvar Configurações
               </Button>
@@ -634,16 +526,10 @@ const Desafio10x10 = () => {
   const ListagemJogos = useMemo(() => {
     // render dos meeples de número de partidas
     const NumeroPartidas = (partidas) => {
-      let partidasTotaisMontadas = Array.from(
-        { length: partidasTotais },
-        (v, k) => k + 1
-      );
+      let partidasTotaisMontadas = Array.from({ length: partidasTotais }, (v, k) => k + 1);
       let partidasJogadas = partidasTotaisMontadas.map((item, index) => {
         return (
-          <Text
-            color={index + 1 <= partidas ? "green.500" : "#DDDDDD22"}
-            key={item}
-          >
+          <Text color={index + 1 <= partidas ? 'green.500' : '#DDDDDD22'} key={item}>
             <GiMeeple />
           </Text>
         );
@@ -653,10 +539,10 @@ const Desafio10x10 = () => {
     // render listagem de categorias
     const ListagemCategorias = (categoria) => {
       function corPorCategoria(item) {
-        if (item === "Cooperativo") {
-          return "green";
-        } else if (item === "Duelo") {
-          return "red";
+        if (item === 'Cooperativo') {
+          return 'green';
+        } else if (item === 'Duelo') {
+          return 'red';
         }
       }
       return (
@@ -665,12 +551,7 @@ const Desafio10x10 = () => {
             .filter((item) => categoria.indexOf(item.id) > -1)
             .map((item) => {
               return (
-                <Badge
-                  key={item.nome}
-                  fontSize="9px"
-                  mr="5px"
-                  colorScheme={corPorCategoria(item.nome)}
-                >
+                <Badge key={item.nome} fontSize="9px" mr="5px" colorScheme={corPorCategoria(item.nome)}>
                   {item.nome}
                 </Badge>
               );
@@ -684,31 +565,20 @@ const Desafio10x10 = () => {
         return (
           <TRow key={item.id}>
             <TColumn w="30%" flexDirection="column" justifyContent="center">
-              <Text
-                fontSize={{ md: "22px", sm: "16px" }}
-                fontWeight="bold"
-                letterSpacing="-0.7px"
-              >
+              <Text fontSize={{ md: '22px', sm: '16px' }} fontWeight="bold" letterSpacing="-0.7px">
                 {item.nome}
               </Text>
-              <Stack
-                display={{ md: "flex", sm: "none" }}
-                shouldWrapChildren={true}
-              >
-                {showHUD ? ListagemCategorias(item.categoria) : ""}
+              <Stack display={{ md: 'flex', sm: 'none' }} shouldWrapChildren={true}>
+                {showHUD ? ListagemCategorias(item.categoria) : ''}
               </Stack>
             </TColumn>
             <TColumn w="50%" alignItems="center">
-              <Flex fontSize={{ md: "34px", sm: "22px" }} alignItems="center">
+              <Flex fontSize={{ md: '34px', sm: '22px' }} alignItems="center">
                 {NumeroPartidas(item.partidas)}
                 {item.partidas === partidasTotais ? (
                   <Flex color="yellow.500" ml="10px" alignItems="center">
                     <AiTwotoneCrown />
-                    <Text
-                      display={{ md: "flex", sm: "none" }}
-                      fontSize="10px"
-                      textTransform="uppercase"
-                    >
+                    <Text display={{ md: 'flex', sm: 'none' }} fontSize="10px" textTransform="uppercase">
                       Finalizado!
                     </Text>
                   </Flex>
@@ -720,9 +590,9 @@ const Desafio10x10 = () => {
             <TColumnButtons w="20%" alignItems="center">
               {showHUD ? (
                 <HStack
-                  pt={{ md: "0px", sm: "5px" }}
+                  pt={{ md: '0px', sm: '5px' }}
                   spacing="20px"
-                  justifyContent={{ md: "center", sm: "space-between" }}
+                  justifyContent={{ md: 'center', sm: 'space-between' }}
                   w="100%"
                 >
                   <Flex>
@@ -760,7 +630,7 @@ const Desafio10x10 = () => {
                   </Flex>
                 </HStack>
               ) : (
-                ""
+                ''
               )}
             </TColumnButtons>
           </TRow>
@@ -769,8 +639,7 @@ const Desafio10x10 = () => {
     ) : (
       <TRow>
         <TColumn w="100%" color="gray.400" fontSize="12px">
-          Nenhum jogo encontrado. Clique no botão "Adicionar Jogo" para
-          cadastrar!
+          Nenhum jogo encontrado. Clique no botão "Adicionar Jogo" para cadastrar!
         </TColumn>
       </TRow>
     );
@@ -780,12 +649,7 @@ const Desafio10x10 = () => {
   return (
     <>
       {modalRemoverJogo || modalSalvarConfiguracoes ? (
-        <Modal
-          isOpen={isOpen}
-          onClose={handleFecharModal}
-          motionPreset="slideInBottom"
-          isCentered
-        >
+        <Modal isOpen={isOpen} onClose={handleFecharModal} motionPreset="slideInBottom" isCentered>
           <ModalOverlay
             onClick={() => {
               handleFecharModal;
@@ -795,38 +659,33 @@ const Desafio10x10 = () => {
           <ModalContent>{ModalDesafio()}</ModalContent>
         </Modal>
       ) : (
-        ""
+        ''
       )}
 
       {drawerEdicaoJogo || drawerConfiguracaoDesafio ? (
-        <Drawer
-          isOpen={isOpen}
-          onClose={handleFecharDrawer}
-          placement="right"
-          size="lg"
-        >
+        <Drawer isOpen={isOpen} onClose={handleFecharDrawer} placement="right" size="lg">
           <DrawerOverlay onClick={handleFecharDrawer} />
           <DrawerContent>{DrawerDesafio()}</DrawerContent>
         </Drawer>
       ) : (
-        ""
+        ''
       )}
 
       <Flex
-        w={{ lg: "1300px", md: "100%", sm: "100%" }}
+        w={{ lg: '1300px', md: '100%', sm: '100%' }}
         maxW="100%"
         minH="60vh"
         alignItems="center"
         flexDirection="column"
-        py={{ md: "20px", sm: "10px" }}
+        py={{ md: '20px', sm: '10px' }}
         m="0 auto"
       >
         <Flex justifyContent="space-between" align="center" w="100%">
           <Flex alignItems="center" w="60%">
-            <Heading fontWeight="bold" fontSize={{ md: "32px", sm: "20px" }}>
+            <Heading fontWeight="bold" fontSize={{ md: '32px', sm: '20px' }}>
               Desafio {jogosTotais}x{partidasTotais}
             </Heading>
-            <Popover placement="bottom">{Informacoes("desafio10x10")}</Popover>
+            <Popover placement="bottom">{Informacoes('desafio10x10')}</Popover>
           </Flex>
           <Flex alignItems="center" justifyContent="flex-end" w="40%">
             <ButtonGroup>
@@ -842,7 +701,7 @@ const Desafio10x10 = () => {
               </Flex>
               <Flex>
                 <IconButton
-                  display={{ md: "none", sm: "flex" }}
+                  display={{ md: 'none', sm: 'flex' }}
                   aria-label="Configurações do Desafio"
                   icon={<FaCog />}
                   colorScheme="gray"
@@ -850,7 +709,7 @@ const Desafio10x10 = () => {
                   onClick={() => handleAbrirConfiguracaoDesafio()}
                 />
                 <Button
-                  display={{ md: "flex", sm: "none" }}
+                  display={{ md: 'flex', sm: 'none' }}
                   leftIcon={<FaCog />}
                   colorScheme="gray"
                   size="sm"
@@ -861,15 +720,11 @@ const Desafio10x10 = () => {
               </Flex>
               <Flex>
                 <ButtonGroup size="sm" isAttached>
-                  <Button
-                    display={{ md: "block", sm: "none" }}
-                    size="sm"
-                    isDisabled
-                  >
+                  <Button display={{ md: 'block', sm: 'none' }} size="sm" isDisabled>
                     {jogosListados.length}/{jogosTotais}
                   </Button>
                   <IconButton
-                    display={{ md: "none", sm: "flex" }}
+                    display={{ md: 'none', sm: 'flex' }}
                     aria-label="Adicionar Jogo"
                     icon={<FaPlus />}
                     colorScheme="blue"
@@ -878,7 +733,7 @@ const Desafio10x10 = () => {
                     isDisabled={jogosListados.length >= jogosTotais}
                   />
                   <Button
-                    display={{ md: "flex", sm: "none" }}
+                    display={{ md: 'flex', sm: 'none' }}
                     leftIcon={<FaPlus />}
                     colorScheme="blue"
                     size="sm"
@@ -892,15 +747,13 @@ const Desafio10x10 = () => {
             </ButtonGroup>
           </Flex>
         </Flex>
-        <Flex mt={{ md: "40px", sm: "10px" }} w="100%">
+        <Flex mt={{ md: '40px', sm: '10px' }} w="100%">
           <Box overflowX="auto" w="100%">
             <Table>
-              <THeader display={{ md: "flex", sm: "none" }}>
+              <THeader display={{ md: 'flex', sm: 'none' }}>
                 <THead w="30%">Jogos</THead>
                 <THead w="50%">Partidas</THead>
-                <THeadButtons w="20%">
-                  {showHUD ? "Controle | Editar" : ""}
-                </THeadButtons>
+                <THeadButtons w="20%">{showHUD ? 'Controle | Editar' : ''}</THeadButtons>
               </THeader>
               <TBody>{ListagemJogos}</TBody>
             </Table>
