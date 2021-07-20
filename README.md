@@ -5,7 +5,8 @@
 Com esta aplicação é possível criar o famoso desafio 10x10 no universo dos jogos de tabuleiro.
 O desafio consiste em selecionar 10 jogos e jogar 10 partidas de cada um deles.
 
-| ![Tela Inicial](https://github.com/ericut/boardgame10/blob/main/.doc/imgs/01-tela-inicial.png) | ![Tela Adicionar Jogo](https://github.com/ericut/boardgame10/blob/main/.doc/imgs/02-tela-inicial.png) |
+| ![Tela Inicial](https://github.com/ericut/boardgame10/blob/main/.doc/imgs/01-tela-inicial.png) | ![Tela Adicionar Jogo](https://github.com/ericut/boardgame10/blob/main/.doc/imgs/02-tela-adicao.png) |
+| ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
 
 ### Recursos
 
