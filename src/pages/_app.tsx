@@ -6,7 +6,7 @@ import CustomTheme from '../theme/theme';
 import Header from '../components/Header/Header';
 import Footer from '../components/Footer/Footer';
 
-export default function App({ Component, pageProps }) {
+export default function App({ Component, pageProps }: any) {
   return (
     <ChakraProvider resetCSS={true} theme={CustomTheme}>
       <Head>

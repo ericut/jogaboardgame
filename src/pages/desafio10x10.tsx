@@ -74,37 +74,37 @@ const Desafio10x10 = () => {
   const [modalRemoverJogo, setModalRemoverJogo] = useState(false);
 
   // estado de configurações do desafio
-  const [configuracoesDesafio, setConfiguracoesDesafio] = useState<IConfiguracoesProps | undefined>({
+  const [configuracoesDesafio, setConfiguracoesDesafio] = useState<IConfiguracoesProps>({
     qtdJogos: 10,
     qtdPartidas: 10,
   });
 
-  const [jogosTotais, setJogosTotais] = useState(configuracoesDesafio.qtdJogos);
-  const [partidasTotais, setPartidasTotais] = useState(configuracoesDesafio.qtdPartidas);
+  const [jogosTotais, setJogosTotais] = useState<number>(configuracoesDesafio.qtdJogos);
+  const [partidasTotais, setPartidasTotais] = useState<number>(configuracoesDesafio.qtdPartidas);
   // estado de listagem dos jogos
-  const [jogosListados, setJogosListados] = useState<IJogosProps[] | undefined>(jogosData);
+  const [jogosListados, setJogosListados] = useState<IJogosProps[]>(jogosData);
   // estado da edição e adição de jogo
-  const [jogoEdicao, setJogoEdicao] = useState<IJogosProps | undefined>({
+  const [jogoEdicao, setJogoEdicao] = useState<IJogosProps>({
     id: 0,
     nome: '',
     partidas: '',
     categoria: [],
   });
   // estado das categorias
-  const [categoriaListagem] = useState<ICategoriasProps[] | undefined>(categoriasData);
+  const [categoriaListagem] = useState<ICategoriasProps[]>(categoriasData);
 
   // recuperação do jogo na localstorage
   useEffect(() => {
     // recuperação de jogos
     if (localStorage.getItem('listagemJogos')) {
-      let jogosRecuperados = JSON.parse(localStorage.getItem('listagemJogos'));
+      let jogosRecuperados = JSON.parse(localStorage.getItem('listagemJogos') || '');
       setJogosListados(jogosRecuperados);
     } else {
       setJogosListados(jogosData);
     }
     // recuperação de configurações
     if (localStorage.getItem('configuracoesDesafio')) {
-      let configuracoesRecuperadas = JSON.parse(localStorage.getItem('configuracoesDesafio'));
+      let configuracoesRecuperadas = JSON.parse(localStorage.getItem('configuracoesDesafio') || '');
       setConfiguracoesDesafio(configuracoesRecuperadas);
       setJogosTotais(configuracoesRecuperadas.qtdJogos);
       setPartidasTotais(configuracoesRecuperadas.qtdPartidas);
@@ -124,7 +124,7 @@ const Desafio10x10 = () => {
     setDrawerConfiguracaoDesafio(true);
   }
   // controles edição e adição de jogo
-  function handleAbrirEdicaoJogo(item?) {
+  function handleAbrirEdicaoJogo(item?: IJogosProps) {
     onOpen();
     setDrawerEdicaoJogo(true);
     if (item) {
@@ -134,10 +134,10 @@ const Desafio10x10 = () => {
     }
   }
   // controle checkbox das categorias
-  function handleEditarCategorias(event) {
+  function handleEditarCategorias(event: any) {
     let value = +event.target.value;
     let checked = event.target.checked;
-    let categorias = jogoEdicao.categoria;
+    let categorias = jogoEdicao ? jogoEdicao.categoria : [];
     if (checked) {
       setJogoEdicao({ ...jogoEdicao, categoria: categorias.concat([value]) });
     } else {
@@ -148,8 +148,8 @@ const Desafio10x10 = () => {
     }
   }
   // controles -/+ das linhas da tabela
-  function handleAcrescentarPartida(item) {
-    let jogoAddPartida = jogosListados.find((findItem) => findItem.id === item.id);
+  function handleAcrescentarPartida(item: IJogosProps) {
+    let jogoAddPartida: IJogosProps | any = jogosListados.find((findItem) => findItem.id === item.id);
     if (jogoAddPartida.partidas < 10) {
       // mutation + increment
       jogoAddPartida.partidas = +jogoAddPartida.partidas;
@@ -167,8 +167,8 @@ const Desafio10x10 = () => {
       );
     }
   }
-  function handleRetirarPartida(item) {
-    let jogoAddPartida = jogosListados.find((findItem) => findItem.id === item.id);
+  function handleRetirarPartida(item: IJogosProps) {
+    let jogoAddPartida: IJogosProps | any = jogosListados.find((findItem) => findItem.id === item.id);
     if (jogoAddPartida.partidas > 0) {
       // mutation + decrement
       jogoAddPartida.partidas = +jogoAddPartida.partidas;
@@ -213,7 +213,7 @@ const Desafio10x10 = () => {
   }
 
   // popover informações sobre o desafio
-  const Informacoes = (tipo) => {
+  const Informacoes = (tipo: string) => {
     let informacao = <></>;
     if (tipo === 'desafio10x10') {
       informacao = (
@@ -525,7 +525,7 @@ const Desafio10x10 = () => {
   // renderização da listagem de jogos
   const ListagemJogos = useMemo(() => {
     // render dos meeples de número de partidas
-    const NumeroPartidas = (partidas) => {
+    const NumeroPartidas = (partidas: number) => {
       let partidasTotaisMontadas = Array.from({ length: partidasTotais }, (v, k) => k + 1);
       let partidasJogadas = partidasTotaisMontadas.map((item, index) => {
         return (
@@ -537,8 +537,8 @@ const Desafio10x10 = () => {
       return <>{partidasJogadas}</>;
     };
     // render listagem de categorias
-    const ListagemCategorias = (categoria) => {
-      function corPorCategoria(item) {
+    const ListagemCategorias = (categoria: number[]) => {
+      function corPorCategoria(item: string) {
         if (item === 'Cooperativo') {
           return 'green';
         } else if (item === 'Duelo') {
@@ -574,7 +574,7 @@ const Desafio10x10 = () => {
             </TColumn>
             <TColumn w="50%" alignItems="center">
               <Flex fontSize={{ md: '34px', sm: '22px' }} alignItems="center">
-                {NumeroPartidas(item.partidas)}
+                {NumeroPartidas(+item.partidas)}
                 {item.partidas === partidasTotais ? (
                   <Flex color="yellow.500" ml="10px" alignItems="center">
                     <AiTwotoneCrown />
