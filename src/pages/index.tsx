@@ -1,4 +1,4 @@
-import Desafio10x10 from "./desafio10x10";
+import Desafio10x10 from './desafio10x10';
 
 const IndexPage = () => {
   return (
