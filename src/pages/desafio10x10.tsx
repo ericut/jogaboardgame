@@ -1,5 +1,4 @@
-import { useMemo, useState, useEffect } from 'react';
-import { v4 as uuidv4 } from 'uuid';
+import { useMemo, useState, useEffect, useContext } from 'react';
 // chakra
 import {
   Text,
@@ -54,16 +53,27 @@ import { GiMeeple } from 'react-icons/gi';
 import { FaEdit, FaSave, FaPlus, FaMinus, FaEye, FaEyeSlash, FaCog } from 'react-icons/fa';
 import { AiTwotoneCrown } from 'react-icons/ai';
 import { MdHelp } from 'react-icons/md';
-// props
-import { IJogosProps, ICategoriasProps, IConfiguracoesProps } from '../interfaces';
 // data
-import { jogosData } from '../data/jogosData';
-import { categoriasData } from '../data/categoriasData';
+import { categoriasData } from '../context/data/categoriasData';
+// interfaces
+import { IJogosProps, ICategoriasProps } from '../interfaces';
+// context
+import { ConfiguracoesContext } from '../context/ConfiguracoesContext';
+import { ListagemJogosContext } from '../context/ListagemJogosContext';
+import { EdicaoJogoContext } from '../context/EdicaoJogoContext';
 
 const Desafio10x10 = () => {
   // hooks chakra
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  // contexts
+  const { listagemJogosData, handleRetirarPartida, handleAcrescentarPartida, handleMudarConfiguracoesListagem } =
+    useContext(ListagemJogosContext);
+  const { jogoEdicao, setJogoEdicao, handleSalvarJogo, handleRemoverJogo } = useContext(EdicaoJogoContext);
+  const { configuracoesDesafio, jogosTotais, partidasTotais } = useContext(ConfiguracoesContext);
+
+  // jogoEdicao
+  //
   // estados de controles
   const [showHUD, setShowHUD] = useState(true);
   // drawers
@@ -73,50 +83,12 @@ const Desafio10x10 = () => {
   const [modalSalvarConfiguracoes, setModalSalvarConfiguracoes] = useState(false);
   const [modalRemoverJogo, setModalRemoverJogo] = useState(false);
 
-  // estado de configurações do desafio
-  const [configuracoesDesafio, setConfiguracoesDesafio] = useState<IConfiguracoesProps>({
-    qtdJogos: 10,
-    qtdPartidas: 10,
-  });
-
-  const [jogosTotais, setJogosTotais] = useState<number>(configuracoesDesafio.qtdJogos);
-  const [partidasTotais, setPartidasTotais] = useState<number>(configuracoesDesafio.qtdPartidas);
-  // estado de listagem dos jogos
-  const [jogosListados, setJogosListados] = useState<IJogosProps[]>(jogosData);
-  // estado da edição e adição de jogo
-  const [jogoEdicao, setJogoEdicao] = useState<IJogosProps>({
-    id: 0,
-    nome: '',
-    partidas: '',
-    categoria: [],
-  });
   // estado das categorias
   const [categoriaListagem] = useState<ICategoriasProps[]>(categoriasData);
 
-  // recuperação do jogo na localstorage
   useEffect(() => {
-    // recuperação de jogos
-    if (localStorage.getItem('listagemJogos')) {
-      let jogosRecuperados = JSON.parse(localStorage.getItem('listagemJogos') || '');
-      setJogosListados(jogosRecuperados);
-    } else {
-      setJogosListados(jogosData);
-    }
     // recuperação de configurações
-    if (localStorage.getItem('configuracoesDesafio')) {
-      let configuracoesRecuperadas = JSON.parse(localStorage.getItem('configuracoesDesafio') || '');
-      setConfiguracoesDesafio(configuracoesRecuperadas);
-      setJogosTotais(configuracoesRecuperadas.qtdJogos);
-      setPartidasTotais(configuracoesRecuperadas.qtdPartidas);
-    } else {
-      setConfiguracoesDesafio({ qtdJogos: 10, qtdPartidas: 10 });
-    }
   }, []);
-
-  // aplicando localstorage quando há alguma atualização na listagem
-  useEffect(() => {
-    localStorage.setItem('listagemJogos', JSON.stringify(jogosListados));
-  }, [jogosListados]);
 
   // controles configuração do desafio
   function handleAbrirConfiguracaoDesafio() {
@@ -147,45 +119,7 @@ const Desafio10x10 = () => {
       });
     }
   }
-  // controles -/+ das linhas da tabela
-  function handleAcrescentarPartida(item: IJogosProps) {
-    let jogoAddPartida: IJogosProps | any = jogosListados.find((findItem) => findItem.id === item.id);
-    if (jogoAddPartida.partidas < 10) {
-      // mutation + increment
-      jogoAddPartida.partidas = +jogoAddPartida.partidas;
-      jogoAddPartida.partidas += 1;
-      setJogosListados(
-        jogosListados.map((itemAdded) => {
-          if (itemAdded.id === jogoAddPartida.id) {
-            itemAdded.id = jogoAddPartida.id;
-            itemAdded.nome = jogoAddPartida.nome;
-            itemAdded.partidas = jogoAddPartida.partidas;
-            itemAdded.categoria = jogoAddPartida.categoria;
-          }
-          return itemAdded;
-        })
-      );
-    }
-  }
-  function handleRetirarPartida(item: IJogosProps) {
-    let jogoAddPartida: IJogosProps | any = jogosListados.find((findItem) => findItem.id === item.id);
-    if (jogoAddPartida.partidas > 0) {
-      // mutation + decrement
-      jogoAddPartida.partidas = +jogoAddPartida.partidas;
-      jogoAddPartida.partidas -= 1;
-      setJogosListados(
-        jogosListados.map((itemAdded) => {
-          if (itemAdded.id === jogoAddPartida.id) {
-            itemAdded.id = jogoAddPartida.id;
-            itemAdded.nome = jogoAddPartida.nome;
-            itemAdded.partidas = jogoAddPartida.partidas;
-            itemAdded.categoria = jogoAddPartida.categoria;
-          }
-          return itemAdded;
-        })
-      );
-    }
-  }
+
   // controles dos componentes do chakra
   function handleFecharDrawer() {
     if (configuracoesDesafio.qtdJogos !== jogosTotais || configuracoesDesafio.qtdPartidas !== partidasTotais) {
@@ -247,22 +181,9 @@ const Desafio10x10 = () => {
 
   // renderização modal remoção do jogo
   const ModalDesafio = () => {
-    // controles remoção do jogo da lista
-    function handleRemoverJogo() {
-      setJogosListados(jogosListados.filter((item) => item.id !== jogoEdicao.id));
-      handleFecharModal();
-      handleFecharDrawer();
-    }
     // controle salvar configuracoes
     function handleSalvarConfiguracoes() {
-      setJogosListados(
-        jogosListados.map((item) => {
-          if (item.partidas >= configuracoesDesafio.qtdPartidas) {
-            item.partidas = configuracoesDesafio.qtdPartidas;
-          }
-          return item;
-        })
-      );
+      handleMudarConfiguracoesListagem(configuracoesDesafio.qtdPartidas);
       localStorage.setItem('configuracoesDesafio', JSON.stringify(configuracoesDesafio));
       setJogosTotais(configuracoesDesafio.qtdJogos);
       setPartidasTotais(configuracoesDesafio.qtdPartidas);
@@ -339,50 +260,7 @@ const Desafio10x10 = () => {
         setModalSalvarConfiguracoes(true);
       }
     }
-    // controle salvar jogo
-    function handleSalvarJogo() {
-      let jogoExistente = jogosListados.find((item) => item.id === jogoEdicao.id);
-      if (jogoExistente) {
-        setJogosListados(
-          jogosListados.map((item) => {
-            if (item.id === jogoEdicao.id) {
-              item.id = jogoEdicao.id;
-              item.nome = jogoEdicao.nome;
-              item.partidas = jogoEdicao.partidas;
-              item.categoria = jogoEdicao.categoria;
-            }
-            return item;
-          })
-        );
-        toast({
-          title: `Jogo atualizado: ${jogoEdicao.nome}`,
-          status: 'success',
-          duration: 3000,
-          isClosable: true,
-        });
-        handleFecharDrawer();
-      } else {
-        if (jogoEdicao.nome !== '') {
-          jogoEdicao.id = uuidv4();
-          jogoEdicao.partidas = jogoEdicao.partidas ? jogoEdicao.partidas : 0;
-          setJogosListados([...jogosListados, jogoEdicao]);
-          toast({
-            title: `Jogo adicionado: ${jogoEdicao.nome}`,
-            status: 'success',
-            duration: 3000,
-            isClosable: true,
-          });
-          handleFecharDrawer();
-        } else {
-          toast({
-            title: 'Insira o nome do jogo para salvar!',
-            status: 'warning',
-            duration: 3000,
-            isClosable: true,
-          });
-        }
-      }
-    }
+
     // controles remoção do jogo da lista
     function handleConfirmarRemocaoJogo() {
       setModalRemoverJogo(true);
@@ -560,8 +438,8 @@ const Desafio10x10 = () => {
       );
     };
 
-    return jogosListados.length !== 0 ? (
-      jogosListados.slice(0, jogosTotais).map((item, index) => {
+    return listagemJogosData.length !== 0 ? (
+      listagemJogosData.slice(0, jogosTotais).map((item, index) => {
         return (
           <TRow key={item.id}>
             <TColumn w="30%" flexDirection="column" justifyContent="center">
@@ -643,7 +521,7 @@ const Desafio10x10 = () => {
         </TColumn>
       </TRow>
     );
-  }, [jogosListados, categoriaListagem, showHUD, partidasTotais, jogosTotais]);
+  }, [listagemJogosData, categoriaListagem, showHUD, partidasTotais, jogosTotais]);
 
   // renderização geral
   return (
@@ -721,7 +599,7 @@ const Desafio10x10 = () => {
               <Flex>
                 <ButtonGroup size="sm" isAttached>
                   <Button display={{ md: 'block', sm: 'none' }} size="sm" isDisabled>
-                    {jogosListados.length}/{jogosTotais}
+                    {listagemJogosData.length}/{jogosTotais}
                   </Button>
                   <IconButton
                     display={{ md: 'none', sm: 'flex' }}
@@ -730,7 +608,7 @@ const Desafio10x10 = () => {
                     colorScheme="blue"
                     size="sm"
                     onClick={() => handleAbrirEdicaoJogo()}
-                    isDisabled={jogosListados.length >= jogosTotais}
+                    isDisabled={listagemJogosData.length >= jogosTotais}
                   />
                   <Button
                     display={{ md: 'flex', sm: 'none' }}
@@ -738,7 +616,7 @@ const Desafio10x10 = () => {
                     colorScheme="blue"
                     size="sm"
                     onClick={() => handleAbrirEdicaoJogo()}
-                    isDisabled={jogosListados.length >= jogosTotais}
+                    isDisabled={listagemJogosData.length >= jogosTotais}
                   >
                     Adicionar Jogo
                   </Button>
