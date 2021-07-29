@@ -1,4 +1,3 @@
-import { useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import {
@@ -25,7 +24,6 @@ import LogoWhite from './Logo/bg10_logo_white.svg';
 const Header = () => {
   const { toggleColorMode, colorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const btnRef = useRef();
   const MenuBGColor = useColorModeValue('gray.100', 'gray.700');
 
   const MenuItens = () => {

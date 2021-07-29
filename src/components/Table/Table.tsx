@@ -1,19 +1,20 @@
-import { ReactNode } from "react";
-import {
-  Flex,
-  Box,
-  HStack,
-  useColorModeValue,
-  BoxProps,
-} from "@chakra-ui/react";
+import { ReactNode } from 'react';
+import { Flex, Box, HStack, useColorModeValue, BoxProps, FlexProps, StackProps } from '@chakra-ui/react';
 
 // interfaces
-interface ITableColumnProps extends BoxProps {
+interface ITableProps extends BoxProps, FlexProps {
   w?: string;
   children: ReactNode;
 }
 
-export function Table({ children, ...rest }) {
+interface ITableStackProps extends StackProps {
+  w?: string;
+  children: ReactNode;
+}
+
+type ITableWidthOmited = Omit<ITableProps, 'w'>;
+
+export function Table({ children, ...rest }: ITableProps) {
   return (
     <Box w="100%" {...rest}>
       {children}
@@ -21,8 +22,8 @@ export function Table({ children, ...rest }) {
   );
 }
 
-export function THeader({ children, ...rest }) {
-  const TextColor = useColorModeValue("gray.400", "gray.400");
+export function THeader({ children, ...rest }: ITableWidthOmited) {
+  const TextColor = useColorModeValue('gray.400', 'gray.400');
   return (
     <Flex
       color={TextColor}
@@ -32,9 +33,9 @@ export function THeader({ children, ...rest }) {
       style={{ zIndex: 1 }}
       fontWeight="bold"
       letterSpacing="1px"
-      flexDirection={{ md: "initial", sm: "column" }}
-      alignItems={{ md: "center", sm: "flex-start" }}
-      justifyContent={{ md: "initial", sm: "flex-start" }}
+      flexDirection={{ md: 'initial', sm: 'column' }}
+      alignItems={{ md: 'center', sm: 'flex-start' }}
+      justifyContent={{ md: 'initial', sm: 'flex-start' }}
       {...rest}
     >
       {children}
@@ -42,21 +43,21 @@ export function THeader({ children, ...rest }) {
   );
 }
 
-export function THead({ children, w, ...rest }) {
+export function THead({ children, w, ...rest }: ITableProps) {
   return (
-    <Box p="0px 10px" w={{ md: w ? w : "100%", sm: "100%" }} {...rest}>
+    <Box p="0px 10px" w={{ md: w ? w : '100%', sm: '100%' }} {...rest}>
       {children}
     </Box>
   );
 }
 
-export function THeadButtons({ children, w, ...rest }) {
+export function THeadButtons({ children, w, ...rest }: ITableProps) {
   return (
     <Flex
-      display={{ md: "flex", sm: "none" }}
+      display={{ md: 'flex', sm: 'none' }}
       p="0 10px"
-      justifyContent={{ md: "center", sm: "flex-start" }}
-      w={{ md: w ? w : "100%", sm: "100%" }}
+      justifyContent={{ md: 'center', sm: 'flex-start' }}
+      w={{ md: w ? w : '100%', sm: '100%' }}
       {...rest}
     >
       <Box textAlign="center">{children}</Box>
@@ -64,8 +65,8 @@ export function THeadButtons({ children, w, ...rest }) {
   );
 }
 
-export function TBody({ children, ...rest }) {
-  const BorderColor = useColorModeValue("gray.400", "gray.600");
+export function TBody({ children, ...rest }: ITableWidthOmited) {
+  const BorderColor = useColorModeValue('gray.400', 'gray.600');
   return (
     <Box
       borderBottom="2px solid"
@@ -79,9 +80,9 @@ export function TBody({ children, ...rest }) {
   );
 }
 
-export function TRow({ children, ...rest }) {
-  const BorderColor = useColorModeValue("gray.400", "gray.600");
-  const HoverBgColor = useColorModeValue("gray.100", "gray.700");
+export function TRow({ children, ...rest }: ITableWidthOmited) {
+  const BorderColor = useColorModeValue('gray.400', 'gray.600');
+  const HoverBgColor = useColorModeValue('gray.100', 'gray.700');
   return (
     <Flex
       borderBottom="1px solid"
@@ -89,10 +90,10 @@ export function TRow({ children, ...rest }) {
       minH="40px"
       fontSize="14px"
       transition="0.5s all"
-      padding={{ md: "10px 0", sm: "2px 0" }}
-      flexDirection={{ md: "initial", sm: "column" }}
-      alignItems={{ md: "stretch", sm: "flex-start" }}
-      justifyContent={{ md: "initial", sm: "flex-start" }}
+      padding={{ md: '10px 0', sm: '2px 0' }}
+      flexDirection={{ md: 'initial', sm: 'column' }}
+      alignItems={{ md: 'stretch', sm: 'flex-start' }}
+      justifyContent={{ md: 'initial', sm: 'flex-start' }}
       _hover={{
         backgroundColor: HoverBgColor,
       }}
@@ -103,26 +104,21 @@ export function TRow({ children, ...rest }) {
   );
 }
 
-export function TColumn({ children, w, ...rest }: ITableColumnProps) {
+export function TColumn({ children, w, ...rest }: ITableProps) {
   return (
-    <Flex
-      p="0 10px"
-      w={{ md: w ? w : "100%", sm: "100%" }}
-      _hover={{ color: "primary.900" }}
-      {...rest}
-    >
+    <Flex p="0 10px" w={{ md: w ? w : '100%', sm: '100%' }} _hover={{ color: 'primary.900' }} {...rest}>
       {children}
     </Flex>
   );
 }
 
-export function TColumnButtons({ children, w, ...rest }: ITableColumnProps) {
+export function TColumnButtons({ children, w, ...rest }: ITableStackProps) {
   return (
     <HStack
       p="0 10px"
       alignItems="stretch"
-      justifyContent={{ md: "center", sm: "flex-start" }}
-      w={{ md: w ? w : "100%", sm: "100%" }}
+      justifyContent={{ md: 'center', sm: 'flex-start' }}
+      w={{ md: w ? w : '100%', sm: '100%' }}
       {...rest}
     >
       {children}
