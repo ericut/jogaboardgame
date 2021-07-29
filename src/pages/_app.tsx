@@ -31,7 +31,7 @@ export default function App({ Component, pageProps }: any) {
           </ConfiguracoesProvider>
         </ListagemCategoriasProvider>
       </ListagemJogosProvider>
-      <Footer />
+      <Footer version={'Version 0.1.2 B'} />
     </ChakraProvider>
   );
 }

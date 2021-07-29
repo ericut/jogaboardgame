@@ -1,6 +1,6 @@
-import { useRef } from "react";
-import Image from "next/image";
-import Link from "next/link";
+import { useRef } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
 import {
   HStack,
   VStack,
@@ -16,17 +16,17 @@ import {
   DrawerContent,
   DrawerCloseButton,
   useDisclosure,
-} from "@chakra-ui/react";
-import { BiMenu, BiMoon, BiSun } from "react-icons/bi";
+} from '@chakra-ui/react';
+import { BiMenu, BiMoon, BiSun } from 'react-icons/bi';
 
-import Logo from "./Logo/bg10_logo.svg";
-import LogoWhite from "./Logo/bg10_logo_white.svg";
+import Logo from './Logo/bg10_logo.svg';
+import LogoWhite from './Logo/bg10_logo_white.svg';
 
 const Header = () => {
   const { toggleColorMode, colorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const btnRef = useRef();
-  const MenuBGColor = useColorModeValue("gray.100", "gray.700");
+  const MenuBGColor = useColorModeValue('gray.100', 'gray.700');
 
   const MenuItens = () => {
     return (
@@ -47,12 +47,7 @@ const Header = () => {
 
   return (
     <>
-      <Drawer
-        isOpen={isOpen}
-        placement="right"
-        onClose={onClose}
-        finalFocusRef={btnRef}
-      >
+      <Drawer isOpen={isOpen} placement="right" onClose={onClose}>
         <DrawerOverlay />
         <DrawerContent>
           <DrawerCloseButton />
@@ -66,50 +61,39 @@ const Header = () => {
       </Drawer>
       <Flex
         as="header"
-        m={{ md: "0 0 20px", sm: "0 0 5px" }}
+        m={{ md: '0 0 20px', sm: '0 0 5px' }}
         p="0 20px"
         maxW="100%"
         justifyContent="center"
         bg={MenuBGColor}
       >
         <Flex
-          w={{ lg: "1300px", sm: "100%" }}
+          w={{ lg: '1300px', sm: '100%' }}
           justifyContent="space-between"
           alignItems="center"
-          h={{ md: "90px", sm: "60px" }}
+          h={{ md: '90px', sm: '60px' }}
         >
-          <Flex
-            w={{ md: "200px", sm: "120px" }}
-            alignItems="center"
-            cursor="pointer"
-          >
+          <Flex w={{ md: '200px', sm: '120px' }} alignItems="center" cursor="pointer">
             <Link href="/" passHref>
               <a>
-                <Image
-                  src={colorMode === "light" ? Logo : LogoWhite}
-                  alt="bg10 <3"
-                />
+                <Image src={colorMode === 'light' ? Logo : LogoWhite} alt="bg10 <3" />
               </a>
             </Link>
           </Flex>
           <Flex>
-            <HStack
-              alignItems="center"
-              display={{ base: "none", md: "inline-flex" }}
-            >
+            <HStack alignItems="center" display={{ base: 'none', md: 'inline-flex' }}>
               <MenuItens />
             </HStack>
             <IconButton
-              icon={colorMode === "light" ? <BiMoon /> : <BiSun />}
+              icon={colorMode === 'light' ? <BiMoon /> : <BiSun />}
               aria-label="Dark/Light Mode"
               onClick={toggleColorMode}
               mx="10px"
             />
             <IconButton
-              display={{ base: "flex", md: "none" }}
+              display={{ base: 'flex', md: 'none' }}
               aria-label="Open menu"
               fontSize="40px"
-              ref={btnRef}
               onClick={onOpen}
               variant="ghost"
               icon={<BiMenu />}

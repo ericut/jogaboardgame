@@ -1,22 +1,13 @@
 import { useMemo, useState, useContext } from 'react';
 // chakra
 import { Text, Box, ButtonGroup, Button, IconButton, Flex, Heading, Badge, HStack, Stack } from '@chakra-ui/react';
-import {
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-  PopoverHeader,
-  PopoverBody,
-  PopoverArrow,
-  PopoverCloseButton,
-} from '@chakra-ui/react';
 // componentes
 import { Table, THeader, THead, THeadButtons, TBody, TRow, TColumn, TColumnButtons } from '../components/Table/Table';
+import Popover from '../components/Popover/Popover';
 // icones
 import { GiMeeple } from 'react-icons/gi';
 import { FaEdit, FaPlus, FaMinus, FaEye, FaEyeSlash, FaCog } from 'react-icons/fa';
 import { AiTwotoneCrown } from 'react-icons/ai';
-import { MdHelp } from 'react-icons/md';
 // context
 import { ConfiguracoesContext } from '../context/ConfiguracoesContext';
 import { ListagemCategoriasContext } from '../context/ListagemCategoriaContext';
@@ -30,35 +21,7 @@ const Desafio10x10 = () => {
   const { handleAbrirEdicaoJogo } = useContext(EdicaoJogoContext);
   const { jogosTotais, partidasTotais, handleAbrirConfiguracaoDesafio } = useContext(ConfiguracoesContext);
 
-  // estados de controles
   const [showHUD, setShowHUD] = useState(true);
-
-  // popover informações sobre o desafio
-  const Informacoes = () => {
-    return (
-      <>
-        <PopoverTrigger>
-          <Text fontSize="16px" px="10px" cursor="pointer" position="relative" color="blue.200">
-            <MdHelp />
-          </Text>
-        </PopoverTrigger>
-        <PopoverContent>
-          <PopoverArrow />
-          <PopoverCloseButton />
-          <PopoverHeader fontWeight="bold">
-            O que é o Desafio {jogosTotais}x{partidasTotais}?
-          </PopoverHeader>
-          <PopoverBody>
-            Escolha <strong>{jogosTotais} jogos</strong> e jogue cada um deles <strong>{partidasTotais} vezes</strong>,
-            o período padrão para as <strong>{jogosTotais * partidasTotais} partidas</strong> é de um ano. Avance na
-            trilha dos meeples conforme finalizar as partidas de cada jogo.
-            <br />O desafio pode ser feito de forma leve, podendo mudar qualquer um dos jogos, ou de forma pesada onde
-            não poderá alterar a lista dos jogos no período ou até finalizar todas as partidas.
-          </PopoverBody>
-        </PopoverContent>
-      </>
-    );
-  };
 
   // renderização da listagem de jogos
   const ListagemJogos = useMemo(() => {
@@ -200,7 +163,13 @@ const Desafio10x10 = () => {
             <Heading fontWeight="bold" fontSize={{ md: '32px', sm: '20px' }}>
               Desafio {jogosTotais}x{partidasTotais}
             </Heading>
-            <Popover placement="bottom">{Informacoes()}</Popover>
+            <Popover title={`O que é o Desafio ${jogosTotais}x${partidasTotais}?`}>
+              Escolha <strong>{jogosTotais} jogos</strong> e jogue cada um deles <strong>{partidasTotais} vezes</strong>
+              , o período padrão para as <strong>{jogosTotais * partidasTotais} partidas</strong> é de um ano. Avance na
+              trilha dos meeples conforme finalizar as partidas de cada jogo.
+              <br />O desafio pode ser feito de forma leve, podendo mudar qualquer um dos jogos, ou de forma pesada onde
+              não poderá alterar a lista dos jogos no período ou até finalizar todas as partidas.
+            </Popover>
           </Flex>
           <Flex alignItems="center" justifyContent="flex-end" w="40%">
             <ButtonGroup>

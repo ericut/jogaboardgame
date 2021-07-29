@@ -1,21 +1,25 @@
-import { Text, Flex, HStack } from "@chakra-ui/react";
-import { FaGithub, FaLinkedin, FaInstagram } from "react-icons/fa";
+import { Text, Flex, HStack } from '@chakra-ui/react';
+import { FaGithub, FaLinkedin, FaInstagram } from 'react-icons/fa';
 
-const Footer = () => {
+interface IFooterProps {
+  version?: string;
+}
+
+const Footer = ({ version }: IFooterProps) => {
   const redesSociais = [
     {
-      nome: "GitHub",
-      link: "https://github.com/ericut/",
+      nome: 'GitHub',
+      link: 'https://github.com/ericut/',
       icone: <FaGithub />,
     },
     {
-      nome: "LinkedIn",
-      link: "https://www.linkedin.com/in/ericfrankli/",
+      nome: 'LinkedIn',
+      link: 'https://www.linkedin.com/in/ericfrankli/',
       icone: <FaLinkedin />,
     },
     {
-      nome: "Instagram",
-      link: "https://www.instagram.com/ericfrankli/",
+      nome: 'Instagram',
+      link: 'https://www.instagram.com/ericfrankli/',
       icone: <FaInstagram />,
     },
   ];
@@ -26,37 +30,30 @@ const Footer = () => {
         <HStack pb="20px">
           {redesSociais.map((item) => {
             return (
-              <a
-                key={item.nome}
-                className="socialIcons"
-                href={item.link}
-                target="_blank"
-              >
+              <a key={item.nome} className="socialIcons" href={item.link} target="_blank">
                 <Text fontSize="24px">{item.icone}</Text>
               </a>
             );
           })}
         </HStack>
       </Flex>
-      <Flex
-        fontSize="9px"
-        letterSpacing="1.2px"
-        textTransform="uppercase"
-        color="gray.400"
-      >
+      <Flex fontSize="9px" letterSpacing="1.2px" textTransform="uppercase" color="gray.400">
         Feito em NextJS & ChakraUi
         <Text color="red" p="0 5px">
           ❤
         </Text>
         <Text pr="3px">por</Text>
-        <a
-          className="socialIcons"
-          href="https://github.com/ericut/boardgame10"
-          target="_blank"
-        >
+        <a className="socialIcons" href="https://github.com/ericut/boardgame10" target="_blank">
           Eric Frank Li
         </a>
       </Flex>
+      {version ? (
+        <Flex pt="10px" fontSize="8px" opacity="0.5" textTransform="uppercase" letterSpacing="2px">
+          {version}
+        </Flex>
+      ) : (
+        ' '
+      )}
     </Flex>
   );
 };
