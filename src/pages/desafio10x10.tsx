@@ -1,43 +1,7 @@
-import { useMemo, useState, useEffect, useContext } from 'react';
+import { useMemo, useState, useContext } from 'react';
 // chakra
+import { Text, Box, ButtonGroup, Button, IconButton, Flex, Heading, Badge, HStack, Stack } from '@chakra-ui/react';
 import {
-  Text,
-  Box,
-  ButtonGroup,
-  Button,
-  IconButton,
-  Flex,
-  Heading,
-  Badge,
-  HStack,
-  VStack,
-  Input,
-  FormControl,
-  FormLabel,
-  InputGroup,
-  InputRightAddon,
-  NumberInput,
-  NumberInputField,
-  Checkbox,
-  Stack,
-  useToast,
-  useDisclosure,
-} from '@chakra-ui/react';
-import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
-  Drawer,
-  DrawerBody,
-  DrawerHeader,
-  DrawerOverlay,
-  DrawerContent,
-  DrawerCloseButton,
-  DrawerFooter,
   Popover,
   PopoverTrigger,
   PopoverContent,
@@ -50,108 +14,35 @@ import {
 import { Table, THeader, THead, THeadButtons, TBody, TRow, TColumn, TColumnButtons } from '../components/Table/Table';
 // icones
 import { GiMeeple } from 'react-icons/gi';
-import { FaEdit, FaSave, FaPlus, FaMinus, FaEye, FaEyeSlash, FaCog } from 'react-icons/fa';
+import { FaEdit, FaPlus, FaMinus, FaEye, FaEyeSlash, FaCog } from 'react-icons/fa';
 import { AiTwotoneCrown } from 'react-icons/ai';
 import { MdHelp } from 'react-icons/md';
-// data
-import { categoriasData } from '../context/data/categoriasData';
-// interfaces
-import { IJogosProps, ICategoriasProps } from '../interfaces';
 // context
 import { ConfiguracoesContext } from '../context/ConfiguracoesContext';
+import { ListagemCategoriasContext } from '../context/ListagemCategoriaContext';
 import { ListagemJogosContext } from '../context/ListagemJogosContext';
 import { EdicaoJogoContext } from '../context/EdicaoJogoContext';
 
 const Desafio10x10 = () => {
-  // hooks chakra
-  const toast = useToast();
-  const { isOpen, onOpen, onClose } = useDisclosure();
   // contexts
-  const { listagemJogosData, handleRetirarPartida, handleAcrescentarPartida, handleMudarConfiguracoesListagem } =
-    useContext(ListagemJogosContext);
-  const { jogoEdicao, setJogoEdicao, handleSalvarJogo, handleRemoverJogo } = useContext(EdicaoJogoContext);
-  const { configuracoesDesafio, jogosTotais, partidasTotais } = useContext(ConfiguracoesContext);
+  const { listagemJogosData, handleRetirarPartida, handleAcrescentarPartida } = useContext(ListagemJogosContext);
+  const { listagemCategoriasData } = useContext(ListagemCategoriasContext);
+  const { handleAbrirEdicaoJogo } = useContext(EdicaoJogoContext);
+  const { jogosTotais, partidasTotais, handleAbrirConfiguracaoDesafio } = useContext(ConfiguracoesContext);
 
-  // jogoEdicao
-  //
   // estados de controles
   const [showHUD, setShowHUD] = useState(true);
-  // drawers
-  const [drawerConfiguracaoDesafio, setDrawerConfiguracaoDesafio] = useState(false);
-  const [drawerEdicaoJogo, setDrawerEdicaoJogo] = useState(false);
-  // modals
-  const [modalSalvarConfiguracoes, setModalSalvarConfiguracoes] = useState(false);
-  const [modalRemoverJogo, setModalRemoverJogo] = useState(false);
-
-  // estado das categorias
-  const [categoriaListagem] = useState<ICategoriasProps[]>(categoriasData);
-
-  useEffect(() => {
-    // recuperação de configurações
-  }, []);
-
-  // controles configuração do desafio
-  function handleAbrirConfiguracaoDesafio() {
-    onOpen();
-    setDrawerConfiguracaoDesafio(true);
-  }
-  // controles edição e adição de jogo
-  function handleAbrirEdicaoJogo(item?: IJogosProps) {
-    onOpen();
-    setDrawerEdicaoJogo(true);
-    if (item) {
-      setJogoEdicao(item);
-    } else {
-      return;
-    }
-  }
-  // controle checkbox das categorias
-  function handleEditarCategorias(event: any) {
-    let value = +event.target.value;
-    let checked = event.target.checked;
-    let categorias = jogoEdicao ? jogoEdicao.categoria : [];
-    if (checked) {
-      setJogoEdicao({ ...jogoEdicao, categoria: categorias.concat([value]) });
-    } else {
-      setJogoEdicao({
-        ...jogoEdicao,
-        categoria: categorias.filter((item) => item !== value),
-      });
-    }
-  }
-
-  // controles dos componentes do chakra
-  function handleFecharDrawer() {
-    if (configuracoesDesafio.qtdJogos !== jogosTotais || configuracoesDesafio.qtdPartidas !== partidasTotais) {
-      toast({
-        title: 'Você alterou as configurações, salve para continuar.',
-        status: 'warning',
-        duration: 3000,
-        isClosable: true,
-      });
-    } else {
-      setDrawerConfiguracaoDesafio(false);
-      onClose();
-    }
-    setDrawerEdicaoJogo(false);
-    setJogoEdicao({
-      id: 0,
-      nome: '',
-      partidas: '',
-      categoria: [],
-    });
-  }
-  function handleFecharModal() {
-    setModalRemoverJogo(false);
-    setModalSalvarConfiguracoes(false);
-  }
 
   // popover informações sobre o desafio
-  const Informacoes = (tipo: string) => {
-    let informacao = <></>;
-    if (tipo === 'desafio10x10') {
-      informacao = (
-        <>
+  const Informacoes = () => {
+    return (
+      <>
+        <PopoverTrigger>
+          <Text fontSize="16px" px="10px" cursor="pointer" position="relative" color="blue.200">
+            <MdHelp />
+          </Text>
+        </PopoverTrigger>
+        <PopoverContent>
           <PopoverArrow />
           <PopoverCloseButton />
           <PopoverHeader fontWeight="bold">
@@ -164,240 +55,9 @@ const Desafio10x10 = () => {
             <br />O desafio pode ser feito de forma leve, podendo mudar qualquer um dos jogos, ou de forma pesada onde
             não poderá alterar a lista dos jogos no período ou até finalizar todas as partidas.
           </PopoverBody>
-        </>
-      );
-    }
-    return (
-      <>
-        <PopoverTrigger>
-          <Text fontSize="16px" px="10px" cursor="pointer" position="relative" color="blue.200">
-            <MdHelp />
-          </Text>
-        </PopoverTrigger>
-        <PopoverContent>{informacao}</PopoverContent>
+        </PopoverContent>
       </>
     );
-  };
-
-  // renderização modal remoção do jogo
-  const ModalDesafio = () => {
-    // controle salvar configuracoes
-    function handleSalvarConfiguracoes() {
-      handleMudarConfiguracoesListagem(configuracoesDesafio.qtdPartidas);
-      localStorage.setItem('configuracoesDesafio', JSON.stringify(configuracoesDesafio));
-      setJogosTotais(configuracoesDesafio.qtdJogos);
-      setPartidasTotais(configuracoesDesafio.qtdPartidas);
-      setDrawerConfiguracaoDesafio(false);
-      setModalSalvarConfiguracoes(false);
-      onClose();
-    }
-
-    // renders
-    const renderModalRemoverJogo = () => {
-      return (
-        <>
-          <ModalHeader>Remover Jogo da Lista</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Text>Deseja remover este jogo da sua lista?</Text>
-            <Text fontWeight="bold">{jogoEdicao.nome}</Text>
-          </ModalBody>
-          <ModalFooter>
-            <HStack w="100%">
-              <Button variant="outline" colorScheme="orange" w="50%" onClick={() => handleRemoverJogo()}>
-                Confirmar
-              </Button>
-              <Button colorScheme="blue" w="50%" onClick={() => handleFecharModal()}>
-                Cancelar
-              </Button>
-            </HStack>
-          </ModalFooter>
-        </>
-      );
-    };
-
-    const renderModalSalvarConfiguracoes = () => {
-      return (
-        <>
-          <ModalHeader>Confirmação da nova configuração</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Text>Deseja salvar estas configurações?</Text>
-            <Text fontWeight="bold">Quantidade de Jogos: {configuracoesDesafio.qtdJogos}</Text>
-            <Text fontWeight="bold" pb="20px">
-              Quantidade de Partidas: {configuracoesDesafio.qtdPartidas}
-            </Text>
-            <Text color="red.400" fontSize="14px" p="5px" border="1px solid" borderColor="red.400">
-              <strong>ATENÇÃO:</strong>
-              <br />• Se já tiver partidas computadas excedendo ao novo número de total de partidas, será aplicado o
-              novo valor finalizando o desafio do jogo.
-              <br />• Se o número de jogos cadastros for maior que de jogos totais do desafio, eles não serão listados
-              na listagem.
-            </Text>
-          </ModalBody>
-          <ModalFooter>
-            <HStack w="100%">
-              <Button variant="outline" colorScheme="green" w="50%" onClick={() => handleSalvarConfiguracoes()}>
-                Confirmar
-              </Button>
-              <Button colorScheme="blue" w="50%" onClick={() => handleFecharModal()}>
-                Cancelar
-              </Button>
-            </HStack>
-          </ModalFooter>
-        </>
-      );
-    };
-
-    return modalRemoverJogo ? renderModalRemoverJogo() : renderModalSalvarConfiguracoes();
-  };
-
-  // renderização drawer de edição e adição de jogo // configurações do desafio
-  const DrawerDesafio = () => {
-    // controle salvar configurações
-    function handleConfirmaSalvarConfiguracoes() {
-      if (configuracoesDesafio.qtdJogos !== jogosTotais || configuracoesDesafio.qtdPartidas !== partidasTotais) {
-        setModalSalvarConfiguracoes(true);
-      }
-    }
-
-    // controles remoção do jogo da lista
-    function handleConfirmarRemocaoJogo() {
-      setModalRemoverJogo(true);
-    }
-
-    // renders
-    const renderDrawerEdicao = () => {
-      return (
-        <>
-          <DrawerCloseButton />
-          <DrawerHeader>{jogoEdicao.id === 0 ? 'Adicionar' : 'Editar'} Jogo</DrawerHeader>
-          <DrawerBody>
-            <VStack>
-              <Input
-                placeholder="Nome do Jogo"
-                value={jogoEdicao.nome}
-                onChange={(event) => setJogoEdicao({ ...jogoEdicao, nome: event.target.value })}
-              />
-              <InputGroup>
-                <NumberInput
-                  w="100%"
-                  value={jogoEdicao.partidas}
-                  min={0}
-                  max={partidasTotais}
-                  onChange={(value) => setJogoEdicao({ ...jogoEdicao, partidas: +value })}
-                >
-                  <NumberInputField placeholder="Número de Partidas Iniciais" />
-                </NumberInput>
-                <InputRightAddon fontSize="10px" textTransform="uppercase" children={`Max ${partidasTotais}`} />
-              </InputGroup>
-              <Stack w="100%" shouldWrapChildren={true}>
-                <Text mt="10px">Categorias:</Text>
-                <>
-                  {categoriaListagem.map((item) => {
-                    return (
-                      <Checkbox
-                        w="50%"
-                        key={item.id}
-                        value={item.id}
-                        isChecked={jogoEdicao.categoria.includes(item.id)}
-                        onChange={(event) => handleEditarCategorias(event)}
-                        mb="5px"
-                      >
-                        {item.nome}
-                      </Checkbox>
-                    );
-                  })}
-                </>
-              </Stack>
-            </VStack>
-          </DrawerBody>
-          <DrawerFooter>
-            <HStack w="100%">
-              <Button
-                colorScheme="orange"
-                leftIcon={<FaSave />}
-                onClick={() => handleConfirmarRemocaoJogo()}
-                w="50%"
-                isDisabled={jogoEdicao.id === 0}
-              >
-                Remover Jogo
-              </Button>
-              <Button colorScheme="green" leftIcon={<FaSave />} onClick={() => handleSalvarJogo()} w="50%">
-                Salvar Jogo
-              </Button>
-            </HStack>
-          </DrawerFooter>
-        </>
-      );
-    };
-
-    const renderDrawerConfiguracao = () => {
-      return (
-        <>
-          <DrawerCloseButton />
-          <DrawerHeader>Configurações do Desafio</DrawerHeader>
-          <DrawerBody>
-            <VStack alignItems="flex-start">
-              <FormControl w="100%" mb="10px">
-                <FormLabel>Quantidade de Jogos do Desafio:</FormLabel>
-                <InputGroup>
-                  <NumberInput
-                    w="100%"
-                    value={configuracoesDesafio.qtdJogos}
-                    min={1}
-                    max={10}
-                    onChange={(value) =>
-                      setConfiguracoesDesafio({
-                        ...configuracoesDesafio,
-                        qtdJogos: +value,
-                      })
-                    }
-                  >
-                    <NumberInputField placeholder="Quantidade de Jogos do Desafio" />
-                  </NumberInput>
-                  <InputRightAddon fontSize="10px" textTransform="uppercase" children="Max 10" />
-                </InputGroup>
-              </FormControl>
-              <FormControl w="100%">
-                <FormLabel>Quantidade de Partidas por Jogo:</FormLabel>
-                <InputGroup>
-                  <NumberInput
-                    w="100%"
-                    value={configuracoesDesafio.qtdPartidas}
-                    min={1}
-                    max={10}
-                    onChange={(value) =>
-                      setConfiguracoesDesafio({
-                        ...configuracoesDesafio,
-                        qtdPartidas: +value,
-                      })
-                    }
-                  >
-                    <NumberInputField placeholder="Quantidade de Partidas do Desafio" />
-                  </NumberInput>
-                  <InputRightAddon fontSize="10px" textTransform="uppercase" children="Max 10" />
-                </InputGroup>
-              </FormControl>
-            </VStack>
-          </DrawerBody>
-          <DrawerFooter>
-            <HStack w="100%" justifyContent="flex-end">
-              <Button
-                colorScheme="green"
-                leftIcon={<FaSave />}
-                onClick={() => handleConfirmaSalvarConfiguracoes()}
-                w={{ md: '50%', sm: '100%' }}
-              >
-                Salvar Configurações
-              </Button>
-            </HStack>
-          </DrawerFooter>
-        </>
-      );
-    };
-
-    return drawerEdicaoJogo ? renderDrawerEdicao() : renderDrawerConfiguracao();
   };
 
   // renderização da listagem de jogos
@@ -425,7 +85,7 @@ const Desafio10x10 = () => {
       }
       return (
         <>
-          {categoriaListagem
+          {listagemCategoriasData
             .filter((item) => categoria.indexOf(item.id) > -1)
             .map((item) => {
               return (
@@ -521,34 +181,11 @@ const Desafio10x10 = () => {
         </TColumn>
       </TRow>
     );
-  }, [listagemJogosData, categoriaListagem, showHUD, partidasTotais, jogosTotais]);
+  }, [listagemJogosData, listagemCategoriasData, showHUD, partidasTotais, jogosTotais]);
 
   // renderização geral
   return (
     <>
-      {modalRemoverJogo || modalSalvarConfiguracoes ? (
-        <Modal isOpen={isOpen} onClose={handleFecharModal} motionPreset="slideInBottom" isCentered>
-          <ModalOverlay
-            onClick={() => {
-              handleFecharModal;
-              onClose();
-            }}
-          />
-          <ModalContent>{ModalDesafio()}</ModalContent>
-        </Modal>
-      ) : (
-        ''
-      )}
-
-      {drawerEdicaoJogo || drawerConfiguracaoDesafio ? (
-        <Drawer isOpen={isOpen} onClose={handleFecharDrawer} placement="right" size="lg">
-          <DrawerOverlay onClick={handleFecharDrawer} />
-          <DrawerContent>{DrawerDesafio()}</DrawerContent>
-        </Drawer>
-      ) : (
-        ''
-      )}
-
       <Flex
         w={{ lg: '1300px', md: '100%', sm: '100%' }}
         maxW="100%"
@@ -563,7 +200,7 @@ const Desafio10x10 = () => {
             <Heading fontWeight="bold" fontSize={{ md: '32px', sm: '20px' }}>
               Desafio {jogosTotais}x{partidasTotais}
             </Heading>
-            <Popover placement="bottom">{Informacoes('desafio10x10')}</Popover>
+            <Popover placement="bottom">{Informacoes()}</Popover>
           </Flex>
           <Flex alignItems="center" justifyContent="flex-end" w="40%">
             <ButtonGroup>

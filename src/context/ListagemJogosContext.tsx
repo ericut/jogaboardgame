@@ -23,15 +23,19 @@ export function ListagemJogosProvider({ children }: IListagemProviderProps) {
   const [listagemJogosData, setListagemJogosData] = useState<IJogosProps[]>([]);
 
   useEffect(() => {
-    if (localStorage.getItem('listagemJogos')) {
-      let jogosRecuperados = JSON.parse(localStorage.getItem('listagemJogos') || '');
-      setListagemJogosData(jogosRecuperados);
-    } else {
+    if (!localStorage.getItem('listagemJogos') || listagemJogosData === []) {
       Service.buscarListagemJogos().then((response) => {
         setListagemJogosData(response.data.content);
       });
+    } else {
+      let jogosRecuperados = JSON.parse(localStorage.getItem('listagemJogos') || '');
+      setListagemJogosData(jogosRecuperados);
     }
   }, []);
+
+  useEffect(() => {
+    localStorageSetListagem();
+  }, [listagemJogosData]);
 
   function localStorageSetListagem() {
     localStorage.setItem('listagemJogos', JSON.stringify(listagemJogosData));

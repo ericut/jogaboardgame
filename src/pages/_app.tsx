@@ -8,8 +8,9 @@ import CustomTheme from '../theme/theme';
 import Header from '../components/Header/Header';
 import Footer from '../components/Footer/Footer';
 // context
-import { ConfiguracoesProvider } from '../context/ConfiguracoesContext';
 import { ListagemJogosProvider } from '../context/ListagemJogosContext';
+import { ListagemCategoriasProvider } from '../context/ListagemCategoriaContext';
+import { ConfiguracoesProvider } from '../context/ConfiguracoesContext';
 import { EdicaoJogoProvider } from '../context/EdicaoJogoContext';
 
 export default function App({ Component, pageProps }: any) {
@@ -20,13 +21,15 @@ export default function App({ Component, pageProps }: any) {
       </Head>
       <Header />
       <ListagemJogosProvider>
-        <ConfiguracoesProvider>
-          <EdicaoJogoProvider>
-            <Container as="main" m="0" p="0 20px" maxW="100%">
-              <Component {...pageProps} />
-            </Container>
-          </EdicaoJogoProvider>
-        </ConfiguracoesProvider>
+        <ListagemCategoriasProvider>
+          <ConfiguracoesProvider>
+            <EdicaoJogoProvider>
+              <Container as="main" m="0" p="0 20px" maxW="100%">
+                <Component {...pageProps} />
+              </Container>
+            </EdicaoJogoProvider>
+          </ConfiguracoesProvider>
+        </ListagemCategoriasProvider>
       </ListagemJogosProvider>
       <Footer />
     </ChakraProvider>
