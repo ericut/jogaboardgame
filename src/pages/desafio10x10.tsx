@@ -148,103 +148,101 @@ const Desafio10x10 = () => {
 
   // renderização geral
   return (
-    <>
-      <Flex
-        w={{ lg: '1300px', md: '100%', sm: '100%' }}
-        maxW="100%"
-        minH="60vh"
-        alignItems="center"
-        flexDirection="column"
-        py={{ md: '20px', sm: '10px' }}
-        m="0 auto"
-      >
-        <Flex justifyContent="space-between" align="center" w="100%">
-          <Flex alignItems="center" w="60%">
-            <Heading fontWeight="bold" fontSize={{ md: '32px', sm: '20px' }}>
-              Desafio {jogosTotais}x{partidasTotais}
-            </Heading>
-            <Popover title={`O que é o Desafio ${jogosTotais}x${partidasTotais}?`}>
-              Escolha <strong>{jogosTotais} jogos</strong> e jogue cada um deles <strong>{partidasTotais} vezes</strong>
-              , o período padrão para as <strong>{jogosTotais * partidasTotais} partidas</strong> é de um ano. Avance na
-              trilha dos meeples conforme finalizar as partidas de cada jogo.
-              <br />O desafio pode ser feito de forma leve, podendo mudar qualquer um dos jogos, ou de forma pesada onde
-              não poderá alterar a lista dos jogos no período ou até finalizar todas as partidas.
-            </Popover>
-          </Flex>
-          <Flex alignItems="center" justifyContent="flex-end" w="40%">
-            <ButtonGroup>
-              <Flex>
-                <IconButton
-                  aria-label="Adicionar Jogo"
-                  icon={showHUD ? <FaEyeSlash /> : <FaEye />}
-                  colorScheme="gray"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowHUD(!showHUD)}
-                />
-              </Flex>
-              <Flex>
+    <Flex
+      w={{ lg: '1300px', md: '100%', sm: '100%' }}
+      maxW="100%"
+      minH="60vh"
+      alignItems="center"
+      flexDirection="column"
+      py={{ md: '20px', sm: '10px' }}
+      m="0 auto"
+    >
+      <Flex justifyContent="space-between" align="center" w="100%">
+        <Flex alignItems="center" w="60%">
+          <Heading fontWeight="bold" fontSize={{ md: '32px', sm: '20px' }}>
+            Desafio {jogosTotais}x{partidasTotais}
+          </Heading>
+          <Popover title={`O que é o Desafio ${jogosTotais}x${partidasTotais}?`}>
+            Escolha <strong>{jogosTotais} jogos</strong> e jogue cada um deles <strong>{partidasTotais} vezes</strong>,
+            o período padrão para as <strong>{jogosTotais * partidasTotais} partidas</strong> é de um ano. Avance na
+            trilha dos meeples conforme finalizar as partidas de cada jogo.
+            <br />O desafio pode ser feito de forma leve, podendo mudar qualquer um dos jogos, ou de forma pesada onde
+            não poderá alterar a lista dos jogos no período ou até finalizar todas as partidas.
+          </Popover>
+        </Flex>
+        <Flex alignItems="center" justifyContent="flex-end" w="40%">
+          <ButtonGroup>
+            <Flex>
+              <IconButton
+                aria-label="Adicionar Jogo"
+                icon={showHUD ? <FaEyeSlash /> : <FaEye />}
+                colorScheme="gray"
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowHUD(!showHUD)}
+              />
+            </Flex>
+            <Flex>
+              <IconButton
+                display={{ md: 'none', sm: 'flex' }}
+                aria-label="Configurações do Desafio"
+                icon={<FaCog />}
+                colorScheme="gray"
+                size="sm"
+                onClick={() => handleAbrirConfiguracaoDesafio()}
+              />
+              <Button
+                display={{ md: 'flex', sm: 'none' }}
+                leftIcon={<FaCog />}
+                colorScheme="gray"
+                size="sm"
+                onClick={() => handleAbrirConfiguracaoDesafio()}
+              >
+                Configurações
+              </Button>
+            </Flex>
+            <Flex>
+              <ButtonGroup size="sm" isAttached>
+                <Button display={{ md: 'block', sm: 'none' }} size="sm" isDisabled>
+                  {listagemJogosData.length}/{jogosTotais}
+                </Button>
                 <IconButton
                   display={{ md: 'none', sm: 'flex' }}
-                  aria-label="Configurações do Desafio"
-                  icon={<FaCog />}
-                  colorScheme="gray"
+                  aria-label="Adicionar Jogo"
+                  icon={<FaPlus />}
+                  colorScheme="blue"
                   size="sm"
-                  onClick={() => handleAbrirConfiguracaoDesafio()}
+                  onClick={() => handleAbrirEdicaoJogo()}
+                  isDisabled={listagemJogosData.length >= jogosTotais}
                 />
                 <Button
                   display={{ md: 'flex', sm: 'none' }}
-                  leftIcon={<FaCog />}
-                  colorScheme="gray"
+                  leftIcon={<FaPlus />}
+                  colorScheme="blue"
                   size="sm"
-                  onClick={() => handleAbrirConfiguracaoDesafio()}
+                  onClick={() => handleAbrirEdicaoJogo()}
+                  isDisabled={listagemJogosData.length >= jogosTotais}
                 >
-                  Configurações
+                  Adicionar Jogo
                 </Button>
-              </Flex>
-              <Flex>
-                <ButtonGroup size="sm" isAttached>
-                  <Button display={{ md: 'block', sm: 'none' }} size="sm" isDisabled>
-                    {listagemJogosData.length}/{jogosTotais}
-                  </Button>
-                  <IconButton
-                    display={{ md: 'none', sm: 'flex' }}
-                    aria-label="Adicionar Jogo"
-                    icon={<FaPlus />}
-                    colorScheme="blue"
-                    size="sm"
-                    onClick={() => handleAbrirEdicaoJogo()}
-                    isDisabled={listagemJogosData.length >= jogosTotais}
-                  />
-                  <Button
-                    display={{ md: 'flex', sm: 'none' }}
-                    leftIcon={<FaPlus />}
-                    colorScheme="blue"
-                    size="sm"
-                    onClick={() => handleAbrirEdicaoJogo()}
-                    isDisabled={listagemJogosData.length >= jogosTotais}
-                  >
-                    Adicionar Jogo
-                  </Button>
-                </ButtonGroup>
-              </Flex>
-            </ButtonGroup>
-          </Flex>
-        </Flex>
-        <Flex mt={{ md: '40px', sm: '10px' }} w="100%">
-          <Box overflowX="auto" w="100%">
-            <Table>
-              <THeader display={{ md: 'flex', sm: 'none' }}>
-                <THead w="30%">Jogos</THead>
-                <THead w="50%">Partidas</THead>
-                <THeadButtons w="20%">{showHUD ? 'Controle | Editar' : ''}</THeadButtons>
-              </THeader>
-              <TBody>{ListagemJogos}</TBody>
-            </Table>
-          </Box>
+              </ButtonGroup>
+            </Flex>
+          </ButtonGroup>
         </Flex>
       </Flex>
-    </>
+      <Flex mt={{ md: '40px', sm: '10px' }} w="100%">
+        <Box overflowX="auto" w="100%">
+          <Table>
+            <THeader display={{ md: 'flex', sm: 'none' }}>
+              <THead w="30%">Jogos</THead>
+              <THead w="50%">Partidas</THead>
+              <THeadButtons w="20%">{showHUD ? 'Controle | Editar' : ''}</THeadButtons>
+            </THeader>
+            <TBody>{ListagemJogos}</TBody>
+          </Table>
+        </Box>
+      </Flex>
+    </Flex>
   );
 };
 
