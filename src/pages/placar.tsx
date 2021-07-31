@@ -1,9 +1,22 @@
+import { useEffect, useContext } from 'react';
 // chakra
-import { Box, Flex, Heading } from '@chakra-ui/react';
+import { Box, Flex, Heading, Button } from '@chakra-ui/react';
 // componentes
 import Popover from '../components/Popover/Popover';
+// icones
+import { FaPlus } from 'react-icons/fa';
+// context
+import { ListagemPlacaresProvider, ListagemPlacaresContext } from '../context/placar/ListagemPlacaresContext';
+import { EdicaoPlacarProvider, EdicaoPlacarContext } from '../context/placar/EdicaoPlacarContext';
 
 const Placar = () => {
+  const { listagemPlacaresData } = useContext(ListagemPlacaresContext);
+  const { handleAbrirEdicaoPlacar } = useContext(EdicaoPlacarContext);
+
+  useEffect(() => {
+    console.log(listagemPlacaresData);
+  }, [listagemPlacaresData]);
+
   return (
     <Flex
       w={{ lg: '1300px', md: '100%', sm: '100%' }}
@@ -26,10 +39,18 @@ const Placar = () => {
           </Popover>
         </Flex>
         <Flex alignItems="center" justifyContent="flex-end" w="40%">
-          btns
+          <Button
+            display={{ md: 'flex', sm: 'none' }}
+            leftIcon={<FaPlus />}
+            colorScheme="blue"
+            size="sm"
+            onClick={() => handleAbrirEdicaoPlacar()}
+          >
+            Criar Placar
+          </Button>
         </Flex>
       </Flex>
-      <Flex mt={{ md: '40px', sm: '10px' }} w="100%">
+      <Flex mt={{ md: '40px', sm: '10px' }} w="100% ">
         <Box overflowX="auto" w="100%">
           table
         </Box>
@@ -38,4 +59,14 @@ const Placar = () => {
   );
 };
 
-export default Placar;
+const PlacarProvider = () => {
+  return (
+    <ListagemPlacaresProvider>
+      <EdicaoPlacarProvider>
+        <Placar />
+      </EdicaoPlacarProvider>
+    </ListagemPlacaresProvider>
+  );
+};
+
+export default PlacarProvider;

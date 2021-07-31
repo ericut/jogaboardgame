@@ -1,4 +1,4 @@
-import { ReactNode, createContext, useState, useEffect, useContext } from 'react';
+import { ReactNode, createContext, useState, useContext } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 // chakra
 import {
@@ -35,17 +35,13 @@ import {
 // icones
 import { FaSave, FaTrash } from 'react-icons/fa';
 // interfaces
-import { IJogosProps } from '../interfaces';
+import { IJogosProps } from '../../interfaces/desafio10x10';
 // context
 import { ListagemJogosContext } from './ListagemJogosContext';
 import { ListagemCategoriasContext } from './ListagemCategoriaContext';
 import { ConfiguracoesContext } from './ConfiguracoesContext';
 
 interface IEdicaoJogoContextData {
-  jogoEdicao: IJogosProps;
-  setJogoEdicao: (object: IJogosProps) => void;
-  handleSalvarJogo: () => void;
-  handleRemoverJogo: () => void;
   handleAbrirEdicaoJogo: (object?: IJogosProps) => void;
 }
 
@@ -105,7 +101,6 @@ export function EdicaoJogoProvider({ children }: IEdicaoJogoProviderProps) {
       setListagemJogosData(
         listagemJogosData.map((item) => {
           if (item.id === jogoEdicao.id) {
-            item.id = jogoEdicao.id;
             item.nome = jogoEdicao.nome;
             item.partidas = jogoEdicao.partidas;
             item.categoria = jogoEdicao.categoria;
@@ -271,9 +266,7 @@ export function EdicaoJogoProvider({ children }: IEdicaoJogoProviderProps) {
   };
 
   return (
-    <EdicaoJogoContext.Provider
-      value={{ jogoEdicao, setJogoEdicao, handleSalvarJogo, handleRemoverJogo, handleAbrirEdicaoJogo }}
-    >
+    <EdicaoJogoContext.Provider value={{ handleAbrirEdicaoJogo }}>
       {children}
       {modalRemoverJogo && ModalEdicaoJogo()}
       {drawerEdicaoJogo && DrawerEdicaoJogo()}

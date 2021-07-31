@@ -33,14 +33,13 @@ import {
 // icones
 import { FaSave } from 'react-icons/fa';
 // interfaces
-import { IConfiguracoesProps } from '../interfaces';
+import { IConfiguracoesProps } from '../../interfaces/desafio10x10';
 // service
 import Service from './services/desafio10x10';
 // context
 import { ListagemJogosContext } from './ListagemJogosContext';
 
 interface IConfiguracoesContextData {
-  configuracoesDesafio: IConfiguracoesProps;
   jogosTotais: number;
   partidasTotais: number;
   handleAbrirConfiguracaoDesafio: () => void;
@@ -236,9 +235,7 @@ export function ConfiguracoesProvider({ children }: IConfiguracoesProviderProps)
   };
 
   return (
-    <ConfiguracoesContext.Provider
-      value={{ configuracoesDesafio, jogosTotais, partidasTotais, handleAbrirConfiguracaoDesafio }}
-    >
+    <ConfiguracoesContext.Provider value={{ jogosTotais, partidasTotais, handleAbrirConfiguracaoDesafio }}>
       {children}
       {modalSalvarConfiguracoes && ModalConfiguracoesDesafio()}
       {drawerConfiguracaoDesafio && DrawerConfiguracoesDesafio()}

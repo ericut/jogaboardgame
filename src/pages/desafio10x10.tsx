@@ -9,17 +9,20 @@ import { GiMeeple } from 'react-icons/gi';
 import { FaEdit, FaPlus, FaMinus, FaEye, FaEyeSlash, FaCog } from 'react-icons/fa';
 import { AiTwotoneCrown } from 'react-icons/ai';
 // context
-import { ConfiguracoesContext } from '../context/ConfiguracoesContext';
-import { ListagemCategoriasContext } from '../context/ListagemCategoriaContext';
-import { ListagemJogosContext } from '../context/ListagemJogosContext';
-import { EdicaoJogoContext } from '../context/EdicaoJogoContext';
+import { ListagemJogosProvider, ListagemJogosContext } from '../context/desafio10x10/ListagemJogosContext';
+import {
+  ListagemCategoriasProvider,
+  ListagemCategoriasContext,
+} from '../context/desafio10x10/ListagemCategoriaContext';
+import { ConfiguracoesProvider, ConfiguracoesContext } from '../context/desafio10x10/ConfiguracoesContext';
+import { EdicaoJogoProvider, EdicaoJogoContext } from '../context/desafio10x10/EdicaoJogoContext';
 
 const Desafio10x10 = () => {
   // contexts
   const { listagemJogosData, handleRetirarPartida, handleAcrescentarPartida } = useContext(ListagemJogosContext);
   const { listagemCategoriasData } = useContext(ListagemCategoriasContext);
-  const { handleAbrirEdicaoJogo } = useContext(EdicaoJogoContext);
   const { jogosTotais, partidasTotais, handleAbrirConfiguracaoDesafio } = useContext(ConfiguracoesContext);
+  const { handleAbrirEdicaoJogo } = useContext(EdicaoJogoContext);
 
   const [showHUD, setShowHUD] = useState(true);
 
@@ -230,7 +233,22 @@ const Desafio10x10 = () => {
           </ButtonGroup>
         </Flex>
       </Flex>
-      <Flex mt={{ md: '40px', sm: '10px' }} w="100%">
+      <Flex mt={{ md: '40px', sm: '10px' }} w="100%" position="relative" justifyContent="center">
+        {listagemJogosData.length === 0 ? (
+          <Flex position="absolute" m="0 auto" top="30px" zIndex="-1">
+            <Text
+              fontSize={{ md: '2600%', sm: '800%' }}
+              opacity="0.025"
+              color="gray.500"
+              fontWeight="bold"
+              letterSpacing="-10px"
+            >
+              {`${jogosTotais}x${partidasTotais}`}
+            </Text>
+          </Flex>
+        ) : (
+          ''
+        )}
         <Box overflowX="auto" w="100%">
           <Table>
             <THeader display={{ md: 'flex', sm: 'none' }}>
@@ -246,4 +264,18 @@ const Desafio10x10 = () => {
   );
 };
 
-export default Desafio10x10;
+const Desafio10x10Provider = () => {
+  return (
+    <ListagemJogosProvider>
+      <ListagemCategoriasProvider>
+        <ConfiguracoesProvider>
+          <EdicaoJogoProvider>
+            <Desafio10x10 />
+          </EdicaoJogoProvider>
+        </ConfiguracoesProvider>
+      </ListagemCategoriasProvider>
+    </ListagemJogosProvider>
+  );
+};
+
+export default Desafio10x10Provider;
