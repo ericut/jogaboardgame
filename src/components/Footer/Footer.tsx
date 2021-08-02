@@ -43,7 +43,7 @@ const Footer = ({ version }: IFooterProps) => {
           ❤
         </Text>
         <Text pr="3px">por</Text>
-        <a className="socialIcons" href="https://github.com/ericut/jogaboardgame" target="_blank">
+        <a className="socialIcons" href="https://github.com/ericut/" target="_blank">
           Eric Frank Li
         </a>
       </Flex>
