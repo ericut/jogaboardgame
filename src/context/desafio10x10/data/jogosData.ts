@@ -1,4 +1,4 @@
-import { IJogosProps } from '../../interfaces';
+import { IJogosProps } from '../../../interfaces/desafio10x10';
 
 export const jogosData: IJogosProps[] = [
   {

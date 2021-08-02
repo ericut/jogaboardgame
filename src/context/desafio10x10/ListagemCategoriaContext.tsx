@@ -1,6 +1,6 @@
 import { ReactNode, createContext, useState, useEffect } from 'react';
 // interfaces
-import { ICategoriasProps } from '../interfaces';
+import { ICategoriasProps } from '../../interfaces/desafio10x10';
 // service
 import Service from './services/desafio10x10';
 

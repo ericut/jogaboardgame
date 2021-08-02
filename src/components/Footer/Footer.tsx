@@ -38,12 +38,12 @@ const Footer = ({ version }: IFooterProps) => {
         </HStack>
       </Flex>
       <Flex fontSize="9px" letterSpacing="1.2px" textTransform="uppercase" color="gray.400">
-        Feito em NextJS & ChakraUi
+        JOGA BG
         <Text color="red" p="0 5px">
           ❤
         </Text>
         <Text pr="3px">por</Text>
-        <a className="socialIcons" href="https://github.com/ericut/boardgame10" target="_blank">
+        <a className="socialIcons" href="https://github.com/ericut/jogaboardgame" target="_blank">
           Eric Frank Li
         </a>
       </Flex>
