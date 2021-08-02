@@ -6,8 +6,7 @@ import { Table, THeader, THead, THeadButtons, TBody, TRow, TColumn, TColumnButto
 import Popover from '../components/Popover/Popover';
 // icones
 import { GiMeeple } from 'react-icons/gi';
-import { FaEdit, FaPlus, FaMinus, FaEye, FaEyeSlash, FaCog } from 'react-icons/fa';
-import { AiTwotoneCrown } from 'react-icons/ai';
+import { FaEdit, FaPlus, FaMinus, FaEye, FaEyeSlash, FaCog, FaCrown } from 'react-icons/fa';
 // context
 import { ListagemJogosProvider, ListagemJogosContext } from '../context/desafio10x10/ListagemJogosContext';
 import {
@@ -81,7 +80,7 @@ const Desafio10x10 = () => {
                 {NumeroPartidas(+item.partidas)}
                 {item.partidas === partidasTotais ? (
                   <Flex color="yellow.500" ml="10px" alignItems="center">
-                    <AiTwotoneCrown />
+                    <FaCrown />
                     <Text display={{ md: 'flex', sm: 'none' }} fontSize="10px" textTransform="uppercase">
                       Finalizado!
                     </Text>

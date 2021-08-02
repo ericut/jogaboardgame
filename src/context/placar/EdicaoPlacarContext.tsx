@@ -6,6 +6,8 @@ import {
   HStack,
   VStack,
   Text,
+  Flex,
+  Box,
   Input,
   InputGroup,
   InputRightAddon,
@@ -14,6 +16,7 @@ import {
   Stack,
   useDisclosure,
   useToast,
+  IconButton,
   Checkbox,
 } from '@chakra-ui/react';
 import {
@@ -33,7 +36,9 @@ import {
   DrawerFooter,
 } from '@chakra-ui/react';
 // icones
-import { FaSave, FaTrash } from 'react-icons/fa';
+import { FaSave, FaTrash, FaPlus, FaCircle } from 'react-icons/fa';
+// utilitários
+import { novaData, formatarData } from '../../utils/formatarData';
 // interfaces
 import { IPlacaresProps } from '../../interfaces/placar';
 // context
@@ -60,21 +65,7 @@ export function EdicaoPlacarProvider({ children }: IEdicaoPlacarProviderProps) {
   const [drawerEdicaoPlacar, setDrawerEdicaoPlacar] = useState(false);
   const [modalRemoverPlacar, setModalRemoverPlacar] = useState(false);
 
-  // formatar data
-  function novaDataFinal() {
-    let novaData = new Date();
-    function novaDataAdicionarZero(numero: number) {
-      if (numero <= 9) {
-        return '0' + numero;
-      } else {
-        return numero;
-      }
-    }
-    return `${novaData.getFullYear()}-${novaDataAdicionarZero(novaData.getMonth() + 1)}-${novaDataAdicionarZero(
-      novaData.getDate()
-    )}`;
-  }
-
+  //
   const [placarEdicao, setPlacarEdicao] = useState<IPlacaresProps>({
     id: 0,
     nome: '',
@@ -82,9 +73,12 @@ export function EdicaoPlacarProvider({ children }: IEdicaoPlacarProviderProps) {
     jogadores: [],
     status: 'Ativo',
     partidas: 0,
-    data_inicio: novaDataFinal(),
+    data_inicio: novaData(),
     data_fim: '',
   });
+  // campos da edição
+  const [jogoAdicionar, setJogoAdicionar] = useState('');
+  const [jogadorAdicionar, setJogadorAdicionar] = useState('');
 
   function handleAbrirEdicaoPlacar(item?: IPlacaresProps) {
     onOpen();
@@ -99,6 +93,7 @@ export function EdicaoPlacarProvider({ children }: IEdicaoPlacarProviderProps) {
   function handleSalvarPlacar() {
     let placarExistente = listagemPlacaresData.find((item) => item.id === placarEdicao.id);
     if (placarExistente) {
+      // adicionar regra para trocar placar de ativo / finalizado vice versa
       setListagemPlacaresData(
         listagemPlacaresData.map((item) => {
           if (item.id === placarEdicao.id) {
@@ -122,7 +117,11 @@ export function EdicaoPlacarProvider({ children }: IEdicaoPlacarProviderProps) {
     } else {
       if (placarEdicao.nome !== '') {
         placarEdicao.id = uuidv4();
-        setListagemPlacaresData([...listagemPlacaresData, placarEdicao]);
+        let listagemPlacarDataFinalizados = listagemPlacaresData.map((item) => {
+          item.status = 'Finalizado';
+          return item;
+        });
+        setListagemPlacaresData([...listagemPlacarDataFinalizados, placarEdicao]);
         toast({
           title: `Placar adicionado: ${placarEdicao.nome}`,
           status: 'success',
@@ -166,7 +165,7 @@ export function EdicaoPlacarProvider({ children }: IEdicaoPlacarProviderProps) {
       jogadores: [],
       status: 'Ativo',
       partidas: 0,
-      data_inicio: new Date() + '',
+      data_inicio: novaData(),
       data_fim: '',
     });
   }
@@ -184,10 +183,10 @@ export function EdicaoPlacarProvider({ children }: IEdicaoPlacarProviderProps) {
           }}
         />
         <ModalContent>
-          <ModalHeader>Remover Jogo da Lista</ModalHeader>
+          <ModalHeader>Apagar Placar</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <Text>Deseja remover este jogo da sua lista?</Text>
+            <Text>Deseja apagar este placar?</Text>
             <Text fontWeight="bold">{placarEdicao.nome}</Text>
           </ModalBody>
           <ModalFooter>
@@ -211,14 +210,121 @@ export function EdicaoPlacarProvider({ children }: IEdicaoPlacarProviderProps) {
         <DrawerOverlay onClick={handleFecharDrawer} />
         <DrawerContent>
           <DrawerCloseButton />
-          <DrawerHeader>{placarEdicao.id === 0 ? 'Adicionar' : 'Editar'} Placar</DrawerHeader>
+          <DrawerHeader>{placarEdicao.id === 0 ? 'Criar' : 'Editar'} Placar</DrawerHeader>
           <DrawerBody>
-            <VStack>
-              <Input
-                placeholder="Nome do Placar"
-                value={placarEdicao.nome}
-                onChange={(event) => setPlacarEdicao({ ...placarEdicao, nome: event.target.value })}
-              />
+            <VStack spacing={5}>
+              <Flex w="100%">
+                <Input
+                  placeholder="Nome do Placar"
+                  value={placarEdicao.nome}
+                  onChange={(event) => setPlacarEdicao({ ...placarEdicao, nome: event.target.value })}
+                />
+              </Flex>
+              <Flex w="100%" justifyContent="space-between" px="5px">
+                <Box w="35%">
+                  <Text fontSize="14px">Criado em:</Text>
+                  <Button size="sm" isDisabled>
+                    {formatarData(placarEdicao.data_inicio)}
+                  </Button>
+                </Box>
+                <Box w="35%">
+                  <Text fontSize="14px">{placarEdicao.data_fim ? 'Finalizado em:' : 'Finalizar:'}</Text>
+                  <Text>
+                    {placarEdicao.data_fim ? (
+                      <Button size="sm" isDisabled>
+                        {formatarData(placarEdicao.data_fim)}
+                      </Button>
+                    ) : (
+                      <Button size="sm" colorScheme="orange" variant="outline" onClick={() => {}}>
+                        Finalizar Placar
+                      </Button>
+                    )}
+                  </Text>
+                </Box>
+                <Box w="30%">
+                  <Text fontSize="14px">Status:</Text>
+                  <Flex alignItems="center">
+                    <Text fontSize="12px" mr="5px" color={placarEdicao.status === 'Ativo' ? 'green.500' : 'orange.500'}>
+                      <FaCircle />
+                    </Text>
+                    <Flex alignItems="center" h="32px">
+                      {placarEdicao.status}
+                    </Flex>
+                  </Flex>
+                </Box>
+              </Flex>
+              <Box w="100%">
+                <Flex mb="5px">
+                  <Input
+                    placeholder="Adicionar Jogo"
+                    value={jogoAdicionar}
+                    onChange={(event) => setJogoAdicionar(event.target.value)}
+                    mr="10px"
+                  />
+                  <IconButton colorScheme="blue" aria-label="Adicionar Jogo" icon={<FaPlus />} onClick={() => {}} />
+                </Flex>
+                <Box borderBottom="1px solid" borderBottomColor="gray.500">
+                  {placarEdicao.jogos.map((jogo, index) => {
+                    return (
+                      <Flex
+                        borderBottom="1px solid"
+                        borderBottomColor="gray.600"
+                        w="100%"
+                        p="5px"
+                        justifyContent="space-between"
+                      >
+                        <Text>{jogo}</Text>
+                        <Text>
+                          <IconButton
+                            size="sm"
+                            variant="ghost"
+                            colorScheme="red"
+                            aria-label="Excluir Jogo"
+                            icon={<FaTrash />}
+                            onClick={() => {}}
+                          />
+                        </Text>
+                      </Flex>
+                    );
+                  })}
+                </Box>
+              </Box>
+              <Box w="100%">
+                <Flex mb="5px">
+                  <Input
+                    placeholder="Adicionar Jogador"
+                    value={jogadorAdicionar}
+                    onChange={(event) => setJogadorAdicionar(event.target.value)}
+                    mr="10px"
+                  />
+                  <IconButton colorScheme="blue" aria-label="Adicionar Jogo" icon={<FaPlus />} onClick={() => {}} />
+                </Flex>
+                <Box w="100%" borderBottom="1px solid" borderBottomColor="gray.500">
+                  {placarEdicao.jogadores.map((jogador, index) => {
+                    return (
+                      <Flex
+                        borderBottom="1px solid"
+                        borderBottomColor="gray.600"
+                        w="100%"
+                        p="5px"
+                        justifyContent="space-between"
+                      >
+                        <Text>{jogador}</Text>
+                        <Text>
+                          <IconButton
+                            size="sm"
+                            variant="ghost"
+                            colorScheme="red"
+                            aria-label="Excluir Jogador"
+                            icon={<FaTrash />}
+                            onClick={() => {}}
+                          />
+                        </Text>
+                      </Flex>
+                    );
+                  })}
+                </Box>
+              </Box>
             </VStack>
           </DrawerBody>
           <DrawerFooter>
@@ -230,7 +336,7 @@ export function EdicaoPlacarProvider({ children }: IEdicaoPlacarProviderProps) {
                 w="50%"
                 isDisabled={placarEdicao.id === 0}
               >
-                Remover Jogo
+                Apagar Placar
               </Button>
               <Button colorScheme="green" leftIcon={<FaSave />} onClick={() => handleSalvarPlacar()} w="50%">
                 Salvar Placar

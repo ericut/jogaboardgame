@@ -1,10 +1,16 @@
-import { useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useMemo } from 'react';
 // chakra
-import { Box, Flex, Heading, Button } from '@chakra-ui/react';
+import { Text, Box, Flex, Heading, Button, HStack, IconButton } from '@chakra-ui/react';
+import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
 // componentes
+import { Table, THeader, THead, THeadButtons, TBody, TRow, TColumn, TColumnButtons } from '../components/Table/Table';
 import Popover from '../components/Popover/Popover';
 // icones
-import { FaPlus } from 'react-icons/fa';
+import { FaPlus, FaHistory, FaTrophy, FaEdit, FaCircle } from 'react-icons/fa';
+// utilitários
+import { formatarData } from '../utils/formatarData';
+// interfaces
+import { IPlacaresProps } from '../interfaces/placar';
 // context
 import { ListagemPlacaresProvider, ListagemPlacaresContext } from '../context/placar/ListagemPlacaresContext';
 import { EdicaoPlacarProvider, EdicaoPlacarContext } from '../context/placar/EdicaoPlacarContext';
@@ -12,9 +18,88 @@ import { EdicaoPlacarProvider, EdicaoPlacarContext } from '../context/placar/Edi
 const Placar = () => {
   const { listagemPlacaresData } = useContext(ListagemPlacaresContext);
   const { handleAbrirEdicaoPlacar } = useContext(EdicaoPlacarContext);
+  //
+  const [placarAtivo, setPlacarAtivo] = useState<IPlacaresProps | undefined>(undefined);
 
   useEffect(() => {
-    console.log(listagemPlacaresData);
+    setPlacarAtivo(
+      listagemPlacaresData.find((item) => {
+        return item.status === 'Ativo';
+      })
+    );
+    console.log('listinha', listagemPlacaresData);
+  }, [listagemPlacaresData]);
+
+  const PlacarAtivo = useMemo(() => {
+    return <Flex w="100%">{placarAtivo?.nome}</Flex>;
+  }, [placarAtivo]);
+
+  const PlacarHistorico = useMemo(() => {
+    return listagemPlacaresData.length !== 0 ? (
+      listagemPlacaresData
+        .sort((a, b) => {
+          if (a.status > b.status) {
+            return 1;
+          } else if (a.status < b.status) {
+            return -1;
+          } else {
+            return 0;
+          }
+        })
+        .map((item) => {
+          return (
+            <TRow key={item.id} alignItems="center">
+              <TColumn w="25%">{item.nome}</TColumn>
+              <TColumn w="15%">
+                {item.jogos
+                  .map((jogos) => {
+                    return jogos;
+                  })
+                  .join(', ')}
+              </TColumn>
+              <TColumn w="15%">
+                {item.jogadores
+                  .map((jogadores) => {
+                    return jogadores;
+                  })
+                  .join(', ')}
+              </TColumn>
+              <TColumn w="10%">{item.partidas}</TColumn>
+              <TColumn w="10%">{formatarData(item.data_inicio)}</TColumn>
+              <TColumn w="10%">{item.data_fim ? formatarData(item.data_fim) : '-'}</TColumn>
+              <TColumn w="10%" alignItems="center">
+                <Text fontSize="12px" mr="5px" color={item.status === 'Ativo' ? 'green.500' : 'orange.500'}>
+                  <FaCircle />
+                </Text>
+                {item.status}
+              </TColumn>
+              <TColumnButtons w="5%">
+                <HStack
+                  pt={{ md: '0px', sm: '5px' }}
+                  spacing="20px"
+                  justifyContent={{ md: 'center', sm: 'space-between' }}
+                  w="100%"
+                >
+                  <IconButton
+                    size="sm"
+                    colorScheme="blue"
+                    variant="ghost"
+                    aria-label="Editar Jogo"
+                    icon={<FaEdit />}
+                    onClick={() => handleAbrirEdicaoPlacar(item)}
+                  />
+                </HStack>
+              </TColumnButtons>
+            </TRow>
+          );
+        })
+    ) : (
+      <TRow>
+        <TColumn w="100%" color="gray.400" fontSize="12px">
+          Nenhum placar encontrado. Clique no botão "Criar Placar" para cadastrar!
+        </TColumn>
+      </TRow>
+    );
   }, [listagemPlacaresData]);
 
   return (
@@ -50,10 +135,36 @@ const Placar = () => {
           </Button>
         </Flex>
       </Flex>
-      <Flex mt={{ md: '40px', sm: '10px' }} w="100% ">
-        <Box overflowX="auto" w="100%">
-          table
-        </Box>
+      <Flex mt={{ md: '40px', sm: '10px' }} w="100%">
+        <Tabs w="100%">
+          <TabList justifyContent="space-between">
+            <Tab>
+              <Text mr="5px" color="yellow.500">
+                <FaTrophy />
+              </Text>
+              Placar Ativo
+            </Tab>
+            <Tab>
+              <Text mr="5px" color="green.500">
+                <FaHistory />
+              </Text>
+              Histórico de Placares
+            </Tab>
+          </TabList>
+          <TabPanels>
+            <TabPanel>{PlacarAtivo}</TabPanel>
+            <TabPanel>
+              <Box overflowX="auto" w="100%">
+                <Table>
+                  <THeader display={{ md: 'flex', sm: 'none' }}>
+                    <THead w="30%">Nome</THead>
+                  </THeader>
+                  <TBody>{PlacarHistorico}</TBody>
+                </Table>
+              </Box>
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
       </Flex>
     </Flex>
   );

@@ -12,13 +12,13 @@ export default function App({ Component, pageProps }: any) {
   return (
     <ChakraProvider resetCSS={true} theme={CustomTheme}>
       <Head>
-        <title>Boardgame {'<3'}</title>
+        <title>Joga BG {'<3'}</title>
       </Head>
       <Header />
       <Container as="main" m="0" p="0 20px" maxW="100%">
         <Component {...pageProps} />
       </Container>
-      <Footer version={'Version 0.1.2 B'} />
+      <Footer version={'Versão 0.2.0'} />
     </ChakraProvider>
   );
 }
