@@ -5,7 +5,7 @@ interface IOrdenadorTabelaContextProps {
   ordenarPeloValor: string;
   ordenarCrescente: string;
   handleOrdenarPeloValor: (value: string) => void;
-  handleOrdenarCrescente: (value: string) => void;
+  handleOrdenarCrescente: (value?: string) => void;
 }
 
 interface IOrdenadorTabelaProviderProps {
@@ -22,7 +22,7 @@ export function OrdenadorTabelaProvider({ children }: IOrdenadorTabelaProviderPr
     setOrdenarPeloValor(value);
   }
 
-  function handleOrdenarCrescente(value: string) {
+  function handleOrdenarCrescente(value?: string) {
     if (!value) {
       if (ordenarCrescente === 'desc') {
         setOrdenarCrescente('asc');
