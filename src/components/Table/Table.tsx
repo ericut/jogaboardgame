@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 import { Flex, Box, HStack, useColorModeValue, BoxProps, FlexProps, StackProps } from '@chakra-ui/react';
+import { FaSort, FaSortUp, FaSortDown } from 'react-icons/fa';
 
 // interfaces
 interface ITableProps extends BoxProps, FlexProps {
@@ -12,7 +13,15 @@ interface ITableStackProps extends StackProps {
   children: ReactNode;
 }
 
+interface ITableHeadProps extends ITableProps {
+  ordernarPor?: string;
+  setOrdenarPeloValor?: any;
+}
+
 type ITableWidthOmited = Omit<ITableProps, 'w'>;
+
+// hooks para a ordenação
+// receber o item que precisa ordernar, e faz ordenação desc e asc por meio da head column
 
 export function Table({ children, ...rest }: ITableProps) {
   return (
@@ -43,10 +52,55 @@ export function THeader({ children, ...rest }: ITableWidthOmited) {
   );
 }
 
-export function THead({ children, w, ...rest }: ITableProps) {
+export function TFooter({ children, ...rest }: ITableWidthOmited) {
+  const TextColor = useColorModeValue('gray.400', 'gray.400');
+  return (
+    <Flex
+      color={TextColor}
+      minH="38px"
+      fontSize="11px"
+      p="10px 10px"
+      textTransform="uppercase"
+      style={{ zIndex: 1 }}
+      fontWeight="bold"
+      letterSpacing="1px"
+      flexDirection={{ md: 'initial', sm: 'column' }}
+      alignItems={{ md: 'center', sm: 'flex-start' }}
+      justifyContent={{ md: 'initial', sm: 'flex-start' }}
+      {...rest}
+    >
+      {children}
+    </Flex>
+  );
+}
+
+export function THead({ children, w, ordernarPor, setOrdenarPeloValor, ...rest }: ITableHeadProps) {
+  function ordernacaoIcones() {
+    return <FaSort />;
+  }
+
+  function mudarOrdenacaoColuna() {
+    setOrdenarPeloValor(ordernarPor);
+  }
+
   return (
     <Box p="0px 10px" w={{ md: w ? w : '100%', sm: '100%' }} {...rest}>
-      {children}
+      {ordernarPor ? (
+        <Flex
+          w="100%"
+          alignItems="center"
+          transition="0.2s opacity"
+          _hover={{ cursor: 'pointer', opacity: '0.8' }}
+          onClick={() => {
+            mudarOrdenacaoColuna();
+          }}
+        >
+          {children}
+          {ordernacaoIcones()}
+        </Flex>
+      ) : (
+        children
+      )}
     </Box>
   );
 }

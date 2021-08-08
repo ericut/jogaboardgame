@@ -55,17 +55,12 @@ interface IEdicaoPlacarProviderProps {
 export const EdicaoPlacarContext = createContext({} as IEdicaoPlacarContextData);
 
 export function EdicaoPlacarProvider({ children }: IEdicaoPlacarProviderProps) {
-  // hooks chakra
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  // contexts
   const { listagemPlacaresData, setListagemPlacaresData, localStorageSetListagemPlacares } =
     useContext(ListagemPlacaresContext);
-  // drawers && modals
   const [drawerEdicaoPlacar, setDrawerEdicaoPlacar] = useState(false);
   const [modalRemoverPlacar, setModalRemoverPlacar] = useState(false);
-
-  //
   const [placarEdicao, setPlacarEdicao] = useState<IPlacaresProps>({
     id: 0,
     nome: '',
@@ -76,7 +71,6 @@ export function EdicaoPlacarProvider({ children }: IEdicaoPlacarProviderProps) {
     data_inicio: novaData(),
     data_fim: '',
   });
-  // campos da edição
   const [jogoAdicionar, setJogoAdicionar] = useState('');
   const [jogadorAdicionar, setJogadorAdicionar] = useState('');
 
@@ -170,9 +164,6 @@ export function EdicaoPlacarProvider({ children }: IEdicaoPlacarProviderProps) {
     });
   }
 
-  //
-  //
-  // renders
   const ModalEdicaoPlacar = () => {
     return (
       <Modal isOpen={isOpen} onClose={handleFecharModal} motionPreset="slideInBottom" isCentered>

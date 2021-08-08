@@ -1,19 +1,34 @@
-import { extendTheme, ThemeConfig } from "@chakra-ui/react";
+import { extendTheme, ThemeConfig } from '@chakra-ui/react';
 
-import styles from "./styles";
-import colors from "./foundations/colors";
-import fonts from "./foundations/fonts";
-import breakpoints from "./foundations/breakpoints";
+import colors from './foundations/colors';
+import breakpoints from './foundations/breakpoints';
 
 const config: ThemeConfig = {
-  initialColorMode: "dark",
+  initialColorMode: 'dark',
 };
 
 const CustomTheme = extendTheme({
+  styles: {
+    global: {
+      a: {
+        _hover: {
+          textDecoration: 'underline',
+        },
+      },
+      '.socialIcons': {
+        transition: '0.5s all',
+        _hover: {
+          color: 'blue.500',
+        },
+      },
+    },
+  },
+  fonts: {
+    heading: 'Montserrat',
+    body: 'Roboto',
+  },
   config,
-  styles,
   colors,
-  fonts,
   breakpoints,
 });
 

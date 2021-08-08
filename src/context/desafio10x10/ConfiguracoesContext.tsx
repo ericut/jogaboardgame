@@ -1,4 +1,4 @@
-import { ReactNode, createContext, useState, useEffect, useContext } from 'react';
+import { ReactNode, createContext, useState, useEffect, useContext, useMemo } from 'react';
 // chakra
 import {
   Button,
@@ -52,12 +52,9 @@ interface IConfiguracoesProviderProps {
 export const ConfiguracoesContext = createContext({} as IConfiguracoesContextData);
 
 export function ConfiguracoesProvider({ children }: IConfiguracoesProviderProps) {
-  // hooks chakra
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  // contexts
   const { handleMudarConfiguracoesListagem } = useContext(ListagemJogosContext);
-  // drawers && modals
   const [drawerConfiguracaoDesafio, setDrawerConfiguracaoDesafio] = useState(false);
   const [modalSalvarConfiguracoes, setModalSalvarConfiguracoes] = useState(false);
 
@@ -118,50 +115,6 @@ export function ConfiguracoesProvider({ children }: IConfiguracoesProviderProps)
       onClose();
     }
   }
-
-  //
-  //
-  // renders
-  const ModalConfiguracoesDesafio = () => {
-    return (
-      <Modal isOpen={isOpen} onClose={handleFecharModal} motionPreset="slideInBottom" isCentered>
-        <ModalOverlay
-          onClick={() => {
-            handleFecharModal;
-            onClose();
-          }}
-        />
-        <ModalContent>
-          <ModalHeader>Confirmação da nova configuração</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Text>Deseja salvar estas configurações?</Text>
-            <Text fontWeight="bold">Quantidade de Jogos: {configuracoesDesafio.qtdJogos}</Text>
-            <Text fontWeight="bold" pb="20px">
-              Quantidade de Partidas: {configuracoesDesafio.qtdPartidas}
-            </Text>
-            <Text color="red.400" fontSize="14px" p="5px" border="1px solid" borderColor="red.400">
-              <strong>ATENÇÃO:</strong>
-              <br />• Se já tiver partidas computadas excedendo ao novo número de total de partidas, será aplicado o
-              novo valor finalizando o desafio do jogo.
-              <br />• Se o número de jogos cadastros for maior que de jogos totais do desafio, eles não serão listados
-              na listagem.
-            </Text>
-          </ModalBody>
-          <ModalFooter>
-            <HStack w="100%">
-              <Button variant="outline" colorScheme="green" w="50%" onClick={() => handleSalvarConfiguracoes()}>
-                Confirmar
-              </Button>
-              <Button colorScheme="blue" w="50%" onClick={() => handleFecharModal()}>
-                Cancelar
-              </Button>
-            </HStack>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-    );
-  };
 
   const DrawerConfiguracoesDesafio = () => {
     return (
@@ -234,10 +187,51 @@ export function ConfiguracoesProvider({ children }: IConfiguracoesProviderProps)
     );
   };
 
+  const ModalConfiguracoesDesafio = useMemo(() => {
+    return (
+      <Modal isOpen={isOpen} onClose={handleFecharModal} motionPreset="slideInBottom" isCentered>
+        <ModalOverlay
+          onClick={() => {
+            handleFecharModal;
+            onClose();
+          }}
+        />
+        <ModalContent>
+          <ModalHeader>Confirmação da nova configuração</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Text>Deseja salvar estas configurações?</Text>
+            <Text fontWeight="bold">Quantidade de Jogos: {configuracoesDesafio.qtdJogos}</Text>
+            <Text fontWeight="bold" pb="20px">
+              Quantidade de Partidas: {configuracoesDesafio.qtdPartidas}
+            </Text>
+            <Text color="red.400" fontSize="14px" p="5px" border="1px solid" borderColor="red.400">
+              <strong>ATENÇÃO:</strong>
+              <br />• Se já tiver partidas computadas excedendo ao novo número de total de partidas, será aplicado o
+              novo valor finalizando o desafio do jogo.
+              <br />• Se o número de jogos cadastros for maior que de jogos totais do desafio, eles não serão listados
+              na listagem.
+            </Text>
+          </ModalBody>
+          <ModalFooter>
+            <HStack w="100%">
+              <Button variant="outline" colorScheme="green" w="50%" onClick={() => handleSalvarConfiguracoes()}>
+                Confirmar
+              </Button>
+              <Button colorScheme="blue" w="50%" onClick={() => handleFecharModal()}>
+                Cancelar
+              </Button>
+            </HStack>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    );
+  }, [modalSalvarConfiguracoes, handleFecharModal]);
+
   return (
     <ConfiguracoesContext.Provider value={{ jogosTotais, partidasTotais, handleAbrirConfiguracaoDesafio }}>
       {children}
-      {modalSalvarConfiguracoes && ModalConfiguracoesDesafio()}
+      {modalSalvarConfiguracoes && ModalConfiguracoesDesafio}
       {drawerConfiguracaoDesafio && DrawerConfiguracoesDesafio()}
     </ConfiguracoesContext.Provider>
   );

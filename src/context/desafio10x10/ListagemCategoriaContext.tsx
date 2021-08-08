@@ -15,7 +15,6 @@ interface IListagemCategoriasProviderProps {
 export const ListagemCategoriasContext = createContext({} as IListagemCategoriasContextData);
 
 export function ListagemCategoriasProvider({ children }: IListagemCategoriasProviderProps) {
-  // estado das categorias
   const [listagemCategoriasData, setListagemCategoriasData] = useState<ICategoriasProps[]>([]);
 
   useEffect(() => {

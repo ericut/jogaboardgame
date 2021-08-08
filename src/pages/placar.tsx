@@ -18,7 +18,6 @@ import { EdicaoPlacarProvider, EdicaoPlacarContext } from '../context/placar/Edi
 const Placar = () => {
   const { listagemPlacaresData } = useContext(ListagemPlacaresContext);
   const { handleAbrirEdicaoPlacar } = useContext(EdicaoPlacarContext);
-  //
   const [placarAtivo, setPlacarAtivo] = useState<IPlacaresProps | undefined>(undefined);
 
   useEffect(() => {
@@ -136,7 +135,7 @@ const Placar = () => {
         </Flex>
       </Flex>
       <Flex mt={{ md: '40px', sm: '10px' }} w="100%">
-        <Tabs w="100%">
+        <Tabs w="100%" variant="enclosed-colored">
           <TabList justifyContent="space-between">
             <Tab>
               <Text mr="5px" color="yellow.500">
@@ -157,7 +156,14 @@ const Placar = () => {
               <Box overflowX="auto" w="100%">
                 <Table>
                   <THeader display={{ md: 'flex', sm: 'none' }}>
-                    <THead w="30%">Nome</THead>
+                    <THead w="25%">Nome</THead>
+                    <THead w="15%">Jogos</THead>
+                    <THead w="15%">Jogadores</THead>
+                    <THead w="10%">Partidas</THead>
+                    <THead w="10%">Data Início</THead>
+                    <THead w="10%">Data Fim</THead>
+                    <THead w="10%">Status</THead>
+                    <THeadButtons w="5%">Ações</THeadButtons>
                   </THeader>
                   <TBody>{PlacarHistorico}</TBody>
                 </Table>
