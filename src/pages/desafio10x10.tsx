@@ -14,7 +14,7 @@ import {
   TColumnButtons,
 } from '../components/Table/Table';
 import Popover from '../components/Popover/Popover';
-import OrdenadorTabela, { useOrdernadorTabela } from '../components/Ordenador/Ordenador';
+import OrdenadorTabela from '../components/Ordenador/Ordenador';
 // icones
 import { GiMeeple } from 'react-icons/gi';
 import { FaEdit, FaPlus, FaMinus, FaEye, FaEyeSlash, FaCog, FaCrown } from 'react-icons/fa';
@@ -26,26 +26,25 @@ import {
 } from '../context/desafio10x10/ListagemCategoriaContext';
 import { ConfiguracoesProvider, ConfiguracoesContext } from '../context/desafio10x10/ConfiguracoesContext';
 import { EdicaoJogoProvider, EdicaoJogoContext } from '../context/desafio10x10/EdicaoJogoContext';
+import { OrdenadorTabelaProvider, OrdenadorTabelaContext } from '../context/OrdenadorTabelaContext';
 
 const Desafio10x10 = () => {
   const { listagemJogosData, handleRetirarPartida, handleAcrescentarPartida } = useContext(ListagemJogosContext);
   const { listagemCategoriasData } = useContext(ListagemCategoriasContext);
   const { jogosTotais, partidasTotais, handleAbrirConfiguracaoDesafio } = useContext(ConfiguracoesContext);
   const { handleAbrirEdicaoJogo } = useContext(EdicaoJogoContext);
-  const [showHUD, setShowHUD] = useState(true);
+  const { ordenacaoTabela, ordenarPeloValor, ordenarCrescente, handleOrdenarPeloValor, handleOrdenarCrescente } =
+    useContext(OrdenadorTabelaContext);
 
-  const [ordenarPeloValor, setOrdenarPeloValor] = useState('');
-  const [ordenacaoCrescente, setOrdenacaoCrescente] = useState(true);
+  const [showHUD, setShowHUD] = useState(true);
   const listagemOrdenacao = [
     { tipo: 'nome', label: 'Nome do Jogo' },
     { tipo: 'partidas', label: 'Número de Partidas' },
   ];
 
-  const { ordenarTabela } = useOrdernadorTabela();
-
   //
   const ListagemJogos = useMemo(() => {
-    const listagemJogosOrdenados = listagemJogosData.sort(ordenarTabela(ordenarPeloValor, ordenacaoCrescente));
+    const listagemJogosOrdenados = listagemJogosData.sort(ordenacaoTabela());
 
     const NumeroPartidas = (partidas: number) => {
       let partidasTotaisMontadas = Array.from({ length: partidasTotais }, (v, k) => k + 1);
@@ -121,7 +120,7 @@ const Desafio10x10 = () => {
                       size="sm"
                       isAttached
                       onClick={() => {
-                        setOrdenarPeloValor('');
+                        handleOrdenarPeloValor('');
                       }}
                     >
                       <IconButton
@@ -177,7 +176,7 @@ const Desafio10x10 = () => {
     partidasTotais,
     jogosTotais,
     ordenarPeloValor,
-    ordenacaoCrescente,
+    ordenarCrescente,
   ]);
 
   return (
@@ -292,13 +291,7 @@ const Desafio10x10 = () => {
             </THeader>
             <TBody>{ListagemJogos}</TBody>
             <TFooter>
-              <OrdenadorTabela
-                listagemOrdenacao={listagemOrdenacao}
-                ordenarPeloValor={ordenarPeloValor}
-                setOrdenarPeloValor={setOrdenarPeloValor}
-                ordenacaoCrescente={ordenacaoCrescente}
-                setOrdenacaoCrescente={setOrdenacaoCrescente}
-              />
+              <OrdenadorTabela listagemOrdenacao={listagemOrdenacao} />
             </TFooter>
           </Table>
         </Box>
@@ -313,7 +306,9 @@ const Desafio10x10Provider = () => {
       <ListagemCategoriasProvider>
         <ConfiguracoesProvider>
           <EdicaoJogoProvider>
-            <Desafio10x10 />
+            <OrdenadorTabelaProvider>
+              <Desafio10x10 />
+            </OrdenadorTabelaProvider>
           </EdicaoJogoProvider>
         </ConfiguracoesProvider>
       </ListagemCategoriasProvider>

@@ -1,6 +1,10 @@
-import { ReactNode } from 'react';
+import { ReactNode, useContext } from 'react';
+// chakra
 import { Flex, Box, HStack, useColorModeValue, BoxProps, FlexProps, StackProps } from '@chakra-ui/react';
+// icones
 import { FaSort, FaSortUp, FaSortDown } from 'react-icons/fa';
+// context
+import { OrdenadorTabelaContext } from '../../context/OrdenadorTabelaContext';
 
 // interfaces
 interface ITableProps extends BoxProps, FlexProps {
@@ -15,13 +19,9 @@ interface ITableStackProps extends StackProps {
 
 interface ITableHeadProps extends ITableProps {
   ordernarPor?: string;
-  setOrdenarPeloValor?: any;
 }
 
 type ITableWidthOmited = Omit<ITableProps, 'w'>;
-
-// hooks para a ordenação
-// receber o item que precisa ordernar, e faz ordenação desc e asc por meio da head column
 
 export function Table({ children, ...rest }: ITableProps) {
   return (
@@ -74,13 +74,29 @@ export function TFooter({ children, ...rest }: ITableWidthOmited) {
   );
 }
 
-export function THead({ children, w, ordernarPor, setOrdenarPeloValor, ...rest }: ITableHeadProps) {
-  function ordernacaoIcones() {
-    return <FaSort />;
+export function THead({ children, w, ordernarPor, ...rest }: ITableHeadProps) {
+  const { ordenarPeloValor, ordenarCrescente, handleOrdenarPeloValor, handleOrdenarCrescente } =
+    useContext(OrdenadorTabelaContext);
+
+  function ordernacaoMudarIcones() {
+    if (ordenarPeloValor === ordernarPor) {
+      if (ordenarCrescente === 'desc') {
+        return <FaSortUp />;
+      } else if (ordenarCrescente === 'asc') {
+        return <FaSortDown />;
+      }
+    } else {
+      return <FaSort />;
+    }
   }
 
   function mudarOrdenacaoColuna() {
-    setOrdenarPeloValor(ordernarPor);
+    if (ordenarCrescente === 'desc') {
+      handleOrdenarCrescente('asc');
+    } else if (ordenarCrescente === 'asc') {
+      handleOrdenarCrescente('desc');
+    }
+    handleOrdenarPeloValor(ordernarPor ? ordernarPor : '');
   }
 
   return (
@@ -89,14 +105,14 @@ export function THead({ children, w, ordernarPor, setOrdenarPeloValor, ...rest }
         <Flex
           w="100%"
           alignItems="center"
-          transition="0.2s opacity"
-          _hover={{ cursor: 'pointer', opacity: '0.8' }}
+          transition="0.2s all"
+          _hover={{ cursor: 'pointer', color: 'blue.300' }}
           onClick={() => {
             mudarOrdenacaoColuna();
           }}
         >
           {children}
-          {ordernacaoIcones()}
+          {ordernacaoMudarIcones()}
         </Flex>
       ) : (
         children
