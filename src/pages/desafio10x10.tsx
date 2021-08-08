@@ -2,8 +2,19 @@ import { useMemo, useState, useContext } from 'react';
 // chakra
 import { Text, Box, ButtonGroup, Button, IconButton, Flex, Heading, Badge, HStack, Stack } from '@chakra-ui/react';
 // componentes
-import { Table, THeader, THead, THeadButtons, TBody, TRow, TColumn, TColumnButtons } from '../components/Table/Table';
+import {
+  Table,
+  THeader,
+  TFooter,
+  THead,
+  THeadButtons,
+  TBody,
+  TRow,
+  TColumn,
+  TColumnButtons,
+} from '../components/Table/Table';
 import Popover from '../components/Popover/Popover';
+import OrdenadorTabela from '../components/Ordenador/Ordenador';
 // icones
 import { GiMeeple } from 'react-icons/gi';
 import { FaEdit, FaPlus, FaMinus, FaEye, FaEyeSlash, FaCog, FaCrown } from 'react-icons/fa';
@@ -15,19 +26,26 @@ import {
 } from '../context/desafio10x10/ListagemCategoriaContext';
 import { ConfiguracoesProvider, ConfiguracoesContext } from '../context/desafio10x10/ConfiguracoesContext';
 import { EdicaoJogoProvider, EdicaoJogoContext } from '../context/desafio10x10/EdicaoJogoContext';
+import { OrdenadorTabelaProvider, OrdenadorTabelaContext } from '../context/OrdenadorTabelaContext';
 
 const Desafio10x10 = () => {
-  // contexts
   const { listagemJogosData, handleRetirarPartida, handleAcrescentarPartida } = useContext(ListagemJogosContext);
   const { listagemCategoriasData } = useContext(ListagemCategoriasContext);
   const { jogosTotais, partidasTotais, handleAbrirConfiguracaoDesafio } = useContext(ConfiguracoesContext);
   const { handleAbrirEdicaoJogo } = useContext(EdicaoJogoContext);
+  const { ordenacaoTabela, ordenarPeloValor, ordenarCrescente, handleOrdenarPeloValor, handleOrdenarCrescente } =
+    useContext(OrdenadorTabelaContext);
 
   const [showHUD, setShowHUD] = useState(true);
+  const listagemOrdenacao = [
+    { tipo: 'nome', label: 'Nome do Jogo' },
+    { tipo: 'partidas', label: 'Número de Partidas' },
+  ];
 
-  // renderização da listagem de jogos
+  //
   const ListagemJogos = useMemo(() => {
-    // render dos meeples de número de partidas
+    const listagemJogosOrdenados = listagemJogosData.sort(ordenacaoTabela());
+
     const NumeroPartidas = (partidas: number) => {
       let partidasTotaisMontadas = Array.from({ length: partidasTotais }, (v, k) => k + 1);
       let partidasJogadas = partidasTotaisMontadas.map((item, index) => {
@@ -39,7 +57,6 @@ const Desafio10x10 = () => {
       });
       return <>{partidasJogadas}</>;
     };
-    // render listagem de categorias
     const ListagemCategorias = (categoria: number[]) => {
       function corPorCategoria(item: string) {
         if (item === 'Cooperativo') {
@@ -64,7 +81,7 @@ const Desafio10x10 = () => {
     };
 
     return listagemJogosData.length !== 0 ? (
-      listagemJogosData.slice(0, jogosTotais).map((item, index) => {
+      listagemJogosOrdenados.slice(0, jogosTotais).map((item) => {
         return (
           <TRow key={item.id}>
             <TColumn w="30%" flexDirection="column" justifyContent="center">
@@ -99,7 +116,13 @@ const Desafio10x10 = () => {
                   w="100%"
                 >
                   <Flex>
-                    <ButtonGroup size="sm" isAttached>
+                    <ButtonGroup
+                      size="sm"
+                      isAttached
+                      onClick={() => {
+                        handleOrdenarPeloValor('');
+                      }}
+                    >
                       <IconButton
                         aria-label="Retirar Jogada"
                         colorScheme="orange"
@@ -146,9 +169,16 @@ const Desafio10x10 = () => {
         </TColumn>
       </TRow>
     );
-  }, [listagemJogosData, listagemCategoriasData, showHUD, partidasTotais, jogosTotais]);
+  }, [
+    listagemJogosData,
+    listagemCategoriasData,
+    showHUD,
+    partidasTotais,
+    jogosTotais,
+    ordenarPeloValor,
+    ordenarCrescente,
+  ]);
 
-  // renderização geral
   return (
     <Flex
       w={{ lg: '1300px', md: '100%', sm: '100%' }}
@@ -251,11 +281,18 @@ const Desafio10x10 = () => {
         <Box overflowX="auto" w="100%">
           <Table>
             <THeader display={{ md: 'flex', sm: 'none' }}>
-              <THead w="30%">Jogos</THead>
-              <THead w="50%">Partidas</THead>
+              <THead w="30%" ordernarPor="nome">
+                Jogos
+              </THead>
+              <THead w="50%" ordernarPor="partidas">
+                Partidas
+              </THead>
               <THeadButtons w="20%">{showHUD ? 'Controle | Editar' : ''}</THeadButtons>
             </THeader>
             <TBody>{ListagemJogos}</TBody>
+            <TFooter>
+              <OrdenadorTabela listagemOrdenacao={listagemOrdenacao} />
+            </TFooter>
           </Table>
         </Box>
       </Flex>
@@ -269,7 +306,9 @@ const Desafio10x10Provider = () => {
       <ListagemCategoriasProvider>
         <ConfiguracoesProvider>
           <EdicaoJogoProvider>
-            <Desafio10x10 />
+            <OrdenadorTabelaProvider>
+              <Desafio10x10 />
+            </OrdenadorTabelaProvider>
           </EdicaoJogoProvider>
         </ConfiguracoesProvider>
       </ListagemCategoriasProvider>

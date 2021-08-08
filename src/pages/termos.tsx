@@ -6,7 +6,6 @@ const TermosDeUso = () => {
       w={{ lg: '1300px', md: '100%', sm: '100%' }}
       maxW="100%"
       minH="60vh"
-      // alignItems="center"
       flexDirection="column"
       py={{ md: '20px', sm: '10px' }}
       m="0 auto"

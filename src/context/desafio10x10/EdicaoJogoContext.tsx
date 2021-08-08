@@ -1,4 +1,4 @@
-import { ReactNode, createContext, useState, useContext } from 'react';
+import { ReactNode, createContext, useState, useContext, useMemo } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 // chakra
 import {
@@ -52,14 +52,11 @@ interface IEdicaoJogoProviderProps {
 export const EdicaoJogoContext = createContext({} as IEdicaoJogoContextData);
 
 export function EdicaoJogoProvider({ children }: IEdicaoJogoProviderProps) {
-  // hooks chakra
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  // contexts
   const { listagemJogosData, setListagemJogosData, localStorageSetListagem } = useContext(ListagemJogosContext);
   const { listagemCategoriasData } = useContext(ListagemCategoriasContext);
   const { partidasTotais } = useContext(ConfiguracoesContext);
-  // drawers && modals
   const [drawerEdicaoJogo, setDrawerEdicaoJogo] = useState(false);
   const [modalRemoverJogo, setModalRemoverJogo] = useState(false);
 
@@ -80,7 +77,6 @@ export function EdicaoJogoProvider({ children }: IEdicaoJogoProviderProps) {
     }
   }
 
-  // controle checkbox das categorias
   function handleEditarCategorias(event: any) {
     let value = +event.target.value;
     let checked = event.target.checked;
@@ -163,40 +159,6 @@ export function EdicaoJogoProvider({ children }: IEdicaoJogoProviderProps) {
     });
   }
 
-  //
-  //
-  // renders
-  const ModalEdicaoJogo = () => {
-    return (
-      <Modal isOpen={isOpen} onClose={handleFecharModal} motionPreset="slideInBottom" isCentered>
-        <ModalOverlay
-          onClick={() => {
-            handleFecharModal;
-            onClose();
-          }}
-        />
-        <ModalContent>
-          <ModalHeader>Remover Jogo da Lista</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Text>Deseja remover este jogo da sua lista?</Text>
-            <Text fontWeight="bold">{jogoEdicao.nome}</Text>
-          </ModalBody>
-          <ModalFooter>
-            <HStack w="100%">
-              <Button variant="outline" colorScheme="orange" w="50%" onClick={() => handleRemoverJogo()}>
-                Confirmar
-              </Button>
-              <Button colorScheme="blue" w="50%" onClick={() => handleFecharModal()}>
-                Cancelar
-              </Button>
-            </HStack>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-    );
-  };
-
   const DrawerEdicaoJogo = () => {
     return (
       <Drawer isOpen={isOpen} onClose={handleFecharDrawer} placement="right" size="lg">
@@ -265,10 +227,41 @@ export function EdicaoJogoProvider({ children }: IEdicaoJogoProviderProps) {
     );
   };
 
+  const ModalEdicaoJogo = useMemo(() => {
+    return (
+      <Modal isOpen={isOpen} onClose={handleFecharModal} motionPreset="slideInBottom" isCentered>
+        <ModalOverlay
+          onClick={() => {
+            handleFecharModal;
+            onClose();
+          }}
+        />
+        <ModalContent>
+          <ModalHeader>Remover Jogo da Lista</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Text>Deseja remover este jogo da sua lista?</Text>
+            <Text fontWeight="bold">{jogoEdicao.nome}</Text>
+          </ModalBody>
+          <ModalFooter>
+            <HStack w="100%">
+              <Button variant="outline" colorScheme="orange" w="50%" onClick={() => handleRemoverJogo()}>
+                Confirmar
+              </Button>
+              <Button colorScheme="blue" w="50%" onClick={() => handleFecharModal()}>
+                Cancelar
+              </Button>
+            </HStack>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    );
+  }, [modalRemoverJogo, handleFecharModal]);
+
   return (
     <EdicaoJogoContext.Provider value={{ handleAbrirEdicaoJogo }}>
       {children}
-      {modalRemoverJogo && ModalEdicaoJogo()}
+      {modalRemoverJogo && ModalEdicaoJogo}
       {drawerEdicaoJogo && DrawerEdicaoJogo()}
     </EdicaoJogoContext.Provider>
   );
