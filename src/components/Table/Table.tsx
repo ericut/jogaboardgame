@@ -18,7 +18,7 @@ interface ITableStackProps extends StackProps {
 }
 
 interface ITableHeadProps extends ITableProps {
-  ordernarPor?: string;
+  ordenarPor?: string;
 }
 
 type ITableWidthOmited = Omit<ITableProps, 'w'>;
@@ -74,12 +74,12 @@ export function TFooter({ children, ...rest }: ITableWidthOmited) {
   );
 }
 
-export function THead({ children, w, ordernarPor, ...rest }: ITableHeadProps) {
+export function THead({ children, w, ordenarPor, ...rest }: ITableHeadProps) {
   const { ordenarPeloValor, ordenarCrescente, handleOrdenarPeloValor, handleOrdenarCrescente } =
     useContext(OrdenadorTabelaContext);
 
   function ordernacaoMudarIcones() {
-    if (ordenarPeloValor === ordernarPor) {
+    if (ordenarPeloValor === ordenarPor) {
       if (ordenarCrescente === 'desc') {
         return <FaSortUp />;
       } else if (ordenarCrescente === 'asc') {
@@ -96,12 +96,12 @@ export function THead({ children, w, ordernarPor, ...rest }: ITableHeadProps) {
     } else if (ordenarCrescente === 'asc') {
       handleOrdenarCrescente('desc');
     }
-    handleOrdenarPeloValor(ordernarPor ? ordernarPor : '');
+    handleOrdenarPeloValor(ordenarPor ? ordenarPor : '');
   }
 
   return (
     <Box p="0px 10px" w={{ md: w ? w : '100%', sm: '100%' }} {...rest}>
-      {ordernarPor ? (
+      {ordenarPor ? (
         <Flex
           w="100%"
           alignItems="center"

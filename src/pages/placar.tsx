@@ -3,8 +3,19 @@ import { useState, useEffect, useContext, useMemo } from 'react';
 import { Text, Box, Flex, Heading, Button, HStack, IconButton } from '@chakra-ui/react';
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
 // componentes
-import { Table, THeader, THead, THeadButtons, TBody, TRow, TColumn, TColumnButtons } from '../components/Table/Table';
+import {
+  Table,
+  THeader,
+  TFooter,
+  THead,
+  THeadButtons,
+  TBody,
+  TRow,
+  TColumn,
+  TColumnButtons,
+} from '../components/Table/Table';
 import Popover from '../components/Popover/Popover';
+import OrdenadorTabela from '../components/Ordenador/Ordenador';
 // icones
 import { FaPlus, FaHistory, FaTrophy, FaEdit, FaCircle } from 'react-icons/fa';
 // utilitários
@@ -14,11 +25,23 @@ import { IPlacaresProps } from '../interfaces/placar';
 // context
 import { ListagemPlacaresProvider, ListagemPlacaresContext } from '../context/placar/ListagemPlacaresContext';
 import { EdicaoPlacarProvider, EdicaoPlacarContext } from '../context/placar/EdicaoPlacarContext';
+import { OrdenadorTabelaProvider, OrdenadorTabelaContext } from '../context/OrdenadorTabelaContext';
 
 const Placar = () => {
   const { listagemPlacaresData } = useContext(ListagemPlacaresContext);
   const { handleAbrirEdicaoPlacar } = useContext(EdicaoPlacarContext);
+  const { ordenacaoTabela, ordenarPeloValor, ordenarCrescente, handleOrdenarPeloValor, handleOrdenarCrescente } =
+    useContext(OrdenadorTabelaContext);
+
   const [placarAtivo, setPlacarAtivo] = useState<IPlacaresProps | undefined>(undefined);
+  const listagemOrdenacao = [
+    { tipo: 'nome', label: 'Nome do Placar' },
+    { tipo: 'jogo', label: 'Nome do Jogo' },
+    { tipo: 'jogadores', label: 'Jogadores' },
+    { tipo: 'partidas', label: 'Número de Partidas' },
+    { tipo: 'data_inicio', label: 'Data de Início' },
+    { tipo: 'data_fim', label: 'Data da Finalização' },
+  ];
 
   useEffect(() => {
     setPlacarAtivo(
@@ -33,8 +56,10 @@ const Placar = () => {
   }, [placarAtivo]);
 
   const PlacarHistorico = useMemo(() => {
+    const listagemPlacarOrdenados = listagemPlacaresData.sort(ordenacaoTabela());
+
     return listagemPlacaresData.length !== 0 ? (
-      listagemPlacaresData
+      listagemPlacarOrdenados
         .sort((a, b) => {
           if (a.status > b.status) {
             return 1;
@@ -92,7 +117,7 @@ const Placar = () => {
         </TColumn>
       </TRow>
     );
-  }, [listagemPlacaresData]);
+  }, [listagemPlacaresData, ordenarPeloValor, ordenarCrescente]);
 
   return (
     <Flex
@@ -149,16 +174,31 @@ const Placar = () => {
               <Box overflowX="auto" w="100%">
                 <Table>
                   <THeader display={{ md: 'flex', sm: 'none' }}>
-                    <THead w="25%">Nome</THead>
-                    <THead w="15%">Jogo</THead>
-                    <THead w="15%">Jogadores</THead>
-                    <THead w="10%">Partidas</THead>
-                    <THead w="10%">Data Início</THead>
-                    <THead w="10%">Data Fim</THead>
+                    <THead w="25%" ordenarPor="nome">
+                      Nome
+                    </THead>
+                    <THead w="15%" ordenarPor="jogo">
+                      Jogo
+                    </THead>
+                    <THead w="15%" ordenarPor="jogadores">
+                      Jogadores
+                    </THead>
+                    <THead w="10%" ordenarPor="partidas">
+                      Partidas
+                    </THead>
+                    <THead w="10%" ordenarPor="data_inicio">
+                      Data Início
+                    </THead>
+                    <THead w="10%" ordenarPor="data_fim">
+                      Data Fim
+                    </THead>
                     <THead w="10%">Status</THead>
                     <THeadButtons w="5%">Ações</THeadButtons>
                   </THeader>
                   <TBody>{PlacarHistorico}</TBody>
+                  <TFooter>
+                    <OrdenadorTabela listagemOrdenacao={listagemOrdenacao} />
+                  </TFooter>
                 </Table>
               </Box>
             </TabPanel>
@@ -173,7 +213,9 @@ const PlacarProvider = () => {
   return (
     <ListagemPlacaresProvider>
       <EdicaoPlacarProvider>
-        <Placar />
+        <OrdenadorTabelaProvider>
+          <Placar />
+        </OrdenadorTabelaProvider>
       </EdicaoPlacarProvider>
     </ListagemPlacaresProvider>
   );
