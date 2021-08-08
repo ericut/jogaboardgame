@@ -378,7 +378,7 @@ export function EdicaoPlacarProvider({ children }: IEdicaoPlacarProviderProps) {
         <DrawerOverlay onClick={handleFecharDrawer} />
         <DrawerContent>
           <DrawerCloseButton />
-          <DrawerHeader>{placarEdicao.id === 0 ? 'Criar' : 'Editar'} Placar</DrawerHeader>
+          <DrawerHeader>{placarEdicao.id === '0' ? 'Criar' : 'Editar'} Placar</DrawerHeader>
           <DrawerBody>
             <VStack spacing={5}>
               <Flex w="100%">
@@ -425,6 +425,7 @@ export function EdicaoPlacarProvider({ children }: IEdicaoPlacarProviderProps) {
                         colorScheme="orange"
                         variant="outline"
                         onClick={() => handleConfirmarFinalizarPlacar()}
+                        isDisabled={placarEdicao.id === '0'}
                       >
                         Finalizar Placar
                       </Button>
@@ -450,12 +451,14 @@ export function EdicaoPlacarProvider({ children }: IEdicaoPlacarProviderProps) {
                     value={jogadorAdicionar}
                     onChange={(event) => setJogadorAdicionar(event.target.value)}
                     mr="10px"
+                    isDisabled={placarEdicao.status === 'Finalizado'}
                   />
                   <IconButton
                     colorScheme="blue"
                     aria-label="Adicionar Jogo"
                     icon={<FaPlus />}
                     onClick={() => handleAdicionarJogador()}
+                    isDisabled={placarEdicao.status === 'Finalizado'}
                   />
                 </Flex>
                 <Box w="100%" borderBottom="1px solid" borderBottomColor="gray.500">
@@ -494,7 +497,7 @@ export function EdicaoPlacarProvider({ children }: IEdicaoPlacarProviderProps) {
                 leftIcon={<FaTrash />}
                 onClick={() => handleConfirmarRemocaoPlacar()}
                 w="50%"
-                isDisabled={placarEdicao.id === 0}
+                isDisabled={placarEdicao.id === '0'}
               >
                 Apagar Placar
               </Button>

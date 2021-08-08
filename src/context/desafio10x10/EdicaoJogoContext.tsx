@@ -166,7 +166,7 @@ export function EdicaoJogoProvider({ children }: IEdicaoJogoProviderProps) {
         <DrawerOverlay onClick={handleFecharDrawer} />
         <DrawerContent>
           <DrawerCloseButton />
-          <DrawerHeader>{jogoEdicao.id === 0 ? 'Adicionar' : 'Editar'} Jogo</DrawerHeader>
+          <DrawerHeader>{jogoEdicao.id === '0' ? 'Adicionar' : 'Editar'} Jogo</DrawerHeader>
           <DrawerBody>
             <VStack>
               <Input
@@ -214,7 +214,7 @@ export function EdicaoJogoProvider({ children }: IEdicaoJogoProviderProps) {
                 leftIcon={<FaTrash />}
                 onClick={() => handleConfirmarRemocaoJogo()}
                 w="50%"
-                isDisabled={jogoEdicao.id === 0}
+                isDisabled={jogoEdicao.id === '0'}
               >
                 Remover Jogo
               </Button>

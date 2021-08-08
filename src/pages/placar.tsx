@@ -49,10 +49,17 @@ const Placar = () => {
         return item.status === 'Ativo';
       })
     );
+    console.table(listagemPlacaresData);
   }, [listagemPlacaresData]);
 
   const PlacarAtivo = useMemo(() => {
-    return <Flex w="100%">{placarAtivo?.nome}</Flex>;
+    return placarAtivo ? (
+      <Flex w="100%">{placarAtivo?.nome}</Flex>
+    ) : (
+      <Flex w="100%" color="gray.400" fontSize="12px" p="10px">
+        Nenhum placar ativo. Clique no botão "Criar Placar" para cadastrar um!
+      </Flex>
+    );
   }, [placarAtivo]);
 
   const PlacarHistorico = useMemo(() => {
@@ -71,7 +78,7 @@ const Placar = () => {
         })
         .map((item) => {
           return (
-            <TRow key={item.id} alignItems="center">
+            <TRow key={item.id} alignItems="center" bg={item.status === 'Ativo' ? 'rgba(72, 187, 120, 0.1)' : ''}>
               <TColumn w="25%">{item.nome}</TColumn>
               <TColumn w="15%">{item.jogo}</TColumn>
               <TColumn w="15%">
@@ -169,8 +176,8 @@ const Placar = () => {
             </Tab>
           </TabList>
           <TabPanels>
-            <TabPanel>{PlacarAtivo}</TabPanel>
-            <TabPanel>
+            <TabPanel px="0">{PlacarAtivo}</TabPanel>
+            <TabPanel px="0">
               <Box overflowX="auto" w="100%">
                 <Table>
                   <THeader display={{ md: 'flex', sm: 'none' }}>
