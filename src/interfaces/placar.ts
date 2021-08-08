@@ -1,7 +1,7 @@
 export interface IPlacaresProps {
   id: string | number;
   nome: string;
-  jogos: string[];
+  jogo: string;
   jogadores: string[];
   status: string;
   partidas: string | number;

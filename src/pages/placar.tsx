@@ -26,7 +26,6 @@ const Placar = () => {
         return item.status === 'Ativo';
       })
     );
-    console.log('listinha', listagemPlacaresData);
   }, [listagemPlacaresData]);
 
   const PlacarAtivo = useMemo(() => {
@@ -49,13 +48,7 @@ const Placar = () => {
           return (
             <TRow key={item.id} alignItems="center">
               <TColumn w="25%">{item.nome}</TColumn>
-              <TColumn w="15%">
-                {item.jogos
-                  .map((jogos) => {
-                    return jogos;
-                  })
-                  .join(', ')}
-              </TColumn>
+              <TColumn w="15%">{item.jogo}</TColumn>
               <TColumn w="15%">
                 {item.jogadores
                   .map((jogadores) => {
@@ -157,7 +150,7 @@ const Placar = () => {
                 <Table>
                   <THeader display={{ md: 'flex', sm: 'none' }}>
                     <THead w="25%">Nome</THead>
-                    <THead w="15%">Jogos</THead>
+                    <THead w="15%">Jogo</THead>
                     <THead w="15%">Jogadores</THead>
                     <THead w="10%">Partidas</THead>
                     <THead w="10%">Data Início</THead>
