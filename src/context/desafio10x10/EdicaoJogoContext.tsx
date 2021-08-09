@@ -61,7 +61,7 @@ export function EdicaoJogoProvider({ children }: IEdicaoJogoProviderProps) {
   const [modalRemoverJogo, setModalRemoverJogo] = useState(false);
 
   const [jogoEdicao, setJogoEdicao] = useState<IJogosProps>({
-    id: 0,
+    id: '0',
     nome: '',
     partidas: '',
     categoria: [],
@@ -80,13 +80,13 @@ export function EdicaoJogoProvider({ children }: IEdicaoJogoProviderProps) {
   function handleEditarCategorias(event: any) {
     let value = +event.target.value;
     let checked = event.target.checked;
-    let categorias = jogoEdicao ? jogoEdicao.categoria : [];
+    let categoriasExistentes = jogoEdicao ? jogoEdicao.categoria : [];
     if (checked) {
-      setJogoEdicao({ ...jogoEdicao, categoria: categorias.concat([value]) });
+      setJogoEdicao({ ...jogoEdicao, categoria: categoriasExistentes.concat([value]) });
     } else {
       setJogoEdicao({
         ...jogoEdicao,
-        categoria: categorias.filter((item) => item !== value),
+        categoria: categoriasExistentes.filter((item) => item !== value),
       });
     }
   }
@@ -110,6 +110,7 @@ export function EdicaoJogoProvider({ children }: IEdicaoJogoProviderProps) {
         duration: 3000,
         isClosable: true,
       });
+      handleFecharDrawer();
     } else {
       if (jogoEdicao.nome !== '') {
         jogoEdicao.id = uuidv4();
@@ -121,6 +122,7 @@ export function EdicaoJogoProvider({ children }: IEdicaoJogoProviderProps) {
           duration: 3000,
           isClosable: true,
         });
+        handleFecharDrawer();
       } else {
         toast({
           title: 'Insira o nome do jogo para salvar!',
@@ -130,7 +132,6 @@ export function EdicaoJogoProvider({ children }: IEdicaoJogoProviderProps) {
         });
       }
     }
-    handleFecharDrawer();
   }
 
   function handleConfirmarRemocaoJogo() {
@@ -152,7 +153,7 @@ export function EdicaoJogoProvider({ children }: IEdicaoJogoProviderProps) {
     setDrawerEdicaoJogo(false);
     onClose();
     setJogoEdicao({
-      id: 0,
+      id: '0',
       nome: '',
       partidas: '',
       categoria: [],
@@ -165,7 +166,7 @@ export function EdicaoJogoProvider({ children }: IEdicaoJogoProviderProps) {
         <DrawerOverlay onClick={handleFecharDrawer} />
         <DrawerContent>
           <DrawerCloseButton />
-          <DrawerHeader>{jogoEdicao.id === 0 ? 'Adicionar' : 'Editar'} Jogo</DrawerHeader>
+          <DrawerHeader>{jogoEdicao.id === '0' ? 'Adicionar' : 'Editar'} Jogo</DrawerHeader>
           <DrawerBody>
             <VStack>
               <Input
@@ -213,7 +214,7 @@ export function EdicaoJogoProvider({ children }: IEdicaoJogoProviderProps) {
                 leftIcon={<FaTrash />}
                 onClick={() => handleConfirmarRemocaoJogo()}
                 w="50%"
-                isDisabled={jogoEdicao.id === 0}
+                isDisabled={jogoEdicao.id === '0'}
               >
                 Remover Jogo
               </Button>

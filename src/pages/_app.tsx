@@ -1,3 +1,6 @@
+import '@fontsource/montserrat';
+import '@fontsource/roboto';
+
 // chakra
 import { ChakraProvider } from '@chakra-ui/react';
 import { Container } from '@chakra-ui/react';
@@ -18,7 +21,7 @@ export default function App({ Component, pageProps }: any) {
       <Container as="main" m="0" p="0 20px" maxW="100%">
         <Component {...pageProps} />
       </Container>
-      <Footer version={'Versão 0.2.0'} />
+      <Footer version={'Versão 0.2.7'} />
     </ChakraProvider>
   );
 }

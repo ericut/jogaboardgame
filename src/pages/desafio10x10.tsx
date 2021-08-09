@@ -281,10 +281,10 @@ const Desafio10x10 = () => {
         <Box overflowX="auto" w="100%">
           <Table>
             <THeader display={{ md: 'flex', sm: 'none' }}>
-              <THead w="30%" ordernarPor="nome">
+              <THead w="30%" ordenarPor="nome">
                 Jogos
               </THead>
-              <THead w="50%" ordernarPor="partidas">
+              <THead w="50%" ordenarPor="partidas">
                 Partidas
               </THead>
               <THeadButtons w="20%">{showHUD ? 'Controle | Editar' : ''}</THeadButtons>

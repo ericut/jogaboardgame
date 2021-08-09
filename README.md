@@ -29,18 +29,31 @@ Pode ser utilizada no celular normalmente, pois os navegadores mobile tem "local
 - ChakraUI
 - Context API
 
-### Implementações previstas para o Desafio10x10
+### Implementações previstas para o projeto
+
+#### Página: Desafio 10x10
 
 - [✔] Controle de estado por Context API
 - [❓] Selecionar período para o desafio, com um contador
 - [❓] Adicionar dados referente à partida: jogadores e a data
-- [❓] Recuperar dados anteriores
 
-### Recursos futuros para a aplicação
+#### Global
 
-- [WIP] Quadro de ranking de partidas, como uma aplicação individual, para gerenciamento de uma sessão completa de jogos
+- [✔] Ordenação de tabela
+- [❓] Seletor de temas
+
+#### Placar
+
+- [WIP] Quadro de ranking de partidas
+- [❓] Controle da sessão de partidas
+- [❓] Quadro de líderes (jogos vencidos, perdidos, total de jogos jogados)
+
+#### Calculadora Pontuações
+
 - [❓] Quadro de pontuação de partida, com calculadora simplificada para auxiliar na contagem de pontuação
 
-### Projeto Publicado (Versão Teste)
+### Link do Projeto
 
-https://jogabg.vercel.app/
+[Versão Retail] https://www.jogabg.com.br/
+
+[Versão Teste] https://jogabg.vercel.app/
