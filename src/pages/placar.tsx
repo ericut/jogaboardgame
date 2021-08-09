@@ -1,6 +1,6 @@
-import { useState, useEffect, useContext, useMemo } from 'react';
+import { useContext, useMemo, useEffect } from 'react';
 // chakra
-import { Text, Box, Flex, Heading, Button, HStack, IconButton } from '@chakra-ui/react';
+import { Text, Box, Flex, Heading, Button, HStack, IconButton, Grid, GridItem, Badge } from '@chakra-ui/react';
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
 // componentes
 import {
@@ -16,24 +16,24 @@ import {
 } from '../components/Table/Table';
 import Popover from '../components/Popover/Popover';
 import OrdenadorTabela from '../components/Ordenador/Ordenador';
+import InfoBoxPlacar from '../components/InfoBox/InfoBoxPlacar';
 // icones
 import { FaPlus, FaHistory, FaTrophy, FaEdit, FaCircle } from 'react-icons/fa';
 // utilitários
 import { formatarData } from '../utils/formatarData';
-// interfaces
-import { IPlacaresProps } from '../interfaces/placar';
 // context
 import { ListagemPlacaresProvider, ListagemPlacaresContext } from '../context/placar/ListagemPlacaresContext';
+import { ControlePlacarAtivoProvider, ControlePlacarAtivoContext } from '../context/placar/ControlePlacarAtivoContext';
 import { EdicaoPlacarProvider, EdicaoPlacarContext } from '../context/placar/EdicaoPlacarContext';
 import { OrdenadorTabelaProvider, OrdenadorTabelaContext } from '../context/OrdenadorTabelaContext';
 
 const Placar = () => {
   const { listagemPlacaresData } = useContext(ListagemPlacaresContext);
+  const { placarAtivo, listagemPartidasPlacaresData, listagemPartidasPlacarAtivoData } =
+    useContext(ControlePlacarAtivoContext);
   const { handleAbrirEdicaoPlacar } = useContext(EdicaoPlacarContext);
-  const { ordenacaoTabela, ordenarPeloValor, ordenarCrescente, handleOrdenarPeloValor, handleOrdenarCrescente } =
-    useContext(OrdenadorTabelaContext);
+  const { ordenacaoTabela, ordenarPeloValor, ordenarCrescente } = useContext(OrdenadorTabelaContext);
 
-  const [placarAtivo, setPlacarAtivo] = useState<IPlacaresProps | undefined>(undefined);
   const listagemOrdenacao = [
     { tipo: 'nome', label: 'Nome do Placar' },
     { tipo: 'jogo', label: 'Nome do Jogo' },
@@ -43,27 +43,93 @@ const Placar = () => {
     { tipo: 'data_fim', label: 'Data da Finalização' },
   ];
 
-  useEffect(() => {
-    setPlacarAtivo(
-      listagemPlacaresData.find((item) => {
-        return item.status === 'Ativo';
-      })
-    );
-  }, [listagemPlacaresData]);
-
-  const PlacarAtivo = useMemo(() => {
+  const PlacarAtivo = () => {
     return placarAtivo ? (
-      <Flex w="100%">{placarAtivo?.nome}</Flex>
+      <Box w="100%">
+        <Grid
+          templateColumns={{ md: 'repeat(4, 1fr)', sm: '1fr' }}
+          templateRows={{ md: 'repeat(2, 1fr)', sm: 'repeat(6, 1fr)' }}
+          gap="10px"
+          w="100%"
+        >
+          <GridItem>
+            <InfoBoxPlacar label="Nome">{placarAtivo.nome}</InfoBoxPlacar>
+          </GridItem>
+          <GridItem>
+            <InfoBoxPlacar label="Jogo">{placarAtivo.jogo}</InfoBoxPlacar>
+          </GridItem>
+          <GridItem>
+            <InfoBoxPlacar label="Data do Placar">{formatarData(placarAtivo.data_inicio)}</InfoBoxPlacar>
+          </GridItem>
+          <GridItem>
+            <InfoBoxPlacar label="Status">
+              <Flex alignItems="center">
+                <Text fontSize="12px" mr="5px" color={placarAtivo.status === 'Ativo' ? 'green.500' : 'orange.500'}>
+                  <FaCircle />
+                </Text>
+                {placarAtivo.status}
+              </Flex>
+            </InfoBoxPlacar>
+          </GridItem>
+          <GridItem colSpan={{ md: 3, sm: 0 }}>
+            <InfoBoxPlacar label="Jogadores">
+              <HStack mt="3px">
+                {placarAtivo.jogadores.map((jogador, index) => {
+                  return (
+                    <Badge key={index} fontSize="13px">
+                      {jogador}
+                    </Badge>
+                  );
+                })}
+              </HStack>
+            </InfoBoxPlacar>
+          </GridItem>
+          <GridItem>
+            <InfoBoxPlacar label="Partidas Realizadas">{placarAtivo.partidas}</InfoBoxPlacar>
+          </GridItem>
+        </Grid>
+      </Box>
     ) : (
       <Flex w="100%" color="gray.400" fontSize="12px" p="10px">
         Nenhum placar ativo. Clique no botão "Criar Placar" para cadastrar um!
       </Flex>
     );
-  }, [placarAtivo]);
+  };
+
+  const PartidasPlacarAtivo = useMemo(() => {
+    function listagemPlacarAtivo() {
+      return listagemPartidasPlacarAtivoData.length !== 0 ? (
+        listagemPartidasPlacarAtivoData
+          .map((item, index) => {
+            return (
+              <TRow key={item.id} alignItems="center">
+                <TColumn w="25%">Partida #{index + 1}</TColumn>
+              </TRow>
+            );
+          })
+          .sort()
+          .reverse()
+      ) : (
+        <TRow>
+          <TColumn w="100%" color="gray.400" fontSize="12px">
+            Nenhuma partida realizada. Clique no botão "Criar Partida" para cadastrar!
+          </TColumn>
+        </TRow>
+      );
+    }
+
+    return (
+      <Table mt="20px">
+        <THeader display={{ md: 'flex', sm: 'none' }}>
+          <THead w="25%">Partidas</THead>
+        </THeader>
+        <TBody>{listagemPlacarAtivo()}</TBody>
+      </Table>
+    );
+  }, [listagemPartidasPlacarAtivoData]);
 
   const PlacarHistorico = useMemo(() => {
     const listagemPlacarOrdenados = listagemPlacaresData.sort(ordenacaoTabela());
-
     return listagemPlacaresData.length !== 0 ? (
       listagemPlacarOrdenados
         .sort((a, b) => {
@@ -168,14 +234,17 @@ const Placar = () => {
               Placar Ativo
             </Tab>
             <Tab>
-              <Text mr="5px" color="green.500">
+              <Text mr="5px" color="orange.500">
                 <FaHistory />
               </Text>
               Histórico de Placares
             </Tab>
           </TabList>
           <TabPanels>
-            <TabPanel px="0">{PlacarAtivo}</TabPanel>
+            <TabPanel px="0">
+              {PlacarAtivo()}
+              {PartidasPlacarAtivo}
+            </TabPanel>
             <TabPanel px="0">
               <Box overflowX="auto" w="100%">
                 <Table>
@@ -218,11 +287,13 @@ const Placar = () => {
 const PlacarProvider = () => {
   return (
     <ListagemPlacaresProvider>
-      <EdicaoPlacarProvider>
-        <OrdenadorTabelaProvider>
-          <Placar />
-        </OrdenadorTabelaProvider>
-      </EdicaoPlacarProvider>
+      <ControlePlacarAtivoProvider>
+        <EdicaoPlacarProvider>
+          <OrdenadorTabelaProvider>
+            <Placar />
+          </OrdenadorTabelaProvider>
+        </EdicaoPlacarProvider>
+      </ControlePlacarAtivoProvider>
     </ListagemPlacaresProvider>
   );
 };
