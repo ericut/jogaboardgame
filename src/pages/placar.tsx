@@ -49,7 +49,6 @@ const Placar = () => {
         return item.status === 'Ativo';
       })
     );
-    console.table(listagemPlacaresData);
   }, [listagemPlacaresData]);
 
   const PlacarAtivo = useMemo(() => {

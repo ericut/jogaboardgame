@@ -1,3 +1,6 @@
+import '@fontsource/montserrat';
+import '@fontsource/roboto';
+
 // chakra
 import { ChakraProvider } from '@chakra-ui/react';
 import { Container } from '@chakra-ui/react';
