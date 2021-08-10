@@ -1,22 +1,17 @@
 import { ReactNode, createContext, useState, useEffect, useContext } from 'react';
 // interfaces
-import {
-  IPlacaresProps,
-  IPartidaPlacarProps,
-  IPartidaPlacarJogadorProps,
-  IPartidaPlacarClassificacaoProps,
-} from '../../interfaces/placar';
+import { IPlacaresProps, IPartidaPlacarProps, IPartidaPlacarClassificacaoProps } from '../../interfaces/placar';
 // context
 import { ListagemPlacaresContext } from '../placar/ListagemPlacaresContext';
 // service
 import Service from './services/placar';
 
 interface IControlePlacarAtivoContextProps {
-  placarAtivo: IPlacaresProps | undefined;
   listagemPartidasPlacaresData: IPartidaPlacarProps[];
   listagemPartidasPlacarAtivoData: IPartidaPlacarProps[];
   localStorageSetListagemPartidasPlacar: () => void;
   listagemJogadoresClassificao: IPartidaPlacarClassificacaoProps[];
+  placarAtivo: IPlacaresProps;
 }
 
 interface IControlePlacarAtivoProviderProps {
@@ -28,20 +23,14 @@ export const ControlePlacarAtivoContext = createContext({} as IControlePlacarAti
 export function ControlePlacarAtivoProvider({ children }: IControlePlacarAtivoProviderProps) {
   const { listagemPlacaresData } = useContext(ListagemPlacaresContext);
 
-  const [placarAtivo, setPlacarAtivo] = useState<IPlacaresProps>();
+  const [placarAtivo, setPlacarAtivo] = useState<any>({});
+
   const [listagemPartidasPlacaresData, setListagemPartidasPlacaresData] = useState<IPartidaPlacarProps[]>([]);
   const [listagemPartidasPlacarAtivoData, setListagemPartidasPlacarAtivoData] = useState<IPartidaPlacarProps[]>([]);
+
   const [listagemJogadoresClassificao, setListagemJogadoresClassificao] = useState<IPartidaPlacarClassificacaoProps[]>(
     []
   );
-
-  useEffect(() => {
-    setPlacarAtivo(
-      listagemPlacaresData.find((item) => {
-        return item.status === 'Ativo';
-      })
-    );
-  }, [listagemPlacaresData]);
 
   useEffect(() => {
     if (!localStorage.getItem('listagemPartidasPlacar') || listagemPartidasPlacaresData === []) {
@@ -55,27 +44,28 @@ export function ControlePlacarAtivoProvider({ children }: IControlePlacarAtivoPr
   }, []);
 
   useEffect(() => {
-    setListagemPartidasPlacarAtivoData(
-      listagemPartidasPlacaresData.filter((itensFiltrados: IPartidaPlacarProps) => {
-        return itensFiltrados.id_placar === placarAtivo?.id_placar;
+    setPlacarAtivo(
+      listagemPlacaresData.find((item) => {
+        return item.status === 'Ativo';
       })
     );
+  }, [listagemPlacaresData]);
+
+  useEffect(() => {
+    let listagemPartidas: any = [];
+    listagemPartidas = listagemPartidasPlacaresData.filter((itensFiltrados: IPartidaPlacarProps) => {
+      return itensFiltrados.id_placar === placarAtivo?.id_placar;
+    });
+    setListagemPartidasPlacarAtivoData(listagemPartidas);
   }, [placarAtivo]);
 
   useEffect(() => {
     let novosJogadores: any = [];
-    listagemPartidasPlacarAtivoData.forEach((item) => {
+    listagemPartidasPlacarAtivoData.forEach((item: any) => {
       novosJogadores = novosJogadores.concat(item.jogadores);
     });
-    let arrayNovosJogadores: any = novosJogadores.map((item: IPartidaPlacarJogadorProps) => {
-      item.id = `${item.id_jogador}-${item.id_placar}-${item.id_partida}`;
-      return item;
-    });
-
-    console.log(arrayNovosJogadores);
-
     let novosJogadoresFinal: any = Object.values(
-      arrayNovosJogadores.reduce((acomulado: any, { nome, derrotas, vitorias, pontuacao }: any) => {
+      novosJogadores.reduce((acomulado: any, { nome, derrotas, vitorias, pontuacao }: any) => {
         acomulado[nome] ??= { nome: nome, derrotas: [], vitorias: [], pontuacao: [] };
         if (Array.isArray(derrotas) && Array.isArray(vitorias) && Array.isArray(pontuacao)) {
           acomulado[nome].derrotas = acomulado[nome].derrotas.concat(derrotas);
@@ -89,7 +79,6 @@ export function ControlePlacarAtivoProvider({ children }: IControlePlacarAtivoPr
         return acomulado;
       }, {})
     );
-
     setListagemJogadoresClassificao(novosJogadoresFinal);
   }, [listagemPartidasPlacarAtivoData]);
 
@@ -104,11 +93,11 @@ export function ControlePlacarAtivoProvider({ children }: IControlePlacarAtivoPr
   return (
     <ControlePlacarAtivoContext.Provider
       value={{
-        placarAtivo,
         listagemPartidasPlacaresData,
         listagemPartidasPlacarAtivoData,
         localStorageSetListagemPartidasPlacar,
         listagemJogadoresClassificao,
+        placarAtivo,
       }}
     >
       {children}

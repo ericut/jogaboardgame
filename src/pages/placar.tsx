@@ -43,7 +43,7 @@ const Placar = () => {
     { tipo: 'data_fim', label: 'Data da Finalização' },
   ];
 
-  const PlacarAtivo = () => {
+  const PlacarAtivo = useMemo(() => {
     return placarAtivo ? (
       <Box w="100%">
         <Grid
@@ -75,13 +75,15 @@ const Placar = () => {
           <GridItem colSpan={{ md: 3, sm: 0 }}>
             <InfoBoxPlacar label="Jogadores">
               <HStack mt="3px">
-                {placarAtivo.jogadores.map((jogador, index) => {
-                  return (
-                    <Badge key={index} fontSize="13px">
-                      {jogador}
-                    </Badge>
-                  );
-                })}
+                {placarAtivo.jogadores
+                  ? placarAtivo.jogadores.map((jogador, index) => {
+                      return (
+                        <Badge key={index} fontSize="13px">
+                          {jogador}
+                        </Badge>
+                      );
+                    })
+                  : ''}
               </HStack>
             </InfoBoxPlacar>
           </GridItem>
@@ -97,7 +99,7 @@ const Placar = () => {
         Nenhum placar ativo. Clique no botão "Criar Placar" para cadastrar um!
       </Flex>
     );
-  };
+  }, [placarAtivo]);
 
   const PartidasPlacarAtivo = useMemo(() => {
     function listagemPlacarAtivo() {
@@ -212,7 +214,7 @@ const Placar = () => {
         </GridItem>
       </Grid>
     );
-  }, [listagemPartidasPlacarAtivoData]);
+  }, [listagemPartidasPlacarAtivoData, listagemJogadoresClassificao]);
 
   const PlacarHistorico = useMemo(() => {
     const listagemPlacarOrdenados = listagemPlacaresData.sort(ordenacaoTabela());
@@ -332,7 +334,7 @@ const Placar = () => {
           </TabList>
           <TabPanels>
             <TabPanel px="0">
-              {PlacarAtivo()}
+              {PlacarAtivo}
               {PartidasPlacarAtivo}
             </TabPanel>
             <TabPanel px="0">
