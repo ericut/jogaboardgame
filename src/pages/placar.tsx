@@ -29,7 +29,7 @@ import { OrdenadorTabelaProvider, OrdenadorTabelaContext } from '../context/Orde
 
 const Placar = () => {
   const { listagemPlacaresData } = useContext(ListagemPlacaresContext);
-  const { placarAtivo, listagemPartidasPlacaresData, listagemPartidasPlacarAtivoData, listagemJogadoresClassificao } =
+  const { placarAtivo, listagemPartidasPlacarAtivoData, listagemJogadoresClassificao, handleAbrirEdicaoPartida } =
     useContext(ControlePlacarAtivoContext);
   const { handleAbrirEdicaoPlacar } = useContext(EdicaoPlacarContext);
   const { ordenacaoTabela, ordenarPeloValor, ordenarCrescente } = useContext(OrdenadorTabelaContext);
@@ -88,7 +88,7 @@ const Placar = () => {
             </InfoBoxPlacar>
           </GridItem>
           <GridItem colSpan={{ md: 2, sm: 0 }}>
-            <Button variant="outline" colorScheme="blue" w="100%" h="100%">
+            <Button variant="outline" colorScheme="green" w="100%" h="100%" onClick={() => handleAbrirEdicaoPartida()}>
               Adicionar Partida
             </Button>
           </GridItem>
@@ -99,7 +99,7 @@ const Placar = () => {
         Nenhum placar ativo. Clique no botão "Criar Placar" para cadastrar um!
       </Flex>
     );
-  }, [placarAtivo]);
+  }, [placarAtivo, placarAtivo?.jogadores]);
 
   const PartidasPlacarAtivo = useMemo(() => {
     function listagemPlacarAtivo() {
@@ -141,39 +141,47 @@ const Placar = () => {
       ) : (
         <TRow>
           <TColumn w="100%" color="gray.400" fontSize="12px">
-            Nenhuma partida realizada. Clique no botão "Criar Partida" para cadastrar!
+            Nenhuma partida realizada. Clique no botão "Adicionar Partida" para cadastrar!
           </TColumn>
         </TRow>
       );
     }
 
     function listagemClassificacaoAtivo() {
-      return listagemJogadoresClassificao
-        .sort((a, b) => {
-          if (a.pontuacao > b.pontuacao) {
-            return -1;
-          } else if (a.pontuacao < b.pontuacao) {
-            return 1;
-          } else {
-            return 0;
-          }
-        })
-        .map((item) => {
-          return (
-            <TRow key={item.nome}>
-              <TColumn w="40%">{item.nome}</TColumn>
-              <TColumn w="20%" justifyContent="center">
-                {item.derrotas.reduce((acc: number, val: number) => acc + val)}
-              </TColumn>
-              <TColumn w="20%" justifyContent="center">
-                {item.vitorias.reduce((acc: number, val: number) => acc + val)}
-              </TColumn>
-              <TColumn w="20%" justifyContent="center">
-                {item.pontuacao.reduce((acc: number, val: number) => acc + val)}
-              </TColumn>
-            </TRow>
-          );
-        });
+      return listagemJogadoresClassificao.length !== 0 ? (
+        listagemJogadoresClassificao
+          .sort((a, b) => {
+            if (a.pontuacao > b.pontuacao) {
+              return -1;
+            } else if (a.pontuacao < b.pontuacao) {
+              return 1;
+            } else {
+              return 0;
+            }
+          })
+          .map((item) => {
+            return (
+              <TRow key={item.nome}>
+                <TColumn w="40%">{item.nome}</TColumn>
+                <TColumn w="20%" justifyContent="center">
+                  {item.derrotas.reduce((acc: number, val: number) => acc + val)}
+                </TColumn>
+                <TColumn w="20%" justifyContent="center">
+                  {item.vitorias.reduce((acc: number, val: number) => acc + val)}
+                </TColumn>
+                <TColumn w="20%" justifyContent="center">
+                  {item.pontuacao.reduce((acc: number, val: number) => acc + val)}
+                </TColumn>
+              </TRow>
+            );
+          })
+      ) : (
+        <TRow>
+          <TColumn w="100%" color="gray.400" fontSize="12px">
+            Adicione uma partida para obter a classificação deste placar.
+          </TColumn>
+        </TRow>
+      );
     }
 
     return (
@@ -249,7 +257,13 @@ const Placar = () => {
               <TColumn w="10%">{formatarData(item.data_inicio)}</TColumn>
               <TColumn w="10%">{item.data_fim ? formatarData(item.data_fim) : '-'}</TColumn>
               <TColumn w="10%" alignItems="center">
-                <Text fontSize="12px" mr="5px" color={item.status === 'Ativo' ? 'green.500' : 'orange.500'}>
+                <Text
+                  fontSize="12px"
+                  mr="5px"
+                  color={
+                    item.status === 'Ativo' ? 'green.500' : item.status === 'Finalizado' ? 'orange.500' : 'red.500'
+                  }
+                >
                   <FaCircle />
                 </Text>
                 {item.status}

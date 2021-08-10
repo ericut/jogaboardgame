@@ -3,7 +3,7 @@ export interface IPlacaresProps {
   nome: string;
   jogo: string;
   jogadores: string[];
-  status: string;
+  status: 'Ativo' | 'Finalizado' | 'Incompleto';
   partidas: string | number;
   data_inicio: string;
   data_fim: string;
@@ -22,9 +22,9 @@ export interface IPartidaPlacarJogadorProps {
   id_placar: string | number;
   id_partida: string | number;
   nome: string;
-  vitorias: number;
-  derrotas: number;
-  pontuacao: number;
+  vitorias: string | number;
+  derrotas: string | number;
+  pontuacao: string | number;
 }
 
 export interface IPartidaPlacarClassificacaoProps {

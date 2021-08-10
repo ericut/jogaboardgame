@@ -1,24 +1,7 @@
 import { ReactNode, createContext, useState, useContext } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 // chakra
-import {
-  Button,
-  HStack,
-  VStack,
-  Text,
-  Flex,
-  Box,
-  Input,
-  InputGroup,
-  InputRightAddon,
-  NumberInput,
-  NumberInputField,
-  Stack,
-  useDisclosure,
-  useToast,
-  IconButton,
-  Checkbox,
-} from '@chakra-ui/react';
+import { Button, HStack, VStack, Text, Flex, Box, Input, useDisclosure, useToast, IconButton } from '@chakra-ui/react';
 import {
   Modal,
   ModalOverlay,
@@ -114,7 +97,11 @@ export function EdicaoPlacarProvider({ children }: IEdicaoPlacarProviderProps) {
         if (placarEdicao.nome !== '' && placarEdicao.jogo !== '') {
           placarEdicao.id_placar = uuidv4();
           let listagemPlacarDataFinalizados = listagemPlacaresData.map((item) => {
-            item.status = 'Finalizado';
+            if (item.data_fim === '') {
+              item.status = 'Incompleto';
+            } else {
+              item.status = 'Finalizado';
+            }
             return item;
           });
           setListagemPlacaresData([...listagemPlacarDataFinalizados, placarEdicao]);
@@ -198,9 +185,10 @@ export function EdicaoPlacarProvider({ children }: IEdicaoPlacarProviderProps) {
     if (placarExistente) {
       setListagemPlacaresData(
         listagemPlacaresData.map((item) => {
-          item.status = 'Finalizado';
           if (item.data_fim === '') {
-            item.data_fim = novaData();
+            item.status = 'Incompleto';
+          } else {
+            item.status = 'Finalizado';
           }
           if (item.id_placar === placarEdicao.id_placar) {
             item.status = 'Ativo';
@@ -396,46 +384,79 @@ export function EdicaoPlacarProvider({ children }: IEdicaoPlacarProviderProps) {
                 />
               </Flex>
               <Flex w="100%" justifyContent="space-between" px="5px">
-                <Box w="35%">
+                <Box w="30%">
                   <Text fontSize="14px">Criado em:</Text>
                   <Button size="sm" isDisabled>
                     {formatarData(placarEdicao.data_inicio)}
                   </Button>
                 </Box>
-                <Box w="35%">
-                  <Text fontSize="14px">{placarEdicao.data_fim ? 'Finalizado em:' : 'Finalizar:'}</Text>
-                  <Flex>
-                    {placarEdicao.status === 'Finalizado' ? (
-                      <Flex>
-                        <Button size="sm" mr="5px" isDisabled>
-                          {placarEdicao.data_fim ? formatarData(placarEdicao.data_fim) : ''}
-                        </Button>
-                        <IconButton
+                {placarEdicao.id_placar !== '0' ? (
+                  <Box w="40%">
+                    <Text fontSize="14px">{placarEdicao.data_fim ? 'Finalizado em:' : 'Você deseja:'}</Text>
+                    <Flex>
+                      {placarEdicao.status === 'Finalizado' ? (
+                        <Flex gridGap="2">
+                          <Button size="sm" isDisabled>
+                            {placarEdicao.data_fim ? formatarData(placarEdicao.data_fim) : ''}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            colorScheme="blue"
+                            onClick={() => handleConfirmarReativarPlacar()}
+                          >
+                            Reativar
+                          </Button>
+                        </Flex>
+                      ) : placarEdicao.status === 'Incompleto' ? (
+                        <Flex gridGap="2">
+                          <Button
+                            size="sm"
+                            colorScheme="orange"
+                            variant="outline"
+                            onClick={() => handleConfirmarFinalizarPlacar()}
+                            isDisabled={placarEdicao.id_placar === '0'}
+                          >
+                            Finalizar
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            colorScheme="blue"
+                            onClick={() => handleConfirmarReativarPlacar()}
+                          >
+                            Reativar
+                          </Button>
+                        </Flex>
+                      ) : (
+                        <Button
                           size="sm"
-                          variant="ghost"
-                          colorScheme="blue"
-                          aria-label="Reativar Placar"
-                          icon={<FaHistory />}
-                          onClick={() => handleConfirmarReativarPlacar()}
-                        />
-                      </Flex>
-                    ) : (
-                      <Button
-                        size="sm"
-                        colorScheme="orange"
-                        variant="outline"
-                        onClick={() => handleConfirmarFinalizarPlacar()}
-                        isDisabled={placarEdicao.id_placar === '0'}
-                      >
-                        Finalizar Placar
-                      </Button>
-                    )}
-                  </Flex>
-                </Box>
+                          colorScheme="orange"
+                          variant="outline"
+                          onClick={() => handleConfirmarFinalizarPlacar()}
+                        >
+                          Finalizar Placar
+                        </Button>
+                      )}
+                    </Flex>
+                  </Box>
+                ) : (
+                  <Box></Box>
+                )}
                 <Box w="30%">
                   <Text fontSize="14px">Status:</Text>
                   <Flex alignItems="center">
-                    <Text fontSize="12px" mr="5px" color={placarEdicao.status === 'Ativo' ? 'green.500' : 'orange.500'}>
+                    <Text
+                      fontSize="12px"
+                      mr="5px"
+                      color={
+                        placarEdicao.status === 'Ativo'
+                          ? 'green.500'
+                          : placarEdicao.status === 'Finalizado'
+                          ? 'orange.500'
+                          : 'red.500'
+                      }
+                    >
                       <FaCircle />
                     </Text>
                     <Flex alignItems="center" h="32px">
