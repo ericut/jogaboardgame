@@ -64,7 +64,7 @@ export function EdicaoPlacarProvider({ children }: IEdicaoPlacarProviderProps) {
   const [modalFinalizarPlacar, setModalFinalizarPlacar] = useState(false);
   const [modalReativarPlacar, setModalReativarPlacar] = useState(false);
   const [placarEdicao, setPlacarEdicao] = useState<IPlacaresProps>({
-    id: '0',
+    id_placar: '0',
     nome: '',
     jogo: '',
     jogadores: [],
@@ -87,11 +87,11 @@ export function EdicaoPlacarProvider({ children }: IEdicaoPlacarProviderProps) {
 
   function handleSalvarPlacar() {
     if (jogadorAdicionar === '') {
-      let placarExistente = listagemPlacaresData.find((item) => item.id === placarEdicao.id);
+      let placarExistente = listagemPlacaresData.find((item) => item.id_placar === placarEdicao.id_placar);
       if (placarExistente) {
         setListagemPlacaresData(
           listagemPlacaresData.map((item) => {
-            if (item.id === placarEdicao.id) {
+            if (item.id_placar === placarEdicao.id_placar) {
               item.nome = placarEdicao.nome;
               item.jogo = placarEdicao.jogo;
               item.jogadores = placarEdicao.jogadores;
@@ -112,7 +112,7 @@ export function EdicaoPlacarProvider({ children }: IEdicaoPlacarProviderProps) {
         handleFecharDrawer();
       } else {
         if (placarEdicao.nome !== '' && placarEdicao.jogo !== '') {
-          placarEdicao.id = uuidv4();
+          placarEdicao.id_placar = uuidv4();
           let listagemPlacarDataFinalizados = listagemPlacaresData.map((item) => {
             item.status = 'Finalizado';
             return item;
@@ -155,7 +155,7 @@ export function EdicaoPlacarProvider({ children }: IEdicaoPlacarProviderProps) {
   }
 
   function handleRemoverPlacar() {
-    setListagemPlacaresData(listagemPlacaresData.filter((item) => item.id !== placarEdicao.id));
+    setListagemPlacaresData(listagemPlacaresData.filter((item) => item.id_placar !== placarEdicao.id_placar));
     localStorageSetListagemPlacares();
     handleFecharModal();
     handleFecharDrawer();
@@ -166,11 +166,11 @@ export function EdicaoPlacarProvider({ children }: IEdicaoPlacarProviderProps) {
   }
 
   function handleFinalizarPlacar() {
-    let placarExistente = listagemPlacaresData.find((item) => item.id === placarEdicao.id);
+    let placarExistente = listagemPlacaresData.find((item) => item.id_placar === placarEdicao.id_placar);
     if (placarExistente) {
       setListagemPlacaresData(
         listagemPlacaresData.map((item) => {
-          if (item.id === placarEdicao.id) {
+          if (item.id_placar === placarEdicao.id_placar) {
             item.status = 'Finalizado';
             item.data_fim = novaData();
           }
@@ -194,7 +194,7 @@ export function EdicaoPlacarProvider({ children }: IEdicaoPlacarProviderProps) {
   }
 
   function handleReativarPlacar() {
-    let placarExistente = listagemPlacaresData.find((item) => item.id === placarEdicao.id);
+    let placarExistente = listagemPlacaresData.find((item) => item.id_placar === placarEdicao.id_placar);
     if (placarExistente) {
       setListagemPlacaresData(
         listagemPlacaresData.map((item) => {
@@ -202,7 +202,7 @@ export function EdicaoPlacarProvider({ children }: IEdicaoPlacarProviderProps) {
           if (item.data_fim === '') {
             item.data_fim = novaData();
           }
-          if (item.id === placarEdicao.id) {
+          if (item.id_placar === placarEdicao.id_placar) {
             item.status = 'Ativo';
             item.data_fim = '';
           }
@@ -230,7 +230,7 @@ export function EdicaoPlacarProvider({ children }: IEdicaoPlacarProviderProps) {
     setDrawerEdicaoPlacar(false);
     onClose();
     setPlacarEdicao({
-      id: '0',
+      id_placar: '0',
       nome: '',
       jogo: '',
       jogadores: [],
@@ -378,7 +378,7 @@ export function EdicaoPlacarProvider({ children }: IEdicaoPlacarProviderProps) {
         <DrawerOverlay onClick={handleFecharDrawer} />
         <DrawerContent>
           <DrawerCloseButton />
-          <DrawerHeader>{placarEdicao.id === '0' ? 'Criar' : 'Editar'} Placar</DrawerHeader>
+          <DrawerHeader>{placarEdicao.id_placar === '0' ? 'Criar' : 'Editar'} Placar</DrawerHeader>
           <DrawerBody>
             <VStack spacing={5}>
               <Flex w="100%">
@@ -425,7 +425,7 @@ export function EdicaoPlacarProvider({ children }: IEdicaoPlacarProviderProps) {
                         colorScheme="orange"
                         variant="outline"
                         onClick={() => handleConfirmarFinalizarPlacar()}
-                        isDisabled={placarEdicao.id === '0'}
+                        isDisabled={placarEdicao.id_placar === '0'}
                       >
                         Finalizar Placar
                       </Button>
@@ -497,7 +497,7 @@ export function EdicaoPlacarProvider({ children }: IEdicaoPlacarProviderProps) {
                 leftIcon={<FaTrash />}
                 onClick={() => handleConfirmarRemocaoPlacar()}
                 w="50%"
-                isDisabled={placarEdicao.id === '0'}
+                isDisabled={placarEdicao.id_placar === '0'}
               >
                 Apagar Placar
               </Button>

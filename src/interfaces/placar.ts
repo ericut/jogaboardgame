@@ -1,5 +1,5 @@
 export interface IPlacaresProps {
-  id: string | number;
+  id_placar: string | number;
   nome: string;
   jogo: string;
   jogadores: string[];
@@ -10,16 +10,26 @@ export interface IPlacaresProps {
 }
 
 export interface IPartidaPlacarProps {
-  id: string | number;
+  id_partida: string | number;
   id_placar: string | number;
-  jogadores: IPartidaPlacarJogadorProps[];
   data_partida: string;
+  jogadores: IPartidaPlacarJogadorProps[];
 }
 
 export interface IPartidaPlacarJogadorProps {
-  id: string | number;
+  id?: string | number;
+  id_jogador: string | number;
+  id_placar: string | number;
+  id_partida: string | number;
   nome: string;
   vitorias: number;
   derrotas: number;
   pontuacao: number;
+}
+
+export interface IPartidaPlacarClassificacaoProps {
+  nome: string;
+  vitorias: number[];
+  derrotas: number[];
+  pontuacao: number[];
 }

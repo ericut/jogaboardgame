@@ -2,7 +2,7 @@ import { IPlacaresProps } from '../../../interfaces/placar';
 
 export const placaresData: IPlacaresProps[] = [
   {
-    id: 'any-id',
+    id_placar: 'any-id',
     nome: 'Jogatina Coup (Exemplo)',
     jogo: 'Coup',
     jogadores: ['Mr Li', 'Iranilo', 'Manin'],

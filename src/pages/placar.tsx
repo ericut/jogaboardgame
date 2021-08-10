@@ -29,7 +29,7 @@ import { OrdenadorTabelaProvider, OrdenadorTabelaContext } from '../context/Orde
 
 const Placar = () => {
   const { listagemPlacaresData } = useContext(ListagemPlacaresContext);
-  const { placarAtivo, listagemPartidasPlacaresData, listagemPartidasPlacarAtivoData } =
+  const { placarAtivo, listagemPartidasPlacaresData, listagemPartidasPlacarAtivoData, listagemJogadoresClassificao } =
     useContext(ControlePlacarAtivoContext);
   const { handleAbrirEdicaoPlacar } = useContext(EdicaoPlacarContext);
   const { ordenacaoTabela, ordenarPeloValor, ordenarCrescente } = useContext(OrdenadorTabelaContext);
@@ -47,19 +47,20 @@ const Placar = () => {
     return placarAtivo ? (
       <Box w="100%">
         <Grid
-          templateColumns={{ md: 'repeat(4, 1fr)', sm: '1fr' }}
+          templateColumns={{ md: 'repeat(5, 1fr)', sm: '1fr' }}
           templateRows={{ md: 'repeat(2, 1fr)', sm: 'repeat(6, 1fr)' }}
-          gap="10px"
+          gap="20px"
+          rowGap="10px"
           w="100%"
         >
-          <GridItem>
-            <InfoBoxPlacar label="Nome">{placarAtivo.nome}</InfoBoxPlacar>
-          </GridItem>
-          <GridItem>
+          <GridItem colSpan={{ md: 2, sm: 0 }}>
             <InfoBoxPlacar label="Jogo">{placarAtivo.jogo}</InfoBoxPlacar>
           </GridItem>
           <GridItem>
             <InfoBoxPlacar label="Data do Placar">{formatarData(placarAtivo.data_inicio)}</InfoBoxPlacar>
+          </GridItem>
+          <GridItem>
+            <InfoBoxPlacar label="Partidas Realizadas">{placarAtivo.partidas}</InfoBoxPlacar>
           </GridItem>
           <GridItem>
             <InfoBoxPlacar label="Status">
@@ -84,8 +85,10 @@ const Placar = () => {
               </HStack>
             </InfoBoxPlacar>
           </GridItem>
-          <GridItem>
-            <InfoBoxPlacar label="Partidas Realizadas">{placarAtivo.partidas}</InfoBoxPlacar>
+          <GridItem colSpan={{ md: 2, sm: 0 }}>
+            <Button variant="outline" colorScheme="blue" w="100%" h="100%">
+              Adicionar Partida
+            </Button>
           </GridItem>
         </Grid>
       </Box>
@@ -102,8 +105,32 @@ const Placar = () => {
         listagemPartidasPlacarAtivoData
           .map((item, index) => {
             return (
-              <TRow key={item.id} alignItems="center">
-                <TColumn w="25%">Partida #{index + 1}</TColumn>
+              <TRow key={item.id_partida} alignItems="center" pt="0px !important">
+                <Table>
+                  <THeader display={{ md: 'flex', sm: 'none' }}>
+                    <THead w="25%" fontWeight="bold">
+                      {placarAtivo?.jogo} - Partida #{index + 1}
+                    </THead>
+                  </THeader>
+                  <TBody>
+                    {item.jogadores.map((subItem, index) => {
+                      return (
+                        <TRow key={index} alignItems="center">
+                          <TColumn w="40%">{subItem.nome}</TColumn>
+                          <TColumn w="20%" justifyContent="center">
+                            {subItem.derrotas}
+                          </TColumn>
+                          <TColumn w="20%" justifyContent="center">
+                            {subItem.vitorias}
+                          </TColumn>
+                          <TColumn w="20%" justifyContent="center">
+                            {subItem.pontuacao}
+                          </TColumn>
+                        </TRow>
+                      );
+                    })}
+                  </TBody>
+                </Table>
               </TRow>
             );
           })
@@ -118,13 +145,72 @@ const Placar = () => {
       );
     }
 
+    function listagemClassificacaoAtivo() {
+      return listagemJogadoresClassificao
+        .sort((a, b) => {
+          if (a.pontuacao > b.pontuacao) {
+            return -1;
+          } else if (a.pontuacao < b.pontuacao) {
+            return 1;
+          } else {
+            return 0;
+          }
+        })
+        .map((item) => {
+          return (
+            <TRow key={item.nome}>
+              <TColumn w="40%">{item.nome}</TColumn>
+              <TColumn w="20%" justifyContent="center">
+                {item.derrotas.reduce((acc: number, val: number) => acc + val)}
+              </TColumn>
+              <TColumn w="20%" justifyContent="center">
+                {item.vitorias.reduce((acc: number, val: number) => acc + val)}
+              </TColumn>
+              <TColumn w="20%" justifyContent="center">
+                {item.pontuacao.reduce((acc: number, val: number) => acc + val)}
+              </TColumn>
+            </TRow>
+          );
+        });
+    }
+
     return (
-      <Table mt="20px">
-        <THeader display={{ md: 'flex', sm: 'none' }}>
-          <THead w="25%">Partidas</THead>
-        </THeader>
-        <TBody>{listagemPlacarAtivo()}</TBody>
-      </Table>
+      <Grid templateColumns={{ md: 'repeat(5, 1fr)', sm: '1fr' }} gap="20px" w="100%" mt="20px">
+        <GridItem colSpan={{ md: 3, sm: 0 }}>
+          <Table>
+            <THeader display={{ md: 'flex', sm: 'none' }}>
+              <THead w="40%">Partidas</THead>
+              <THead w="20%" textAlign="center">
+                Derrotas
+              </THead>
+              <THead w="20%" textAlign="center">
+                Vitórias
+              </THead>
+              <THead w="20%" textAlign="center">
+                Pontuação
+              </THead>
+            </THeader>
+            <TBody>{listagemPlacarAtivo()}</TBody>
+          </Table>
+        </GridItem>
+        <GridItem colSpan={{ md: 2, sm: 0 }}>
+          <Table>
+            <THeader display={{ md: 'flex', sm: 'none' }}>
+              <THead w="40%">Classificação</THead>
+              <THead w="20%" textAlign="center">
+                D
+              </THead>
+              <THead w="20%" textAlign="center">
+                V
+              </THead>
+              <THead w="20%" textAlign="center">
+                Pontos
+              </THead>
+            </THeader>
+            <TBody>{listagemClassificacaoAtivo()}</TBody>
+          </Table>
+        </GridItem>
+      </Grid>
     );
   }, [listagemPartidasPlacarAtivoData]);
 
@@ -143,7 +229,11 @@ const Placar = () => {
         })
         .map((item) => {
           return (
-            <TRow key={item.id} alignItems="center" bg={item.status === 'Ativo' ? 'rgba(72, 187, 120, 0.1)' : ''}>
+            <TRow
+              key={item.id_placar}
+              alignItems="center"
+              bg={item.status === 'Ativo' ? 'rgba(72, 187, 120, 0.1)' : ''}
+            >
               <TColumn w="25%">{item.nome}</TColumn>
               <TColumn w="15%">{item.jogo}</TColumn>
               <TColumn w="15%">
