@@ -34,6 +34,11 @@ const Header = () => {
             <Button variant="ghost">Desafio 10x10</Button>
           </a>
         </Link>
+        <Link href="/placar" passHref>
+          <a>
+            <Button variant="ghost">Placar</Button>
+          </a>
+        </Link>
         <Link href="/termos" passHref>
           <a>
             <Button variant="ghost">Termos de Uso</Button>

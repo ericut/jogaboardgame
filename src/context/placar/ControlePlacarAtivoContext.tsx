@@ -1,19 +1,7 @@
 import { ReactNode, createContext, useState, useEffect, useContext, useMemo } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 // chakra
-import {
-  Button,
-  HStack,
-  VStack,
-  Text,
-  Flex,
-  Box,
-  useToast,
-  Input,
-  IconButton,
-  useDisclosure,
-  Switch,
-} from '@chakra-ui/react';
+import { Button, HStack, VStack, Text, Flex, Box, useToast, useDisclosure, Switch } from '@chakra-ui/react';
 import {
   Drawer,
   DrawerBody,
