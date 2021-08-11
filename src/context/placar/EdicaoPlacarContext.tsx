@@ -1,24 +1,7 @@
 import { ReactNode, createContext, useState, useContext } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 // chakra
-import {
-  Button,
-  HStack,
-  VStack,
-  Text,
-  Flex,
-  Box,
-  Input,
-  InputGroup,
-  InputRightAddon,
-  NumberInput,
-  NumberInputField,
-  Stack,
-  useDisclosure,
-  useToast,
-  IconButton,
-  Checkbox,
-} from '@chakra-ui/react';
+import { Button, HStack, VStack, Text, Flex, Box, Input, useDisclosure, useToast, IconButton } from '@chakra-ui/react';
 import {
   Modal,
   ModalOverlay,
@@ -46,6 +29,7 @@ import { ListagemPlacaresContext } from './ListagemPlacaresContext';
 
 interface IEdicaoPlacarContextData {
   handleAbrirEdicaoPlacar: (object?: IPlacaresProps) => void;
+  handleAtualizarPartidasPlacarAtivo: (id: string, partidas: number) => void;
 }
 
 interface IEdicaoPlacarProviderProps {
@@ -64,7 +48,7 @@ export function EdicaoPlacarProvider({ children }: IEdicaoPlacarProviderProps) {
   const [modalFinalizarPlacar, setModalFinalizarPlacar] = useState(false);
   const [modalReativarPlacar, setModalReativarPlacar] = useState(false);
   const [placarEdicao, setPlacarEdicao] = useState<IPlacaresProps>({
-    id: '0',
+    id_placar: '0',
     nome: '',
     jogo: '',
     jogadores: [],
@@ -74,6 +58,17 @@ export function EdicaoPlacarProvider({ children }: IEdicaoPlacarProviderProps) {
     data_fim: '',
   });
   const [jogadorAdicionar, setJogadorAdicionar] = useState('');
+
+  function handleAtualizarPartidasPlacarAtivo(id: string, partidas: number) {
+    setListagemPlacaresData(
+      listagemPlacaresData.map((placar) => {
+        if (placar.id_placar === id) {
+          placar.partidas = partidas;
+        }
+        return placar;
+      })
+    );
+  }
 
   function handleAbrirEdicaoPlacar(item?: IPlacaresProps) {
     onOpen();
@@ -87,11 +82,11 @@ export function EdicaoPlacarProvider({ children }: IEdicaoPlacarProviderProps) {
 
   function handleSalvarPlacar() {
     if (jogadorAdicionar === '') {
-      let placarExistente = listagemPlacaresData.find((item) => item.id === placarEdicao.id);
+      let placarExistente = listagemPlacaresData.find((item) => item.id_placar === placarEdicao.id_placar);
       if (placarExistente) {
         setListagemPlacaresData(
           listagemPlacaresData.map((item) => {
-            if (item.id === placarEdicao.id) {
+            if (item.id_placar === placarEdicao.id_placar) {
               item.nome = placarEdicao.nome;
               item.jogo = placarEdicao.jogo;
               item.jogadores = placarEdicao.jogadores;
@@ -112,9 +107,13 @@ export function EdicaoPlacarProvider({ children }: IEdicaoPlacarProviderProps) {
         handleFecharDrawer();
       } else {
         if (placarEdicao.nome !== '' && placarEdicao.jogo !== '') {
-          placarEdicao.id = uuidv4();
+          placarEdicao.id_placar = uuidv4();
           let listagemPlacarDataFinalizados = listagemPlacaresData.map((item) => {
-            item.status = 'Finalizado';
+            if (item.data_fim === '') {
+              item.status = 'Incompleto';
+            } else {
+              item.status = 'Finalizado';
+            }
             return item;
           });
           setListagemPlacaresData([...listagemPlacarDataFinalizados, placarEdicao]);
@@ -155,7 +154,7 @@ export function EdicaoPlacarProvider({ children }: IEdicaoPlacarProviderProps) {
   }
 
   function handleRemoverPlacar() {
-    setListagemPlacaresData(listagemPlacaresData.filter((item) => item.id !== placarEdicao.id));
+    setListagemPlacaresData(listagemPlacaresData.filter((item) => item.id_placar !== placarEdicao.id_placar));
     localStorageSetListagemPlacares();
     handleFecharModal();
     handleFecharDrawer();
@@ -166,11 +165,11 @@ export function EdicaoPlacarProvider({ children }: IEdicaoPlacarProviderProps) {
   }
 
   function handleFinalizarPlacar() {
-    let placarExistente = listagemPlacaresData.find((item) => item.id === placarEdicao.id);
+    let placarExistente = listagemPlacaresData.find((item) => item.id_placar === placarEdicao.id_placar);
     if (placarExistente) {
       setListagemPlacaresData(
         listagemPlacaresData.map((item) => {
-          if (item.id === placarEdicao.id) {
+          if (item.id_placar === placarEdicao.id_placar) {
             item.status = 'Finalizado';
             item.data_fim = novaData();
           }
@@ -194,15 +193,16 @@ export function EdicaoPlacarProvider({ children }: IEdicaoPlacarProviderProps) {
   }
 
   function handleReativarPlacar() {
-    let placarExistente = listagemPlacaresData.find((item) => item.id === placarEdicao.id);
+    let placarExistente = listagemPlacaresData.find((item) => item.id_placar === placarEdicao.id_placar);
     if (placarExistente) {
       setListagemPlacaresData(
         listagemPlacaresData.map((item) => {
-          item.status = 'Finalizado';
           if (item.data_fim === '') {
-            item.data_fim = novaData();
+            item.status = 'Incompleto';
+          } else {
+            item.status = 'Finalizado';
           }
-          if (item.id === placarEdicao.id) {
+          if (item.id_placar === placarEdicao.id_placar) {
             item.status = 'Ativo';
             item.data_fim = '';
           }
@@ -230,7 +230,7 @@ export function EdicaoPlacarProvider({ children }: IEdicaoPlacarProviderProps) {
     setDrawerEdicaoPlacar(false);
     onClose();
     setPlacarEdicao({
-      id: '0',
+      id_placar: '0',
       nome: '',
       jogo: '',
       jogadores: [],
@@ -243,16 +243,26 @@ export function EdicaoPlacarProvider({ children }: IEdicaoPlacarProviderProps) {
   }
 
   function handleAdicionarJogador() {
-    let jogadoresExistentes = placarEdicao ? placarEdicao.jogadores : [];
+    let jogadoresExistentes = placarEdicao.jogadores;
     if (jogadorAdicionar) {
-      setPlacarEdicao({ ...placarEdicao, jogadores: jogadoresExistentes.concat([jogadorAdicionar]) });
-      toast({
-        title: `Jogador adicionado: ${jogadorAdicionar}`,
-        status: 'success',
-        duration: 3000,
-        isClosable: true,
-      });
-      setJogadorAdicionar('');
+      let validarJogador = jogadoresExistentes.find((jogador) => jogador === jogadorAdicionar);
+      if (validarJogador) {
+        toast({
+          title: 'Jogador já existente na lista!',
+          status: 'warning',
+          duration: 3000,
+          isClosable: true,
+        });
+      } else {
+        setPlacarEdicao({ ...placarEdicao, jogadores: jogadoresExistentes.concat([jogadorAdicionar]) });
+        toast({
+          title: `Jogador adicionado: ${jogadorAdicionar}`,
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+        });
+        setJogadorAdicionar('');
+      }
     } else {
       toast({
         title: 'Insira o nome de um jogador!',
@@ -378,7 +388,7 @@ export function EdicaoPlacarProvider({ children }: IEdicaoPlacarProviderProps) {
         <DrawerOverlay onClick={handleFecharDrawer} />
         <DrawerContent>
           <DrawerCloseButton />
-          <DrawerHeader>{placarEdicao.id === '0' ? 'Criar' : 'Editar'} Placar</DrawerHeader>
+          <DrawerHeader>{placarEdicao.id_placar === '0' ? 'Criar' : 'Editar'} Placar</DrawerHeader>
           <DrawerBody>
             <VStack spacing={5}>
               <Flex w="100%">
@@ -396,46 +406,79 @@ export function EdicaoPlacarProvider({ children }: IEdicaoPlacarProviderProps) {
                 />
               </Flex>
               <Flex w="100%" justifyContent="space-between" px="5px">
-                <Box w="35%">
+                <Box w="30%">
                   <Text fontSize="14px">Criado em:</Text>
                   <Button size="sm" isDisabled>
                     {formatarData(placarEdicao.data_inicio)}
                   </Button>
                 </Box>
-                <Box w="35%">
-                  <Text fontSize="14px">{placarEdicao.data_fim ? 'Finalizado em:' : 'Finalizar:'}</Text>
-                  <Flex>
-                    {placarEdicao.status === 'Finalizado' ? (
-                      <Flex>
-                        <Button size="sm" mr="5px" isDisabled>
-                          {placarEdicao.data_fim ? formatarData(placarEdicao.data_fim) : ''}
-                        </Button>
-                        <IconButton
+                {placarEdicao.id_placar !== '0' ? (
+                  <Box w="40%">
+                    <Text fontSize="14px">{placarEdicao.data_fim ? 'Finalizado em:' : 'Você deseja:'}</Text>
+                    <Flex>
+                      {placarEdicao.status === 'Finalizado' ? (
+                        <Flex gridGap="2">
+                          <Button size="sm" isDisabled>
+                            {placarEdicao.data_fim ? formatarData(placarEdicao.data_fim) : ''}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            colorScheme="blue"
+                            onClick={() => handleConfirmarReativarPlacar()}
+                          >
+                            Reativar
+                          </Button>
+                        </Flex>
+                      ) : placarEdicao.status === 'Incompleto' ? (
+                        <Flex gridGap="2">
+                          <Button
+                            size="sm"
+                            colorScheme="orange"
+                            variant="outline"
+                            onClick={() => handleConfirmarFinalizarPlacar()}
+                            isDisabled={placarEdicao.id_placar === '0'}
+                          >
+                            Finalizar
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            colorScheme="blue"
+                            onClick={() => handleConfirmarReativarPlacar()}
+                          >
+                            Reativar
+                          </Button>
+                        </Flex>
+                      ) : (
+                        <Button
                           size="sm"
-                          variant="ghost"
-                          colorScheme="blue"
-                          aria-label="Reativar Placar"
-                          icon={<FaHistory />}
-                          onClick={() => handleConfirmarReativarPlacar()}
-                        />
-                      </Flex>
-                    ) : (
-                      <Button
-                        size="sm"
-                        colorScheme="orange"
-                        variant="outline"
-                        onClick={() => handleConfirmarFinalizarPlacar()}
-                        isDisabled={placarEdicao.id === '0'}
-                      >
-                        Finalizar Placar
-                      </Button>
-                    )}
-                  </Flex>
-                </Box>
+                          colorScheme="orange"
+                          variant="outline"
+                          onClick={() => handleConfirmarFinalizarPlacar()}
+                        >
+                          Finalizar Placar
+                        </Button>
+                      )}
+                    </Flex>
+                  </Box>
+                ) : (
+                  <Box></Box>
+                )}
                 <Box w="30%">
                   <Text fontSize="14px">Status:</Text>
                   <Flex alignItems="center">
-                    <Text fontSize="12px" mr="5px" color={placarEdicao.status === 'Ativo' ? 'green.500' : 'orange.500'}>
+                    <Text
+                      fontSize="12px"
+                      mr="5px"
+                      color={
+                        placarEdicao.status === 'Ativo'
+                          ? 'green.500'
+                          : placarEdicao.status === 'Finalizado'
+                          ? 'orange.500'
+                          : 'red.500'
+                      }
+                    >
                       <FaCircle />
                     </Text>
                     <Flex alignItems="center" h="32px">
@@ -465,7 +508,7 @@ export function EdicaoPlacarProvider({ children }: IEdicaoPlacarProviderProps) {
                   {placarEdicao.jogadores.map((jogador, index) => {
                     return (
                       <Flex
-                        key={jogador}
+                        key={`${index + 1}-${jogador}`}
                         borderBottom="1px solid"
                         borderBottomColor="gray.600"
                         w="100%"
@@ -497,7 +540,7 @@ export function EdicaoPlacarProvider({ children }: IEdicaoPlacarProviderProps) {
                 leftIcon={<FaTrash />}
                 onClick={() => handleConfirmarRemocaoPlacar()}
                 w="50%"
-                isDisabled={placarEdicao.id === '0'}
+                isDisabled={placarEdicao.id_placar === '0'}
               >
                 Apagar Placar
               </Button>
@@ -512,7 +555,7 @@ export function EdicaoPlacarProvider({ children }: IEdicaoPlacarProviderProps) {
   };
 
   return (
-    <EdicaoPlacarContext.Provider value={{ handleAbrirEdicaoPlacar }}>
+    <EdicaoPlacarContext.Provider value={{ handleAbrirEdicaoPlacar, handleAtualizarPartidasPlacarAtivo }}>
       {children}
       {modalReativarPlacar && ModalReativarPlacar()}
       {modalFinalizarPlacar && ModalFinalizarPlacar()}

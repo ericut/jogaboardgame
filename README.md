@@ -35,20 +35,20 @@ Pode ser utilizada no celular normalmente, pois os navegadores mobile tem "local
 
 - [✔] Controle de estado por Context API
 - [❓] Selecionar período para o desafio, com um contador
-- [❓] Adicionar dados referente à partida: jogadores e a data
+- [❓] Adicionar dados referente à partida: jogadores e a data [em avaliação]
+
+#### Página: Placar
+
+- [✔] Quadro de ranking de partidas
+- [WIP] Controle da sessão de partidas
+- [WIP] Quadro de líderes (jogos vencidos, perdidos, total de jogos jogados)
 
 #### Global
 
 - [✔] Ordenação de tabela
 - [❓] Seletor de temas
 
-#### Placar
-
-- [WIP] Quadro de ranking de partidas
-- [❓] Controle da sessão de partidas
-- [❓] Quadro de líderes (jogos vencidos, perdidos, total de jogos jogados)
-
-#### Calculadora Pontuações
+#### Página: Calculadora Pontuações [em avaliação]
 
 - [❓] Quadro de pontuação de partida, com calculadora simplificada para auxiliar na contagem de pontuação
 
