@@ -1,4 +1,4 @@
-import { useContext, useMemo, useEffect } from 'react';
+import { useContext, useMemo } from 'react';
 // chakra
 import { Text, Box, Flex, Heading, Button, HStack, IconButton, Grid, GridItem, Badge } from '@chakra-ui/react';
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
@@ -41,6 +41,7 @@ const Placar = () => {
     { tipo: 'partidas', label: 'Número de Partidas' },
     { tipo: 'data_inicio', label: 'Data de Início' },
     { tipo: 'data_fim', label: 'Data da Finalização' },
+    { tipo: 'status', label: 'Status' },
   ];
 
   const PlacarAtivo = useMemo(() => {
@@ -120,10 +121,10 @@ const Placar = () => {
                         <TRow key={index} alignItems="center">
                           <TColumn w="40%">{subItem.nome}</TColumn>
                           <TColumn w="20%" justifyContent="center">
-                            {subItem.derrotas}
+                            {subItem.derrota}
                           </TColumn>
                           <TColumn w="20%" justifyContent="center">
-                            {subItem.vitorias}
+                            {subItem.vitoria}
                           </TColumn>
                           <TColumn w="20%" justifyContent="center">
                             {subItem.pontuacao}
@@ -148,12 +149,15 @@ const Placar = () => {
     }
 
     function listagemClassificacaoAtivo() {
+      console.log(listagemJogadoresClassificao);
       return listagemJogadoresClassificao.length !== 0 ? (
         listagemJogadoresClassificao
           .sort((a, b) => {
-            if (a.pontuacao > b.pontuacao) {
+            let itemA = a.pontuacao.reduce((acc: number, val: number) => acc + val);
+            let itemB = b.pontuacao.reduce((acc: number, val: number) => acc + val);
+            if (itemA > itemB) {
               return -1;
-            } else if (a.pontuacao < b.pontuacao) {
+            } else if (itemA < itemB) {
               return 1;
             } else {
               return 0;
@@ -161,15 +165,18 @@ const Placar = () => {
           })
           .map((item) => {
             return (
-              <TRow key={item.nome}>
+              <TRow key={item.nome} _even={{ backgroundColor: 'rgba(255, 255, 255, 0.05)' }}>
                 <TColumn w="40%">{item.nome}</TColumn>
-                <TColumn w="20%" justifyContent="center">
-                  {item.derrotas.reduce((acc: number, val: number) => acc + val)}
+                <TColumn w="15%" justifyContent="center">
+                  {item.derrota.reduce((acc: number, val: number) => acc + val)}
                 </TColumn>
-                <TColumn w="20%" justifyContent="center">
-                  {item.vitorias.reduce((acc: number, val: number) => acc + val)}
+                <TColumn w="15%" justifyContent="center">
+                  {item.vitoria.reduce((acc: number, val: number) => acc + val)}
                 </TColumn>
-                <TColumn w="20%" justifyContent="center">
+                <TColumn w="15%" justifyContent="center">
+                  {item.pontuacao.length}
+                </TColumn>
+                <TColumn w="15%" justifyContent="center">
                   {item.pontuacao.reduce((acc: number, val: number) => acc + val)}
                 </TColumn>
               </TRow>
@@ -207,13 +214,16 @@ const Placar = () => {
           <Table>
             <THeader display={{ md: 'flex', sm: 'none' }}>
               <THead w="40%">Classificação</THead>
-              <THead w="20%" textAlign="center">
+              <THead w="15%" textAlign="center">
                 D
               </THead>
-              <THead w="20%" textAlign="center">
+              <THead w="15%" textAlign="center">
                 V
               </THead>
-              <THead w="20%" textAlign="center">
+              <THead w="15%" textAlign="center">
+                Jogos
+              </THead>
+              <THead w="15%" textAlign="center">
                 Pontos
               </THead>
             </THeader>
@@ -373,7 +383,9 @@ const Placar = () => {
                     <THead w="10%" ordenarPor="data_fim">
                       Data Fim
                     </THead>
-                    <THead w="10%">Status</THead>
+                    <THead w="10%" ordenarPor="status">
+                      Status
+                    </THead>
                     <THeadButtons w="5%">Ações</THeadButtons>
                   </THeader>
                   <TBody>{PlacarHistorico}</TBody>

@@ -231,16 +231,26 @@ export function EdicaoPlacarProvider({ children }: IEdicaoPlacarProviderProps) {
   }
 
   function handleAdicionarJogador() {
-    let jogadoresExistentes = placarEdicao ? placarEdicao.jogadores : [];
+    let jogadoresExistentes = placarEdicao.jogadores;
     if (jogadorAdicionar) {
-      setPlacarEdicao({ ...placarEdicao, jogadores: jogadoresExistentes.concat([jogadorAdicionar]) });
-      toast({
-        title: `Jogador adicionado: ${jogadorAdicionar}`,
-        status: 'success',
-        duration: 3000,
-        isClosable: true,
-      });
-      setJogadorAdicionar('');
+      let validarJogador = jogadoresExistentes.find((jogador) => jogador === jogadorAdicionar);
+      if (validarJogador) {
+        toast({
+          title: 'Jogador já existente na lista!',
+          status: 'warning',
+          duration: 3000,
+          isClosable: true,
+        });
+      } else {
+        setPlacarEdicao({ ...placarEdicao, jogadores: jogadoresExistentes.concat([jogadorAdicionar]) });
+        toast({
+          title: `Jogador adicionado: ${jogadorAdicionar}`,
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+        });
+        setJogadorAdicionar('');
+      }
     } else {
       toast({
         title: 'Insira o nome de um jogador!',
@@ -486,7 +496,7 @@ export function EdicaoPlacarProvider({ children }: IEdicaoPlacarProviderProps) {
                   {placarEdicao.jogadores.map((jogador, index) => {
                     return (
                       <Flex
-                        key={jogador}
+                        key={`${index + 1}-${jogador}`}
                         borderBottom="1px solid"
                         borderBottomColor="gray.600"
                         w="100%"

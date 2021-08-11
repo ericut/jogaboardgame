@@ -1,7 +1,19 @@
-import { ReactNode, createContext, useState, useEffect, useContext } from 'react';
+import { ReactNode, createContext, useState, useEffect, useContext, useMemo } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 // chakra
-import { Button, HStack, VStack, Text, Flex, Box, useToast, Input, IconButton, useDisclosure } from '@chakra-ui/react';
+import {
+  Button,
+  HStack,
+  VStack,
+  Text,
+  Flex,
+  Box,
+  useToast,
+  Input,
+  IconButton,
+  useDisclosure,
+  Switch,
+} from '@chakra-ui/react';
 import {
   Drawer,
   DrawerBody,
@@ -11,8 +23,11 @@ import {
   DrawerCloseButton,
   DrawerFooter,
 } from '@chakra-ui/react';
+// componentes
+import { Table, THeader, THead, TBody, TRow, TColumn, TColumnButtons } from '../../components/Table/Table';
 // icones
 import { FaSave, FaTrash } from 'react-icons/fa';
+import { GiLaurelCrown } from 'react-icons/gi';
 // utilitários
 import { novaData, formatarData } from '../../utils/formatarData';
 // interfaces
@@ -60,6 +75,7 @@ export function ControlePlacarAtivoProvider({ children }: IControlePlacarAtivoPr
     jogadores: [],
     data_partida: novaData(),
   });
+  const [vencedorExistente, setVencedorExistente] = useState(false);
 
   useEffect(() => {
     if (!localStorage.getItem('listagemPartidasPlacar') || listagemPartidasPlacaresData === []) {
@@ -94,15 +110,15 @@ export function ControlePlacarAtivoProvider({ children }: IControlePlacarAtivoPr
       novosJogadores = novosJogadores.concat(item.jogadores);
     });
     let novosJogadoresFinal: any = Object.values(
-      novosJogadores.reduce((acomulado: any, { nome, derrotas, vitorias, pontuacao }: any) => {
-        acomulado[nome] ??= { nome: nome, derrotas: [], vitorias: [], pontuacao: [] };
-        if (Array.isArray(derrotas) && Array.isArray(vitorias) && Array.isArray(pontuacao)) {
-          acomulado[nome].derrotas = acomulado[nome].derrotas.concat(derrotas);
-          acomulado[nome].vitorias = acomulado[nome].vitorias.concat(vitorias);
+      novosJogadores.reduce((acomulado: any, { nome, derrota, vitoria, pontuacao }: any) => {
+        acomulado[nome] ??= { nome: nome, derrota: [], vitoria: [], pontuacao: [] };
+        if (Array.isArray(derrota) && Array.isArray(vitoria) && Array.isArray(pontuacao)) {
+          acomulado[nome].derrota = acomulado[nome].derrota.concat(derrota);
+          acomulado[nome].vitoria = acomulado[nome].vitoria.concat(vitoria);
           acomulado[nome].pontuacao = acomulado[nome].pontuacao.concat(pontuacao);
         } else {
-          acomulado[nome].derrotas.push(derrotas);
-          acomulado[nome].vitorias.push(vitorias);
+          acomulado[nome].derrota.push(derrota);
+          acomulado[nome].vitoria.push(vitoria);
           acomulado[nome].pontuacao.push(pontuacao);
         }
         return acomulado;
@@ -114,10 +130,6 @@ export function ControlePlacarAtivoProvider({ children }: IControlePlacarAtivoPr
   useEffect(() => {
     localStorageSetListagemPartidasPlacar();
   }, [listagemPartidasPlacaresData]);
-
-  useEffect(() => {
-    console.table(partidaEdicao);
-  }, [partidaEdicao]);
 
   function localStorageSetListagemPartidasPlacar() {
     localStorage.setItem('listagemPartidasPlacar', JSON.stringify(listagemPartidasPlacaresData));
@@ -141,8 +153,8 @@ export function ControlePlacarAtivoProvider({ children }: IControlePlacarAtivoPr
           id_jogador: uuidv4(),
           id_placar: placarAtivo.id_placar,
           nome: item,
-          derrotas: 0,
-          vitorias: 0,
+          derrota: 0,
+          vitoria: 0,
           pontuacao: 0,
         };
         return novoJogador;
@@ -153,7 +165,23 @@ export function ControlePlacarAtivoProvider({ children }: IControlePlacarAtivoPr
   }
 
   function handleSalvarPartida() {
-    console.log('salvar');
+    if (vencedorExistente) {
+      let partidaId = uuidv4();
+      partidaEdicao.id_partida = partidaId;
+      partidaEdicao.jogadores.map((jogadorId) => {
+        jogadorId.id_partida = partidaId;
+        return jogadorId;
+      });
+      setListagemPartidasPlacaresData([...listagemPartidasPlacaresData, partidaEdicao]);
+      setListagemPartidasPlacarAtivoData([...listagemPartidasPlacarAtivoData, partidaEdicao]);
+      toast({
+        title: `Partida adicionada com sucesso`,
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
+      handleFecharDrawer();
+    }
   }
 
   function handleFecharDrawer() {
@@ -171,6 +199,61 @@ export function ControlePlacarAtivoProvider({ children }: IControlePlacarAtivoPr
     handleFecharDrawer();
   }
 
+  function handleSelecionarVencedor(event: any, item: IPartidaPlacarJogadorProps) {
+    let jogadoresAtualizado = [];
+    if (event) {
+      jogadoresAtualizado = partidaEdicao.jogadores.map((jogador: IPartidaPlacarJogadorProps) => {
+        if (jogador.id_jogador === item.id_jogador) {
+          jogador.pontuacao = 1;
+          jogador.vitoria = 1;
+          jogador.derrota = 0;
+        } else {
+          jogador.pontuacao = 0;
+          jogador.vitoria = 0;
+          jogador.derrota = 1;
+        }
+        return jogador;
+      });
+      setVencedorExistente(true);
+    } else {
+      jogadoresAtualizado = partidaEdicao.jogadores.map((jogador: IPartidaPlacarJogadorProps) => {
+        jogador.pontuacao = 0;
+        jogador.vitoria = 0;
+        jogador.derrota = 0;
+        return jogador;
+      });
+      setVencedorExistente(false);
+    }
+    setPartidaEdicao({ ...partidaEdicao, jogadores: jogadoresAtualizado });
+  }
+
+  const ListagemAdicionarPartidaJogadores = useMemo(() => {
+    return partidaEdicao.jogadores.map((item: IPartidaPlacarJogadorProps) => {
+      return (
+        <TRow key={item.id_jogador}>
+          <TColumn w="40%">{item.nome}</TColumn>
+          <TColumn w="30%" justifyContent="center">
+            {item.pontuacao}
+          </TColumn>
+          <TColumnButtons w="30%">
+            <Flex alignItems="center" gridGap="2">
+              <Text fontSize={item.vitoria === 1 ? '20px' : '18px'} color="green.500">
+                <GiLaurelCrown />
+              </Text>
+              <Switch
+                size="md"
+                colorScheme="green"
+                isChecked={item.vitoria === 1}
+                onChange={(e) => handleSelecionarVencedor(e.target.checked, item)}
+              />
+              <Text color={item.vitoria === 1 ? 'green.500' : ''}>Vencedor</Text>
+            </Flex>
+          </TColumnButtons>
+        </TRow>
+      );
+    });
+  }, [partidaEdicao, partidaEdicao.jogadores]);
+
   const DrawerEdicaoPartida = () => {
     return (
       <Drawer isOpen={isOpen} onClose={handleFecharDrawer} placement="right" size="lg">
@@ -187,9 +270,18 @@ export function ControlePlacarAtivoProvider({ children }: IControlePlacarAtivoPr
                 </Button>
               </Box>
               <Box w="100%">
-                {partidaEdicao.jogadores.map((item: IPartidaPlacarJogadorProps) => {
-                  return <Text key={item.id_jogador}>{item.nome}</Text>;
-                })}
+                <Table>
+                  <THeader display={{ md: 'flex', sm: 'none' }}>
+                    <THead w="40%">Jogador</THead>
+                    <THead w="30%" textAlign="center">
+                      Pontuação
+                    </THead>
+                    <THead w="30%" textAlign="center">
+                      Vitória da Partida
+                    </THead>
+                  </THeader>
+                  <TBody>{ListagemAdicionarPartidaJogadores}</TBody>
+                </Table>
               </Box>
             </VStack>
           </DrawerBody>

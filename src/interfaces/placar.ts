@@ -22,14 +22,14 @@ export interface IPartidaPlacarJogadorProps {
   id_placar: string | number;
   id_partida: string | number;
   nome: string;
-  vitorias: string | number;
-  derrotas: string | number;
+  vitoria: string | number;
+  derrota: string | number;
   pontuacao: string | number;
 }
 
 export interface IPartidaPlacarClassificacaoProps {
   nome: string;
-  vitorias: number[];
-  derrotas: number[];
+  vitoria: number[];
+  derrota: number[];
   pontuacao: number[];
 }
