@@ -40,8 +40,8 @@ Pode ser utilizada no celular normalmente, pois os navegadores mobile tem "local
 #### Página: Placar
 
 - [✔] Quadro de ranking de partidas
-- [WIP] Controle da sessão de partidas
-- [WIP] Quadro de líderes (jogos vencidos, perdidos, total de jogos jogados)
+- [✔] Controle da sessão de partidas
+- [✔] Quadro de líderes (jogos vencidos, perdidos, total de jogos jogados)
 
 #### Global
 
