@@ -9,8 +9,9 @@ Além disso é possivel criar e organizar placares (torneios/campeonatos) de ses
 
 | ![Tela Desafio10x10](https://github.com/ericut/jogaboardgame/blob/main/.doc/imgs/01-tela-inicial.png) | ![Tela Adicionar Jogo Desafio10x10](https://github.com/ericut/jogaboardgame/blob/main/.doc/imgs/02-tela-adicao.png) | ![Tela Configurações do Desafio10x10](https://github.com/ericut/jogaboardgame/blob/main/.doc/imgs/03-tela-configuracoes.png) |
 | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| ![Tela Placar](https://github.com/ericut/jogaboardgame/blob/main/.doc/imgs/04-tela-placares.png)      | ![Tela Partidas do Placar Ativo](https://github.com/ericut/jogaboardgame/blob/main/.doc/imgs/05-tela-partidas.png)  | ![Tela Adicionar Partida](https://github.com/ericut/jogaboardgame/blob/main/.doc/imgs/06-tela-adicionarpartida.png)          |
-| ------------------------------------------------------------------------------------------------      | ------------------------------------------------------------------------------------------------------              | -----------------------------------------------------------------------------------------------------------------------      |
+
+| ![Tela Placar](https://github.com/ericut/jogaboardgame/blob/main/.doc/imgs/04-tela-placares.png) | ![Tela Partidas do Placar Ativo](https://github.com/ericut/jogaboardgame/blob/main/.doc/imgs/05-tela-partidas.png) | ![Tela Adicionar Partida](https://github.com/ericut/jogaboardgame/blob/main/.doc/imgs/06-tela-adicionarpartida.png) |
+| ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------- |
 
 ### Recursos
 
