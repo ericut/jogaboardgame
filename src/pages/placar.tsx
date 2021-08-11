@@ -1,4 +1,4 @@
-import { useContext, useMemo, useState } from 'react';
+import { useContext, useMemo } from 'react';
 // chakra
 import { Text, Box, Flex, Heading, Button, HStack, IconButton, Grid, GridItem, Badge } from '@chakra-ui/react';
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
@@ -19,7 +19,7 @@ import OrdenadorTabela from '../components/Ordenador/Ordenador';
 import InfoBoxPlacar from '../components/InfoBox/InfoBoxPlacar';
 import Paginacao, { usePaginacao } from '../components/Paginacao/Paginacao';
 // icones
-import { FaPlus, FaTrophy, FaEdit, FaCircle, FaCogs } from 'react-icons/fa';
+import { FaPlus, FaTrophy, FaEdit, FaCircle, FaCogs, FaTrash } from 'react-icons/fa';
 // utilitários
 import { formatarData } from '../utils/formatarData';
 // context
@@ -30,8 +30,13 @@ import { OrdenadorTabelaProvider, OrdenadorTabelaContext } from '../context/Orde
 
 const Placar = () => {
   const { listagemPlacaresData } = useContext(ListagemPlacaresContext);
-  const { placarAtivo, listagemPartidasPlacarAtivoData, listagemJogadoresClassificao, handleAbrirEdicaoPartida } =
-    useContext(ControlePlacarAtivoContext);
+  const {
+    placarAtivo,
+    listagemPartidasPlacarAtivoData,
+    listagemJogadoresClassificao,
+    handleAbrirEdicaoPartida,
+    handleRemoverPartida,
+  } = useContext(ControlePlacarAtivoContext);
   const { handleAbrirEdicaoPlacar } = useContext(EdicaoPlacarContext);
   const { ordenacaoTabela, ordenarPeloValor, ordenarCrescente } = useContext(OrdenadorTabelaContext);
   const listagemOrdenacao = [
@@ -53,8 +58,8 @@ const Placar = () => {
     return placarAtivo ? (
       <Box w="100%">
         <Grid
-          templateColumns={{ md: 'repeat(5, 1fr)', sm: '1fr' }}
-          templateRows={{ md: 'repeat(2, 1fr)', sm: 'repeat(6, 1fr)' }}
+          templateColumns={{ md: 'repeat(5, 1fr)', sm: 'repeat(2, 1fr)' }}
+          templateRows={{ md: 'repeat(2, 1fr)', sm: 'repeat(4, 1fr)' }}
           gap="20px"
           rowGap="10px"
           w="100%"
@@ -78,7 +83,7 @@ const Placar = () => {
               </Flex>
             </InfoBoxPlacar>
           </GridItem>
-          <GridItem colSpan={{ md: 3, sm: 0 }}>
+          <GridItem colSpan={{ md: 3, sm: 2 }}>
             <InfoBoxPlacar label="Jogadores">
               <HStack mt="3px">
                 {placarAtivo.jogadores
@@ -93,7 +98,7 @@ const Placar = () => {
               </HStack>
             </InfoBoxPlacar>
           </GridItem>
-          <GridItem colSpan={{ md: 2, sm: 0 }}>
+          <GridItem colSpan={{ md: 2, sm: 2 }}>
             <Button variant="outline" colorScheme="green" w="100%" h="100%" onClick={() => handleAbrirEdicaoPartida()}>
               Adicionar Partida
             </Button>
@@ -115,17 +120,35 @@ const Placar = () => {
         listagemPartidasPlacarAtivoData
           .map((item, index) => {
             return (
-              <TRow key={item.id_partida} alignItems="center" pt="0px !important">
+              <TRow
+                key={item.id_partida}
+                pt="0px !important"
+                flexDirection={{ sm: 'initial' }}
+                alignItems={{ sm: 'center' }}
+              >
                 <Table>
-                  <THeader display={{ md: 'flex', sm: 'none' }}>
-                    <THead w="25%" fontWeight="bold">
+                  <THeader justifyContent={{ md: 'space-between', sm: 'center' }}>
+                    <THead fontWeight="bold" textAlign={{ md: 'left', sm: 'center' }}>
                       {placarAtivo?.jogo} - Partida #{index + 1}
+                    </THead>
+                    <THead textAlign="right">
+                      <IconButton
+                        size="sm"
+                        variant="ghost"
+                        color="gray.500"
+                        aria-label="Excluir Partida"
+                        icon={<FaTrash />}
+                        onClick={() => handleRemoverPartida(item, `${placarAtivo?.jogo} - Partida #${index + 1}`)}
+                        _hover={{
+                          color: 'red.300',
+                        }}
+                      />
                     </THead>
                   </THeader>
                   <TBody>
                     {item.jogadores.map((subItem, index) => {
                       return (
-                        <TRow key={index} alignItems="center">
+                        <TRow key={index} flexDirection={{ sm: 'initial' }} alignItems={{ sm: 'center' }}>
                           <TColumn w="40%">{subItem.nome}</TColumn>
                           <TColumn w="20%" justifyContent="center">
                             {subItem.derrota}
@@ -171,7 +194,12 @@ const Placar = () => {
           })
           .map((item) => {
             return (
-              <TRow key={item.nome} _even={{ backgroundColor: 'rgba(255, 255, 255, 0.05)' }}>
+              <TRow
+                key={item.nome}
+                _even={{ backgroundColor: 'rgba(255, 255, 255, 0.05)' }}
+                flexDirection={{ sm: 'initial' }}
+                alignItems={{ sm: 'center' }}
+              >
                 <TColumn w="40%">{item.nome}</TColumn>
                 <TColumn w="15%" justifyContent="center">
                   {item.derrota.reduce((acc: number, val: number) => acc + val)}
@@ -197,18 +225,30 @@ const Placar = () => {
       );
     }
     return (
-      <Grid templateColumns={{ md: 'repeat(5, 1fr)', sm: '1fr' }} gap="20px" w="100%" mt="20px">
-        <GridItem colSpan={{ md: 3, sm: 0 }}>
+      <Grid
+        autoFlow="revert"
+        templateColumns={{ md: 'repeat(5, 1fr)', sm: '1fr' }}
+        templateRows={{ md: '1fr', sm: '1fr' }}
+        gap="20px"
+        w="100%"
+        mt="20px"
+      >
+        <GridItem colSpan={{ md: 3, sm: 0 }} gridRow={{ md: '1', sm: '0' }}>
           <Table>
-            <THeader display={{ md: 'flex', sm: 'none' }}>
-              <THead w="40%">Partidas</THead>
-              <THead w="20%" textAlign="center">
+            <THeader>
+              <THead w="40%" textAlign={{ md: 'left', sm: 'center' }}>
+                Histórico de Partidas
+              </THead>
+              <THead w="60%" textAlign="center" display={{ md: 'none', sm: 'block' }}>
+                Derrotas | Vitórias | Pontos
+              </THead>
+              <THead w="20%" textAlign="center" display={{ md: 'block', sm: 'none' }}>
                 Derrotas
               </THead>
-              <THead w="20%" textAlign="center">
+              <THead w="20%" textAlign="center" display={{ md: 'block', sm: 'none' }}>
                 Vitórias
               </THead>
-              <THead w="20%" textAlign="center">
+              <THead w="20%" textAlign="center" display={{ md: 'block', sm: 'none' }}>
                 Pontuação
               </THead>
             </THeader>
@@ -224,25 +264,38 @@ const Placar = () => {
             </TFooter>
           </Table>
         </GridItem>
-        <GridItem colSpan={{ md: 2, sm: 0 }}>
+        <GridItem colSpan={{ md: 2, sm: 0 }} gridRow={{ md: '0', sm: '1' }}>
           <Table>
-            <THeader display={{ md: 'flex', sm: 'none' }}>
-              <THead w="40%">Classificação</THead>
-              <THead w="15%" textAlign="center">
+            <THeader>
+              <THead w="40%" textAlign={{ md: 'left', sm: 'center' }}>
+                Classificação
+              </THead>
+              <THead w="60%" textAlign="center" display={{ md: 'none', sm: 'block' }}>
+                Derrotas | Vitórias | Jogos | Pontos
+              </THead>
+              <THead w="15%" textAlign="center" display={{ md: 'block', sm: 'none' }}>
                 D
               </THead>
-              <THead w="15%" textAlign="center">
+              <THead w="15%" textAlign="center" display={{ md: 'block', sm: 'none' }}>
                 V
               </THead>
-              <THead w="15%" textAlign="center">
+              <THead w="15%" textAlign="center" display={{ md: 'block', sm: 'none' }}>
                 Jogos
               </THead>
-              <THead w="15%" textAlign="center">
+              <THead w="15%" textAlign="center" display={{ md: 'block', sm: 'none' }}>
                 Pontos
               </THead>
             </THeader>
             <TBody>{listagemClassificacaoAtivo()}</TBody>
           </Table>
+          <Box
+            w="100%"
+            display={{ md: 'none', sm: 'block' }}
+            borderBottom="5px dashed"
+            borderBottomColor="gray.500"
+            mt="30px"
+            bg="gray.600"
+          />
         </GridItem>
       </Grid>
     );
@@ -360,9 +413,9 @@ const Placar = () => {
       </Flex>
       <Flex mt={{ md: '40px', sm: '10px' }} w="100%">
         <Tabs w="100%" variant="enclosed-colored">
-          <TabList justifyContent="space-between">
+          <TabList>
             <Tab>
-              <Text mr="5px" color="yellow.500">
+              <Text mr="5px" color="green.500">
                 <FaTrophy />
               </Text>
               Placar Ativo

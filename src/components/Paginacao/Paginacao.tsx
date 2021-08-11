@@ -12,7 +12,7 @@ interface IPaginacaoProps {
 
 export function usePaginacao() {
   const [paginaAtual, setPaginaAtual] = useState(1);
-  const [itensPorPagina, setItensPorPagina] = useState(10);
+  const [itensPorPagina, setItensPorPagina] = useState(5);
   const ultimaPagina = paginaAtual * itensPorPagina;
   const primeiraPagina = ultimaPagina - itensPorPagina;
 
@@ -40,8 +40,8 @@ const Paginacao = ({
 
   return (
     <Flex w="100%" justifyContent="space-between" alignItems="center" flexDirection={{ md: 'initial', sm: 'column' }}>
-      <Flex alignItems="center" mb="10px" w={{ md: '30%', sm: '90%' }}>
-        <Text textTransform="uppercase" fontSize="9px" color="gray.400">
+      <Flex alignItems="center" mb="10px" w={{ md: '30%', sm: '100%' }}>
+        <Text textTransform="uppercase" fontSize="9px" color="gray.400" w={{ md: '', sm: '50%' }}>
           Itens por Página
         </Text>
         <Select value={itensPorPagina} ml="5px" size="sm" onChange={(e) => mudarItensPorPagina(+e.target.value)}>

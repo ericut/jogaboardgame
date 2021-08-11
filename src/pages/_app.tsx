@@ -22,7 +22,7 @@ export default function App({ Component, pageProps }: any) {
       <Container as="main" m="0" p="0 20px" maxW="100%">
         <Component {...pageProps} />
       </Container>
-      <Footer version={'Versão 0.3.0'} />
+      <Footer version={'Versão 0.3.1'} />
     </ChakraProvider>
   );
 }

@@ -1,8 +1,27 @@
 import { ReactNode, createContext, useState, useEffect, useContext, useMemo } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 // chakra
-import { Button, HStack, VStack, Text, Flex, Box, useToast, useDisclosure, Switch } from '@chakra-ui/react';
 import {
+  Button,
+  HStack,
+  VStack,
+  Text,
+  Flex,
+  Box,
+  useToast,
+  useDisclosure,
+  Switch,
+  FormControl,
+  FormLabel,
+} from '@chakra-ui/react';
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
   Drawer,
   DrawerBody,
   DrawerHeader,
@@ -38,6 +57,7 @@ interface IControlePlacarAtivoContextProps {
   listagemJogadoresClassificao: IPartidaPlacarClassificacaoProps[];
   placarAtivo: IPlacaresProps;
   handleAbrirEdicaoPartida: (object?: IPartidaPlacarProps) => void;
+  handleRemoverPartida: (item?: any, nome?: any) => void;
 }
 
 interface IControlePlacarAtivoProviderProps {
@@ -66,6 +86,8 @@ export function ControlePlacarAtivoProvider({ children }: IControlePlacarAtivoPr
     data_partida: novaData(),
   });
   const [vencedorExistente, setVencedorExistente] = useState(false);
+  const [modalRemoverPartida, setModalRemoverPartida] = useState(false);
+  const [partidaParaRemover, setPartidaParaRemover] = useState<any>({ item: {}, nome: '' });
 
   useEffect(() => {
     if (!localStorage.getItem('listagemPartidasPlacar') || listagemPartidasPlacaresData === []) {
@@ -186,8 +208,8 @@ export function ControlePlacarAtivoProvider({ children }: IControlePlacarAtivoPr
     });
   }
 
-  function handleConfirmarRemocaoPartida() {
-    handleFecharDrawer();
+  function handleFecharModal() {
+    setModalRemoverPartida(false);
   }
 
   function handleSelecionarVencedor(event: any, item: IPartidaPlacarJogadorProps) {
@@ -218,26 +240,100 @@ export function ControlePlacarAtivoProvider({ children }: IControlePlacarAtivoPr
     setPartidaEdicao({ ...partidaEdicao, jogadores: jogadoresAtualizado });
   }
 
+  function handleRemoverPartida(item: any, nome: any) {
+    setPartidaParaRemover({ item, nome });
+    setModalRemoverPartida(true);
+    onOpen();
+  }
+
+  function handleConfirmarRemocaoPartida() {
+    if (partidaParaRemover.item) {
+      setListagemPartidasPlacaresData(
+        listagemPartidasPlacaresData.filter(
+          (itemFiltrado) => itemFiltrado.id_partida !== partidaParaRemover.item.id_partida
+        )
+      );
+      setListagemPartidasPlacarAtivoData(
+        listagemPartidasPlacarAtivoData.filter(
+          (itemFiltrado) => itemFiltrado.id_partida !== partidaParaRemover.item.id_partida
+        )
+      );
+
+      toast({
+        title: `Partida ${partidaParaRemover.nome} removida!`,
+        status: 'warning',
+        duration: 3000,
+        isClosable: true,
+      });
+      handleFecharModal();
+    }
+
+    setPartidaParaRemover({ item: {}, nome: '' });
+    handleAtualizarPartidasPlacarAtivo(placarAtivo.id_placar, listagemPartidasPlacarAtivoData.length - 1);
+  }
+
+  const ModalRemoverPartida = () => {
+    return (
+      <Modal isOpen={isOpen} onClose={handleFecharModal} motionPreset="slideInBottom" isCentered>
+        <ModalOverlay
+          onClick={() => {
+            handleFecharModal;
+            onClose();
+          }}
+        />
+        <ModalContent>
+          <ModalHeader>Apagar Partida</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Text>Deseja apagar esta partida?</Text>
+            <Text fontWeight="bold">{partidaParaRemover.nome}</Text>
+          </ModalBody>
+          <ModalFooter>
+            <HStack w="100%">
+              <Button variant="outline" colorScheme="orange" w="50%" onClick={() => handleConfirmarRemocaoPartida()}>
+                Confirmar
+              </Button>
+              <Button colorScheme="blue" w="50%" onClick={() => handleFecharModal()}>
+                Cancelar
+              </Button>
+            </HStack>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    );
+  };
+
   const ListagemAdicionarPartidaJogadores = useMemo(() => {
     return partidaEdicao.jogadores.map((item: IPartidaPlacarJogadorProps) => {
       return (
-        <TRow key={item.id_jogador}>
+        <TRow key={item.id_jogador} flexDirection={{ sm: 'initial' }} alignItems={{ sm: 'center' }}>
           <TColumn w="40%">{item.nome}</TColumn>
           <TColumn w="30%" justifyContent="center">
             {item.pontuacao}
           </TColumn>
           <TColumnButtons w="30%">
-            <Flex alignItems="center" gridGap="2">
-              <Text fontSize={item.vitoria === 1 ? '20px' : '18px'} color="green.500">
-                <GiLaurelCrown />
-              </Text>
-              <Switch
-                size="md"
-                colorScheme="green"
-                isChecked={item.vitoria === 1}
-                onChange={(e) => handleSelecionarVencedor(e.target.checked, item)}
-              />
-              <Text color={item.vitoria === 1 ? 'green.500' : ''}>Vencedor</Text>
+            <Flex alignItems="center">
+              <FormControl display="flex" alignItems="center" gridGap="2">
+                <Text fontSize={item.vitoria === 1 ? '20px' : '18px'} color="green.500">
+                  <GiLaurelCrown />
+                </Text>
+                <Switch
+                  id={item.id_jogador + ''}
+                  size="md"
+                  colorScheme="green"
+                  isChecked={item.vitoria === 1}
+                  onChange={(e) => handleSelecionarVencedor(e.target.checked, item)}
+                />
+                <FormLabel htmlFor={item.id_jogador + ''} mb="0" cursor="pointer">
+                  <Text
+                    fontSize="14px"
+                    color={item.vitoria === 1 ? 'green.500' : ''}
+                    fontWeight={item.vitoria === 1 ? 'bold' : ''}
+                  >
+                    Vencedor
+                  </Text>
+                </FormLabel>
+              </FormControl>
             </Flex>
           </TColumnButtons>
         </TRow>
@@ -262,12 +358,12 @@ export function ControlePlacarAtivoProvider({ children }: IControlePlacarAtivoPr
               </Box>
               <Box w="100%">
                 <Table>
-                  <THeader display={{ md: 'flex', sm: 'none' }}>
-                    <THead w="40%">Jogador</THead>
-                    <THead w="30%" textAlign="center">
+                  <THeader justifyContent={{ sm: 'center' }}>
+                    <THead w="40%">Jogadores</THead>
+                    <THead w="30%" textAlign="center" display={{ md: 'block', sm: 'none' }}>
                       Pontuação
                     </THead>
-                    <THead w="30%" textAlign="center">
+                    <THead w="30%" textAlign="center" display={{ md: 'block', sm: 'none' }}>
                       Vitória da Partida
                     </THead>
                   </THeader>
@@ -278,15 +374,6 @@ export function ControlePlacarAtivoProvider({ children }: IControlePlacarAtivoPr
           </DrawerBody>
           <DrawerFooter>
             <HStack w="100%" justifyContent="flex-end">
-              <Button
-                colorScheme="orange"
-                leftIcon={<FaTrash />}
-                onClick={() => handleConfirmarRemocaoPartida()}
-                w="50%"
-                isDisabled={partidaEdicao.id_partida === '0'}
-              >
-                Apagar Partida
-              </Button>
               <Button colorScheme="green" leftIcon={<FaSave />} onClick={() => handleSalvarPartida()} w="50%">
                 Salvar Partida
               </Button>
@@ -306,9 +393,11 @@ export function ControlePlacarAtivoProvider({ children }: IControlePlacarAtivoPr
         listagemJogadoresClassificao,
         placarAtivo,
         handleAbrirEdicaoPartida,
+        handleRemoverPartida,
       }}
     >
       {children}
+      {modalRemoverPartida && ModalRemoverPartida()}
       {drawerEdicaoPartida && DrawerEdicaoPartida()}
     </ControlePlacarAtivoContext.Provider>
   );
