@@ -1,4 +1,4 @@
-import { useContext, useMemo } from 'react';
+import { useContext, useMemo, useState } from 'react';
 // chakra
 import { Text, Box, Flex, Heading, Button, HStack, IconButton, Grid, GridItem, Badge } from '@chakra-ui/react';
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
@@ -17,8 +17,9 @@ import {
 import Popover from '../components/Popover/Popover';
 import OrdenadorTabela from '../components/Ordenador/Ordenador';
 import InfoBoxPlacar from '../components/InfoBox/InfoBoxPlacar';
+import Paginacao, { usePaginacao } from '../components/Paginacao/Paginacao';
 // icones
-import { FaPlus, FaHistory, FaTrophy, FaEdit, FaCircle } from 'react-icons/fa';
+import { FaPlus, FaTrophy, FaEdit, FaCircle, FaCogs } from 'react-icons/fa';
 // utilitários
 import { formatarData } from '../utils/formatarData';
 // context
@@ -33,7 +34,6 @@ const Placar = () => {
     useContext(ControlePlacarAtivoContext);
   const { handleAbrirEdicaoPlacar } = useContext(EdicaoPlacarContext);
   const { ordenacaoTabela, ordenarPeloValor, ordenarCrescente } = useContext(OrdenadorTabelaContext);
-
   const listagemOrdenacao = [
     { tipo: 'nome', label: 'Nome do Placar' },
     { tipo: 'jogo', label: 'Nome do Jogo' },
@@ -43,7 +43,12 @@ const Placar = () => {
     { tipo: 'data_fim', label: 'Data da Finalização' },
     { tipo: 'status', label: 'Status' },
   ];
+  const { paginaAtual, itensPorPagina, setPaginaAtual, setItensPorPagina, primeiraPagina, ultimaPagina } =
+    usePaginacao();
 
+  //
+  //
+  //
   const PlacarAtivo = useMemo(() => {
     return placarAtivo ? (
       <Box w="100%">
@@ -100,8 +105,10 @@ const Placar = () => {
         Nenhum placar ativo. Clique no botão "Criar Placar" para cadastrar um!
       </Flex>
     );
-  }, [placarAtivo, placarAtivo?.jogadores]);
-
+  }, [placarAtivo, placarAtivo?.jogadores, listagemPlacaresData]);
+  //
+  //
+  //
   const PartidasPlacarAtivo = useMemo(() => {
     function listagemPlacarAtivo() {
       return listagemPartidasPlacarAtivoData.length !== 0 ? (
@@ -139,6 +146,7 @@ const Placar = () => {
           })
           .sort()
           .reverse()
+          .slice(primeiraPagina, ultimaPagina)
       ) : (
         <TRow>
           <TColumn w="100%" color="gray.400" fontSize="12px">
@@ -147,9 +155,7 @@ const Placar = () => {
         </TRow>
       );
     }
-
     function listagemClassificacaoAtivo() {
-      console.log(listagemJogadoresClassificao);
       return listagemJogadoresClassificao.length !== 0 ? (
         listagemJogadoresClassificao
           .sort((a, b) => {
@@ -190,7 +196,6 @@ const Placar = () => {
         </TRow>
       );
     }
-
     return (
       <Grid templateColumns={{ md: 'repeat(5, 1fr)', sm: '1fr' }} gap="20px" w="100%" mt="20px">
         <GridItem colSpan={{ md: 3, sm: 0 }}>
@@ -208,6 +213,15 @@ const Placar = () => {
               </THead>
             </THeader>
             <TBody>{listagemPlacarAtivo()}</TBody>
+            <TFooter>
+              <Paginacao
+                paginaAtual={paginaAtual}
+                itensPorPagina={itensPorPagina}
+                totalItens={listagemPartidasPlacarAtivoData.length}
+                mudarPaginaAtual={setPaginaAtual}
+                mudarQtdItensPorPagina={setItensPorPagina}
+              />
+            </TFooter>
           </Table>
         </GridItem>
         <GridItem colSpan={{ md: 2, sm: 0 }}>
@@ -232,8 +246,10 @@ const Placar = () => {
         </GridItem>
       </Grid>
     );
-  }, [listagemPartidasPlacarAtivoData, listagemJogadoresClassificao]);
-
+  }, [listagemPartidasPlacarAtivoData, listagemJogadoresClassificao, primeiraPagina, ultimaPagina]);
+  //
+  //
+  //
   const PlacarHistorico = useMemo(() => {
     const listagemPlacarOrdenados = listagemPlacaresData.sort(ordenacaoTabela());
     return listagemPlacaresData.length !== 0 ? (
@@ -254,9 +270,9 @@ const Placar = () => {
               alignItems="center"
               bg={item.status === 'Ativo' ? 'rgba(72, 187, 120, 0.1)' : ''}
             >
-              <TColumn w="25%">{item.nome}</TColumn>
+              <TColumn w="15%">{item.nome}</TColumn>
               <TColumn w="15%">{item.jogo}</TColumn>
-              <TColumn w="15%">
+              <TColumn w="25%">
                 {item.jogadores
                   .map((jogadores) => {
                     return jogadores;
@@ -306,7 +322,9 @@ const Placar = () => {
       </TRow>
     );
   }, [listagemPlacaresData, ordenarPeloValor, ordenarCrescente]);
-
+  //
+  //
+  //
   return (
     <Flex
       w={{ lg: '1300px', md: '100%', sm: '100%' }}
@@ -351,9 +369,9 @@ const Placar = () => {
             </Tab>
             <Tab>
               <Text mr="5px" color="orange.500">
-                <FaHistory />
+                <FaCogs />
               </Text>
-              Histórico de Placares
+              Controle dos Placares
             </Tab>
           </TabList>
           <TabPanels>
@@ -365,13 +383,13 @@ const Placar = () => {
               <Box overflowX="auto" w="100%">
                 <Table>
                   <THeader display={{ md: 'flex', sm: 'none' }}>
-                    <THead w="25%" ordenarPor="nome">
+                    <THead w="15%" ordenarPor="nome">
                       Nome
                     </THead>
                     <THead w="15%" ordenarPor="jogo">
                       Jogo
                     </THead>
-                    <THead w="15%" ordenarPor="jogadores">
+                    <THead w="25%" ordenarPor="jogadores">
                       Jogadores
                     </THead>
                     <THead w="10%" ordenarPor="partidas">
@@ -405,13 +423,13 @@ const Placar = () => {
 const PlacarProvider = () => {
   return (
     <ListagemPlacaresProvider>
-      <ControlePlacarAtivoProvider>
-        <EdicaoPlacarProvider>
+      <EdicaoPlacarProvider>
+        <ControlePlacarAtivoProvider>
           <OrdenadorTabelaProvider>
             <Placar />
           </OrdenadorTabelaProvider>
-        </EdicaoPlacarProvider>
-      </ControlePlacarAtivoProvider>
+        </ControlePlacarAtivoProvider>
+      </EdicaoPlacarProvider>
     </ListagemPlacaresProvider>
   );
 };

@@ -29,6 +29,7 @@ import { ListagemPlacaresContext } from './ListagemPlacaresContext';
 
 interface IEdicaoPlacarContextData {
   handleAbrirEdicaoPlacar: (object?: IPlacaresProps) => void;
+  handleAtualizarPartidasPlacarAtivo: (id: string, partidas: number) => void;
 }
 
 interface IEdicaoPlacarProviderProps {
@@ -57,6 +58,17 @@ export function EdicaoPlacarProvider({ children }: IEdicaoPlacarProviderProps) {
     data_fim: '',
   });
   const [jogadorAdicionar, setJogadorAdicionar] = useState('');
+
+  function handleAtualizarPartidasPlacarAtivo(id: string, partidas: number) {
+    setListagemPlacaresData(
+      listagemPlacaresData.map((placar) => {
+        if (placar.id_placar === id) {
+          placar.partidas = partidas;
+        }
+        return placar;
+      })
+    );
+  }
 
   function handleAbrirEdicaoPlacar(item?: IPlacaresProps) {
     onOpen();
@@ -543,7 +555,7 @@ export function EdicaoPlacarProvider({ children }: IEdicaoPlacarProviderProps) {
   };
 
   return (
-    <EdicaoPlacarContext.Provider value={{ handleAbrirEdicaoPlacar }}>
+    <EdicaoPlacarContext.Provider value={{ handleAbrirEdicaoPlacar, handleAtualizarPartidasPlacarAtivo }}>
       {children}
       {modalReativarPlacar && ModalReativarPlacar()}
       {modalFinalizarPlacar && ModalFinalizarPlacar()}

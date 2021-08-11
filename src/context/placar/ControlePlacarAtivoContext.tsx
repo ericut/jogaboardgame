@@ -39,6 +39,7 @@ import {
 } from '../../interfaces/placar';
 // context
 import { ListagemPlacaresContext } from '../placar/ListagemPlacaresContext';
+import { EdicaoPlacarContext } from '../placar/EdicaoPlacarContext';
 // service
 import Service from './services/placar';
 
@@ -61,6 +62,7 @@ export function ControlePlacarAtivoProvider({ children }: IControlePlacarAtivoPr
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { listagemPlacaresData } = useContext(ListagemPlacaresContext);
+  const { handleAtualizarPartidasPlacarAtivo } = useContext(EdicaoPlacarContext);
   const [placarAtivo, setPlacarAtivo] = useState<any>({});
   const [listagemPartidasPlacaresData, setListagemPartidasPlacaresData] = useState<IPartidaPlacarProps[]>([]);
   const [listagemPartidasPlacarAtivoData, setListagemPartidasPlacarAtivoData] = useState<IPartidaPlacarProps[]>([]);
@@ -182,6 +184,7 @@ export function ControlePlacarAtivoProvider({ children }: IControlePlacarAtivoPr
       });
       handleFecharDrawer();
     }
+    handleAtualizarPartidasPlacarAtivo(placarAtivo.id_placar, listagemPartidasPlacarAtivoData.length + 1);
   }
 
   function handleFecharDrawer() {
