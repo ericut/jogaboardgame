@@ -1,6 +1,6 @@
 import { ReactNode, createContext, useState, useEffect } from 'react';
 // interfaces
-import { ICategoriasProps } from '../interfaces';
+import { ICategoriasProps } from '../../interfaces/desafio10x10';
 // service
 import Service from './services/desafio10x10';
 
@@ -15,7 +15,6 @@ interface IListagemCategoriasProviderProps {
 export const ListagemCategoriasContext = createContext({} as IListagemCategoriasContextData);
 
 export function ListagemCategoriasProvider({ children }: IListagemCategoriasProviderProps) {
-  // estado das categorias
   const [listagemCategoriasData, setListagemCategoriasData] = useState<ICategoriasProps[]>([]);
 
   useEffect(() => {

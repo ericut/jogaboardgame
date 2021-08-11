@@ -18,8 +18,8 @@ import {
 } from '@chakra-ui/react';
 import { BiMenu, BiMoon, BiSun } from 'react-icons/bi';
 
-import Logo from './Logo/bg10_logo.svg';
-import LogoWhite from './Logo/bg10_logo_white.svg';
+import Logo from './Logo/jogabg_logo.svg';
+import LogoWhite from './Logo/jogabg_logo_white.svg';
 
 const Header = () => {
   const { toggleColorMode, colorMode } = useColorMode();
@@ -71,10 +71,10 @@ const Header = () => {
           alignItems="center"
           h={{ md: '90px', sm: '60px' }}
         >
-          <Flex w={{ md: '200px', sm: '120px' }} alignItems="center" cursor="pointer">
+          <Flex w={{ md: '240px', sm: '160px' }} mt="5px" alignItems="center" cursor="pointer">
             <Link href="/" passHref>
               <a>
-                <Image src={colorMode === 'light' ? Logo : LogoWhite} alt="bg10 <3" />
+                <Image src={colorMode === 'light' ? Logo : LogoWhite} alt="JogaBG <3" />
               </a>
             </Link>
           </Flex>

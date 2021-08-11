@@ -1,4 +1,4 @@
-import { ICategoriasProps } from '../../interfaces';
+import { ICategoriasProps } from '../../../interfaces/desafio10x10';
 
 export const categoriasData: ICategoriasProps[] = [
   { id: 1, nome: 'Alocação de trabalhadores' },

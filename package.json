@@ -1,16 +1,20 @@
 {
-  "name": "boardgame10",
-  "version": "0.1.2",
+  "name": "jogabg",
+  "version": "0.2.0",
   "scripts": {
     "dev": "next",
     "build": "next build",
     "start": "next start",
-    "type-check": "tsc"
+    "type-check": "tsc",
+    "test": "jest"
   },
   "dependencies": {
     "@chakra-ui/react": "^1.6.5",
     "@emotion/react": "^11.4.0",
     "@emotion/styled": "^11.3.0",
+    "@fontsource/montserrat": "^4.5.0",
+    "@fontsource/roboto": "^4.5.0",
+    "color": "3.2.1",
     "framer-motion": "^4.1.17",
     "next": "latest",
     "react": "^17.0.2",
@@ -19,10 +23,21 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
+    "@jest/types": "^27.0.6",
+    "@testing-library/dom": "^8.1.0",
+    "@testing-library/jest-dom": "^5.14.1",
+    "@testing-library/react": "^12.0.0",
+    "@testing-library/user-event": "^13.2.1",
+    "@types/color": "^3.0.2",
+    "@types/jest": "^26.0.24",
+    "@types/mocha": "^9.0.0",
     "@types/node": "^12.12.21",
     "@types/react": "^17.0.2",
     "@types/react-dom": "^17.0.1",
     "@types/uuid": "^8.3.1",
+    "babel-jest": "^27.0.6",
+    "jest": "^27.0.6",
+    "jest-dom": "^4.0.0",
     "typescript": "^4.3.2"
   },
   "license": "MIT"

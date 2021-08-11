@@ -2,30 +2,50 @@ import { useMemo, useState, useContext } from 'react';
 // chakra
 import { Text, Box, ButtonGroup, Button, IconButton, Flex, Heading, Badge, HStack, Stack } from '@chakra-ui/react';
 // componentes
-import { Table, THeader, THead, THeadButtons, TBody, TRow, TColumn, TColumnButtons } from '../components/Table/Table';
+import {
+  Table,
+  THeader,
+  TFooter,
+  THead,
+  THeadButtons,
+  TBody,
+  TRow,
+  TColumn,
+  TColumnButtons,
+} from '../components/Table/Table';
 import Popover from '../components/Popover/Popover';
+import OrdenadorTabela from '../components/Ordenador/Ordenador';
 // icones
 import { GiMeeple } from 'react-icons/gi';
-import { FaEdit, FaPlus, FaMinus, FaEye, FaEyeSlash, FaCog } from 'react-icons/fa';
-import { AiTwotoneCrown } from 'react-icons/ai';
+import { FaEdit, FaPlus, FaMinus, FaEye, FaEyeSlash, FaCog, FaCrown } from 'react-icons/fa';
 // context
-import { ConfiguracoesContext } from '../context/ConfiguracoesContext';
-import { ListagemCategoriasContext } from '../context/ListagemCategoriaContext';
-import { ListagemJogosContext } from '../context/ListagemJogosContext';
-import { EdicaoJogoContext } from '../context/EdicaoJogoContext';
+import { ListagemJogosProvider, ListagemJogosContext } from '../context/desafio10x10/ListagemJogosContext';
+import {
+  ListagemCategoriasProvider,
+  ListagemCategoriasContext,
+} from '../context/desafio10x10/ListagemCategoriaContext';
+import { ConfiguracoesProvider, ConfiguracoesContext } from '../context/desafio10x10/ConfiguracoesContext';
+import { EdicaoJogoProvider, EdicaoJogoContext } from '../context/desafio10x10/EdicaoJogoContext';
+import { OrdenadorTabelaProvider, OrdenadorTabelaContext } from '../context/OrdenadorTabelaContext';
 
 const Desafio10x10 = () => {
-  // contexts
   const { listagemJogosData, handleRetirarPartida, handleAcrescentarPartida } = useContext(ListagemJogosContext);
   const { listagemCategoriasData } = useContext(ListagemCategoriasContext);
-  const { handleAbrirEdicaoJogo } = useContext(EdicaoJogoContext);
   const { jogosTotais, partidasTotais, handleAbrirConfiguracaoDesafio } = useContext(ConfiguracoesContext);
+  const { handleAbrirEdicaoJogo } = useContext(EdicaoJogoContext);
+  const { ordenacaoTabela, ordenarPeloValor, ordenarCrescente, handleOrdenarPeloValor, handleOrdenarCrescente } =
+    useContext(OrdenadorTabelaContext);
 
   const [showHUD, setShowHUD] = useState(true);
+  const listagemOrdenacao = [
+    { tipo: 'nome', label: 'Nome do Jogo' },
+    { tipo: 'partidas', label: 'Número de Partidas' },
+  ];
 
-  // renderização da listagem de jogos
+  //
   const ListagemJogos = useMemo(() => {
-    // render dos meeples de número de partidas
+    const listagemJogosOrdenados = listagemJogosData.sort(ordenacaoTabela());
+
     const NumeroPartidas = (partidas: number) => {
       let partidasTotaisMontadas = Array.from({ length: partidasTotais }, (v, k) => k + 1);
       let partidasJogadas = partidasTotaisMontadas.map((item, index) => {
@@ -37,7 +57,6 @@ const Desafio10x10 = () => {
       });
       return <>{partidasJogadas}</>;
     };
-    // render listagem de categorias
     const ListagemCategorias = (categoria: number[]) => {
       function corPorCategoria(item: string) {
         if (item === 'Cooperativo') {
@@ -62,7 +81,7 @@ const Desafio10x10 = () => {
     };
 
     return listagemJogosData.length !== 0 ? (
-      listagemJogosData.slice(0, jogosTotais).map((item, index) => {
+      listagemJogosOrdenados.slice(0, jogosTotais).map((item) => {
         return (
           <TRow key={item.id}>
             <TColumn w="30%" flexDirection="column" justifyContent="center">
@@ -78,7 +97,7 @@ const Desafio10x10 = () => {
                 {NumeroPartidas(+item.partidas)}
                 {item.partidas === partidasTotais ? (
                   <Flex color="yellow.500" ml="10px" alignItems="center">
-                    <AiTwotoneCrown />
+                    <FaCrown />
                     <Text display={{ md: 'flex', sm: 'none' }} fontSize="10px" textTransform="uppercase">
                       Finalizado!
                     </Text>
@@ -97,7 +116,13 @@ const Desafio10x10 = () => {
                   w="100%"
                 >
                   <Flex>
-                    <ButtonGroup size="sm" isAttached>
+                    <ButtonGroup
+                      size="sm"
+                      isAttached
+                      onClick={() => {
+                        handleOrdenarPeloValor('');
+                      }}
+                    >
                       <IconButton
                         aria-label="Retirar Jogada"
                         colorScheme="orange"
@@ -144,108 +169,151 @@ const Desafio10x10 = () => {
         </TColumn>
       </TRow>
     );
-  }, [listagemJogosData, listagemCategoriasData, showHUD, partidasTotais, jogosTotais]);
+  }, [
+    listagemJogosData,
+    listagemCategoriasData,
+    showHUD,
+    partidasTotais,
+    jogosTotais,
+    ordenarPeloValor,
+    ordenarCrescente,
+  ]);
 
-  // renderização geral
   return (
-    <>
-      <Flex
-        w={{ lg: '1300px', md: '100%', sm: '100%' }}
-        maxW="100%"
-        minH="60vh"
-        alignItems="center"
-        flexDirection="column"
-        py={{ md: '20px', sm: '10px' }}
-        m="0 auto"
-      >
-        <Flex justifyContent="space-between" align="center" w="100%">
-          <Flex alignItems="center" w="60%">
-            <Heading fontWeight="bold" fontSize={{ md: '32px', sm: '20px' }}>
-              Desafio {jogosTotais}x{partidasTotais}
-            </Heading>
-            <Popover title={`O que é o Desafio ${jogosTotais}x${partidasTotais}?`}>
-              Escolha <strong>{jogosTotais} jogos</strong> e jogue cada um deles <strong>{partidasTotais} vezes</strong>
-              , o período padrão para as <strong>{jogosTotais * partidasTotais} partidas</strong> é de um ano. Avance na
-              trilha dos meeples conforme finalizar as partidas de cada jogo.
-              <br />O desafio pode ser feito de forma leve, podendo mudar qualquer um dos jogos, ou de forma pesada onde
-              não poderá alterar a lista dos jogos no período ou até finalizar todas as partidas.
-            </Popover>
-          </Flex>
-          <Flex alignItems="center" justifyContent="flex-end" w="40%">
-            <ButtonGroup>
-              <Flex>
-                <IconButton
-                  aria-label="Adicionar Jogo"
-                  icon={showHUD ? <FaEyeSlash /> : <FaEye />}
-                  colorScheme="gray"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowHUD(!showHUD)}
-                />
-              </Flex>
-              <Flex>
+    <Flex
+      w={{ lg: '1300px', md: '100%', sm: '100%' }}
+      maxW="100%"
+      minH="60vh"
+      alignItems="center"
+      flexDirection="column"
+      py={{ md: '20px', sm: '10px' }}
+      m="0 auto"
+    >
+      <Flex justifyContent="space-between" align="center" w="100%">
+        <Flex alignItems="center" w="60%">
+          <Heading fontWeight="bold" fontSize={{ md: '32px', sm: '20px' }}>
+            Desafio {jogosTotais}x{partidasTotais}
+          </Heading>
+          <Popover title={`O que é o Desafio ${jogosTotais}x${partidasTotais}?`}>
+            Escolha <strong>{jogosTotais} jogos</strong> e jogue cada um deles <strong>{partidasTotais} vezes</strong>,
+            o período padrão para as <strong>{jogosTotais * partidasTotais} partidas</strong> é de um ano. Avance na
+            trilha dos meeples conforme finalizar as partidas de cada jogo.
+            <br />O desafio pode ser feito de forma leve, podendo mudar qualquer um dos jogos, ou de forma pesada onde
+            não poderá alterar a lista dos jogos no período ou até finalizar todas as partidas.
+          </Popover>
+        </Flex>
+        <Flex alignItems="center" justifyContent="flex-end" w="40%">
+          <ButtonGroup>
+            <Flex>
+              <IconButton
+                aria-label="Adicionar Jogo"
+                icon={showHUD ? <FaEyeSlash /> : <FaEye />}
+                colorScheme="gray"
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowHUD(!showHUD)}
+              />
+            </Flex>
+            <Flex>
+              <IconButton
+                display={{ md: 'none', sm: 'flex' }}
+                aria-label="Configurações do Desafio"
+                icon={<FaCog />}
+                colorScheme="gray"
+                size="sm"
+                onClick={() => handleAbrirConfiguracaoDesafio()}
+              />
+              <Button
+                display={{ md: 'flex', sm: 'none' }}
+                leftIcon={<FaCog />}
+                colorScheme="gray"
+                size="sm"
+                onClick={() => handleAbrirConfiguracaoDesafio()}
+              >
+                Configurações
+              </Button>
+            </Flex>
+            <Flex>
+              <ButtonGroup size="sm" isAttached>
+                <Button display={{ md: 'block', sm: 'none' }} size="sm" isDisabled>
+                  {listagemJogosData.length}/{jogosTotais}
+                </Button>
                 <IconButton
                   display={{ md: 'none', sm: 'flex' }}
-                  aria-label="Configurações do Desafio"
-                  icon={<FaCog />}
-                  colorScheme="gray"
+                  aria-label="Adicionar Jogo"
+                  icon={<FaPlus />}
+                  colorScheme="blue"
                   size="sm"
-                  onClick={() => handleAbrirConfiguracaoDesafio()}
+                  onClick={() => handleAbrirEdicaoJogo()}
+                  isDisabled={listagemJogosData.length >= jogosTotais}
                 />
                 <Button
                   display={{ md: 'flex', sm: 'none' }}
-                  leftIcon={<FaCog />}
-                  colorScheme="gray"
+                  leftIcon={<FaPlus />}
+                  colorScheme="blue"
                   size="sm"
-                  onClick={() => handleAbrirConfiguracaoDesafio()}
+                  onClick={() => handleAbrirEdicaoJogo()}
+                  isDisabled={listagemJogosData.length >= jogosTotais}
                 >
-                  Configurações
+                  Adicionar Jogo
                 </Button>
-              </Flex>
-              <Flex>
-                <ButtonGroup size="sm" isAttached>
-                  <Button display={{ md: 'block', sm: 'none' }} size="sm" isDisabled>
-                    {listagemJogosData.length}/{jogosTotais}
-                  </Button>
-                  <IconButton
-                    display={{ md: 'none', sm: 'flex' }}
-                    aria-label="Adicionar Jogo"
-                    icon={<FaPlus />}
-                    colorScheme="blue"
-                    size="sm"
-                    onClick={() => handleAbrirEdicaoJogo()}
-                    isDisabled={listagemJogosData.length >= jogosTotais}
-                  />
-                  <Button
-                    display={{ md: 'flex', sm: 'none' }}
-                    leftIcon={<FaPlus />}
-                    colorScheme="blue"
-                    size="sm"
-                    onClick={() => handleAbrirEdicaoJogo()}
-                    isDisabled={listagemJogosData.length >= jogosTotais}
-                  >
-                    Adicionar Jogo
-                  </Button>
-                </ButtonGroup>
-              </Flex>
-            </ButtonGroup>
-          </Flex>
-        </Flex>
-        <Flex mt={{ md: '40px', sm: '10px' }} w="100%">
-          <Box overflowX="auto" w="100%">
-            <Table>
-              <THeader display={{ md: 'flex', sm: 'none' }}>
-                <THead w="30%">Jogos</THead>
-                <THead w="50%">Partidas</THead>
-                <THeadButtons w="20%">{showHUD ? 'Controle | Editar' : ''}</THeadButtons>
-              </THeader>
-              <TBody>{ListagemJogos}</TBody>
-            </Table>
-          </Box>
+              </ButtonGroup>
+            </Flex>
+          </ButtonGroup>
         </Flex>
       </Flex>
-    </>
+      <Flex mt={{ md: '40px', sm: '10px' }} w="100%" position="relative" justifyContent="center">
+        {listagemJogosData.length === 0 ? (
+          <Flex position="absolute" m="0 auto" top="30px" zIndex="-1">
+            <Text
+              fontSize={{ md: '2600%', sm: '800%' }}
+              opacity="0.025"
+              color="gray.500"
+              fontWeight="bold"
+              letterSpacing="-10px"
+            >
+              {`${jogosTotais}x${partidasTotais}`}
+            </Text>
+          </Flex>
+        ) : (
+          ''
+        )}
+        <Box overflowX="auto" w="100%">
+          <Table>
+            <THeader display={{ md: 'flex', sm: 'none' }}>
+              <THead w="30%" ordenarPor="nome">
+                Jogos
+              </THead>
+              <THead w="50%" ordenarPor="partidas">
+                Partidas
+              </THead>
+              <THeadButtons w="20%">{showHUD ? 'Controle | Editar' : ''}</THeadButtons>
+            </THeader>
+            <TBody>{ListagemJogos}</TBody>
+            <TFooter>
+              <OrdenadorTabela listagemOrdenacao={listagemOrdenacao} />
+            </TFooter>
+          </Table>
+        </Box>
+      </Flex>
+    </Flex>
   );
 };
 
-export default Desafio10x10;
+const Desafio10x10Provider = () => {
+  return (
+    <ListagemJogosProvider>
+      <ListagemCategoriasProvider>
+        <ConfiguracoesProvider>
+          <EdicaoJogoProvider>
+            <OrdenadorTabelaProvider>
+              <Desafio10x10 />
+            </OrdenadorTabelaProvider>
+          </EdicaoJogoProvider>
+        </ConfiguracoesProvider>
+      </ListagemCategoriasProvider>
+    </ListagemJogosProvider>
+  );
+};
+
+export default Desafio10x10Provider;

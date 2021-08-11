@@ -1,4 +1,4 @@
-import { ReactNode, createContext, useState, useEffect, useContext } from 'react';
+import { ReactNode, createContext, useState, useContext, useMemo } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 // chakra
 import {
@@ -35,17 +35,13 @@ import {
 // icones
 import { FaSave, FaTrash } from 'react-icons/fa';
 // interfaces
-import { IJogosProps } from '../interfaces';
+import { IJogosProps } from '../../interfaces/desafio10x10';
 // context
 import { ListagemJogosContext } from './ListagemJogosContext';
 import { ListagemCategoriasContext } from './ListagemCategoriaContext';
 import { ConfiguracoesContext } from './ConfiguracoesContext';
 
 interface IEdicaoJogoContextData {
-  jogoEdicao: IJogosProps;
-  setJogoEdicao: (object: IJogosProps) => void;
-  handleSalvarJogo: () => void;
-  handleRemoverJogo: () => void;
   handleAbrirEdicaoJogo: (object?: IJogosProps) => void;
 }
 
@@ -56,19 +52,16 @@ interface IEdicaoJogoProviderProps {
 export const EdicaoJogoContext = createContext({} as IEdicaoJogoContextData);
 
 export function EdicaoJogoProvider({ children }: IEdicaoJogoProviderProps) {
-  // hooks chakra
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  // contexts
   const { listagemJogosData, setListagemJogosData, localStorageSetListagem } = useContext(ListagemJogosContext);
   const { listagemCategoriasData } = useContext(ListagemCategoriasContext);
   const { partidasTotais } = useContext(ConfiguracoesContext);
-  // drawers && modals
   const [drawerEdicaoJogo, setDrawerEdicaoJogo] = useState(false);
   const [modalRemoverJogo, setModalRemoverJogo] = useState(false);
 
   const [jogoEdicao, setJogoEdicao] = useState<IJogosProps>({
-    id: 0,
+    id: '0',
     nome: '',
     partidas: '',
     categoria: [],
@@ -84,17 +77,16 @@ export function EdicaoJogoProvider({ children }: IEdicaoJogoProviderProps) {
     }
   }
 
-  // controle checkbox das categorias
   function handleEditarCategorias(event: any) {
     let value = +event.target.value;
     let checked = event.target.checked;
-    let categorias = jogoEdicao ? jogoEdicao.categoria : [];
+    let categoriasExistentes = jogoEdicao ? jogoEdicao.categoria : [];
     if (checked) {
-      setJogoEdicao({ ...jogoEdicao, categoria: categorias.concat([value]) });
+      setJogoEdicao({ ...jogoEdicao, categoria: categoriasExistentes.concat([value]) });
     } else {
       setJogoEdicao({
         ...jogoEdicao,
-        categoria: categorias.filter((item) => item !== value),
+        categoria: categoriasExistentes.filter((item) => item !== value),
       });
     }
   }
@@ -105,7 +97,6 @@ export function EdicaoJogoProvider({ children }: IEdicaoJogoProviderProps) {
       setListagemJogosData(
         listagemJogosData.map((item) => {
           if (item.id === jogoEdicao.id) {
-            item.id = jogoEdicao.id;
             item.nome = jogoEdicao.nome;
             item.partidas = jogoEdicao.partidas;
             item.categoria = jogoEdicao.categoria;
@@ -119,6 +110,7 @@ export function EdicaoJogoProvider({ children }: IEdicaoJogoProviderProps) {
         duration: 3000,
         isClosable: true,
       });
+      handleFecharDrawer();
     } else {
       if (jogoEdicao.nome !== '') {
         jogoEdicao.id = uuidv4();
@@ -130,6 +122,7 @@ export function EdicaoJogoProvider({ children }: IEdicaoJogoProviderProps) {
           duration: 3000,
           isClosable: true,
         });
+        handleFecharDrawer();
       } else {
         toast({
           title: 'Insira o nome do jogo para salvar!',
@@ -139,7 +132,6 @@ export function EdicaoJogoProvider({ children }: IEdicaoJogoProviderProps) {
         });
       }
     }
-    handleFecharDrawer();
   }
 
   function handleConfirmarRemocaoJogo() {
@@ -161,46 +153,12 @@ export function EdicaoJogoProvider({ children }: IEdicaoJogoProviderProps) {
     setDrawerEdicaoJogo(false);
     onClose();
     setJogoEdicao({
-      id: 0,
+      id: '0',
       nome: '',
       partidas: '',
       categoria: [],
     });
   }
-
-  //
-  //
-  // renders
-  const ModalEdicaoJogo = () => {
-    return (
-      <Modal isOpen={isOpen} onClose={handleFecharModal} motionPreset="slideInBottom" isCentered>
-        <ModalOverlay
-          onClick={() => {
-            handleFecharModal;
-            onClose();
-          }}
-        />
-        <ModalContent>
-          <ModalHeader>Remover Jogo da Lista</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Text>Deseja remover este jogo da sua lista?</Text>
-            <Text fontWeight="bold">{jogoEdicao.nome}</Text>
-          </ModalBody>
-          <ModalFooter>
-            <HStack w="100%">
-              <Button variant="outline" colorScheme="orange" w="50%" onClick={() => handleRemoverJogo()}>
-                Confirmar
-              </Button>
-              <Button colorScheme="blue" w="50%" onClick={() => handleFecharModal()}>
-                Cancelar
-              </Button>
-            </HStack>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-    );
-  };
 
   const DrawerEdicaoJogo = () => {
     return (
@@ -208,7 +166,7 @@ export function EdicaoJogoProvider({ children }: IEdicaoJogoProviderProps) {
         <DrawerOverlay onClick={handleFecharDrawer} />
         <DrawerContent>
           <DrawerCloseButton />
-          <DrawerHeader>{jogoEdicao.id === 0 ? 'Adicionar' : 'Editar'} Jogo</DrawerHeader>
+          <DrawerHeader>{jogoEdicao.id === '0' ? 'Adicionar' : 'Editar'} Jogo</DrawerHeader>
           <DrawerBody>
             <VStack>
               <Input
@@ -256,7 +214,7 @@ export function EdicaoJogoProvider({ children }: IEdicaoJogoProviderProps) {
                 leftIcon={<FaTrash />}
                 onClick={() => handleConfirmarRemocaoJogo()}
                 w="50%"
-                isDisabled={jogoEdicao.id === 0}
+                isDisabled={jogoEdicao.id === '0'}
               >
                 Remover Jogo
               </Button>
@@ -270,12 +228,41 @@ export function EdicaoJogoProvider({ children }: IEdicaoJogoProviderProps) {
     );
   };
 
+  const ModalEdicaoJogo = useMemo(() => {
+    return (
+      <Modal isOpen={isOpen} onClose={handleFecharModal} motionPreset="slideInBottom" isCentered>
+        <ModalOverlay
+          onClick={() => {
+            handleFecharModal;
+            onClose();
+          }}
+        />
+        <ModalContent>
+          <ModalHeader>Remover Jogo da Lista</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Text>Deseja remover este jogo da sua lista?</Text>
+            <Text fontWeight="bold">{jogoEdicao.nome}</Text>
+          </ModalBody>
+          <ModalFooter>
+            <HStack w="100%">
+              <Button variant="outline" colorScheme="orange" w="50%" onClick={() => handleRemoverJogo()}>
+                Confirmar
+              </Button>
+              <Button colorScheme="blue" w="50%" onClick={() => handleFecharModal()}>
+                Cancelar
+              </Button>
+            </HStack>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    );
+  }, [modalRemoverJogo, handleFecharModal]);
+
   return (
-    <EdicaoJogoContext.Provider
-      value={{ jogoEdicao, setJogoEdicao, handleSalvarJogo, handleRemoverJogo, handleAbrirEdicaoJogo }}
-    >
+    <EdicaoJogoContext.Provider value={{ handleAbrirEdicaoJogo }}>
       {children}
-      {modalRemoverJogo && ModalEdicaoJogo()}
+      {modalRemoverJogo && ModalEdicaoJogo}
       {drawerEdicaoJogo && DrawerEdicaoJogo()}
     </EdicaoJogoContext.Provider>
   );

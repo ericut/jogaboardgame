@@ -1,5 +1,10 @@
-import { ReactNode } from 'react';
+import { ReactNode, useContext } from 'react';
+// chakra
 import { Flex, Box, HStack, useColorModeValue, BoxProps, FlexProps, StackProps } from '@chakra-ui/react';
+// icones
+import { FaSort, FaSortUp, FaSortDown } from 'react-icons/fa';
+// context
+import { OrdenadorTabelaContext } from '../../context/OrdenadorTabelaContext';
 
 // interfaces
 interface ITableProps extends BoxProps, FlexProps {
@@ -10,6 +15,10 @@ interface ITableProps extends BoxProps, FlexProps {
 interface ITableStackProps extends StackProps {
   w?: string;
   children: ReactNode;
+}
+
+interface ITableHeadProps extends ITableProps {
+  ordenarPor?: string;
 }
 
 type ITableWidthOmited = Omit<ITableProps, 'w'>;
@@ -43,10 +52,71 @@ export function THeader({ children, ...rest }: ITableWidthOmited) {
   );
 }
 
-export function THead({ children, w, ...rest }: ITableProps) {
+export function TFooter({ children, ...rest }: ITableWidthOmited) {
+  const TextColor = useColorModeValue('gray.400', 'gray.400');
+  return (
+    <Flex
+      color={TextColor}
+      minH="38px"
+      fontSize="11px"
+      p="10px 10px"
+      textTransform="uppercase"
+      style={{ zIndex: 1 }}
+      fontWeight="bold"
+      letterSpacing="1px"
+      flexDirection={{ md: 'initial', sm: 'column' }}
+      alignItems={{ md: 'center', sm: 'flex-start' }}
+      justifyContent={{ md: 'initial', sm: 'flex-start' }}
+      {...rest}
+    >
+      {children}
+    </Flex>
+  );
+}
+
+export function THead({ children, w, ordenarPor, ...rest }: ITableHeadProps) {
+  const { ordenarPeloValor, ordenarCrescente, handleOrdenarPeloValor, handleOrdenarCrescente } =
+    useContext(OrdenadorTabelaContext);
+
+  function ordernacaoMudarIcones() {
+    if (ordenarPeloValor === ordenarPor) {
+      if (ordenarCrescente === 'desc') {
+        return <FaSortUp />;
+      } else if (ordenarCrescente === 'asc') {
+        return <FaSortDown />;
+      }
+    } else {
+      return <FaSort />;
+    }
+  }
+
+  function mudarOrdenacaoColuna() {
+    if (ordenarCrescente === 'desc') {
+      handleOrdenarCrescente('asc');
+    } else if (ordenarCrescente === 'asc') {
+      handleOrdenarCrescente('desc');
+    }
+    handleOrdenarPeloValor(ordenarPor ? ordenarPor : '');
+  }
+
   return (
     <Box p="0px 10px" w={{ md: w ? w : '100%', sm: '100%' }} {...rest}>
-      {children}
+      {ordenarPor ? (
+        <Flex
+          w="100%"
+          alignItems="center"
+          transition="0.2s all"
+          _hover={{ cursor: 'pointer', color: 'blue.300' }}
+          onClick={() => {
+            mudarOrdenacaoColuna();
+          }}
+        >
+          {children}
+          {ordernacaoMudarIcones()}
+        </Flex>
+      ) : (
+        children
+      )}
     </Box>
   );
 }
