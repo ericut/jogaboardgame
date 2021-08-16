@@ -59,7 +59,7 @@ const Placar = () => {
       <Box w="100%">
         <Grid
           templateColumns={{ md: 'repeat(5, 1fr)', sm: 'repeat(2, 1fr)' }}
-          templateRows={{ md: 'repeat(2, 1fr)', sm: 'repeat(4, 1fr)' }}
+          templateRows={{ md: 'repeat(2, 1fr)', sm: 'auto' }}
           gap="20px"
           rowGap="10px"
           w="100%"
@@ -85,21 +85,27 @@ const Placar = () => {
           </GridItem>
           <GridItem colSpan={{ md: 3, sm: 2 }}>
             <InfoBoxPlacar label="Jogadores">
-              <HStack mt="3px">
+              <Box mt="3px" maxW="100%">
                 {placarAtivo.jogadores
                   ? placarAtivo.jogadores.map((jogador, index) => {
                       return (
-                        <Badge key={index} fontSize="13px">
+                        <Badge key={index} fontSize="13px" mr="10px">
                           {jogador}
                         </Badge>
                       );
                     })
                   : ''}
-              </HStack>
+              </Box>
             </InfoBoxPlacar>
           </GridItem>
           <GridItem colSpan={{ md: 2, sm: 2 }}>
-            <Button variant="outline" colorScheme="green" w="100%" h="100%" onClick={() => handleAbrirEdicaoPartida()}>
+            <Button
+              variant="outline"
+              colorScheme="green"
+              w={{ md: '100%', sm: '100%' }}
+              h={{ md: '100%', sm: '56px' }}
+              onClick={() => handleAbrirEdicaoPartida()}
+            >
               Adicionar Partida
             </Button>
           </GridItem>
@@ -400,6 +406,14 @@ const Placar = () => {
           </Popover>
         </Flex>
         <Flex alignItems="center" justifyContent="flex-end" w="40%">
+          <IconButton
+            display={{ md: 'none', sm: 'flex' }}
+            aria-label="Criar Placar"
+            icon={<FaPlus />}
+            colorScheme="blue"
+            size="sm"
+            onClick={() => handleAbrirEdicaoPlacar()}
+          />
           <Button
             display={{ md: 'flex', sm: 'none' }}
             leftIcon={<FaPlus />}
