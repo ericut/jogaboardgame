@@ -1,7 +1,32 @@
-import { useContext, useMemo } from 'react';
+import { useContext, useMemo, useState } from 'react';
 // chakra
-import { Text, Box, Flex, Heading, Button, HStack, IconButton, Grid, GridItem, Badge } from '@chakra-ui/react';
-import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
+import {
+  Text,
+  Box,
+  Flex,
+  Heading,
+  Button,
+  HStack,
+  IconButton,
+  Grid,
+  GridItem,
+  Badge,
+  useDisclosure,
+} from '@chakra-ui/react';
+import {
+  Tabs,
+  TabList,
+  TabPanels,
+  Tab,
+  TabPanel,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+} from '@chakra-ui/react';
 // componentes
 import {
   Table,
@@ -19,7 +44,7 @@ import OrdenadorTabela from '../components/Ordenador/Ordenador';
 import InfoBoxPlacar from '../components/InfoBox/InfoBoxPlacar';
 import Paginacao, { usePaginacao } from '../components/Paginacao/Paginacao';
 // icones
-import { FaPlus, FaTrophy, FaEdit, FaCircle, FaCogs, FaTrash } from 'react-icons/fa';
+import { FaPlus, FaTrophy, FaEdit, FaCircle, FaCogs, FaTrash, FaHistory } from 'react-icons/fa';
 // utilitários
 import { formatarData } from '../utils/formatarData';
 // context
@@ -27,8 +52,10 @@ import { ListagemPlacaresProvider, ListagemPlacaresContext } from '../context/pl
 import { ControlePlacarAtivoProvider, ControlePlacarAtivoContext } from '../context/placar/ControlePlacarAtivoContext';
 import { EdicaoPlacarProvider, EdicaoPlacarContext } from '../context/placar/EdicaoPlacarContext';
 import { OrdenadorTabelaProvider, OrdenadorTabelaContext } from '../context/OrdenadorTabelaContext';
+import { IPlacaresProps } from '../interfaces/placar';
 
 const Placar = () => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const { listagemPlacaresData } = useContext(ListagemPlacaresContext);
   const {
     placarAtivo,
@@ -36,6 +63,8 @@ const Placar = () => {
     listagemJogadoresClassificao,
     handleAbrirEdicaoPartida,
     handleRemoverPartida,
+    handleAbrirHistoricoPlacar,
+    handleFecharHistoricoPlacar,
   } = useContext(ControlePlacarAtivoContext);
   const { handleAbrirEdicaoPlacar } = useContext(EdicaoPlacarContext);
   const { ordenacaoTabela, ordenarPeloValor, ordenarCrescente } = useContext(OrdenadorTabelaContext);
@@ -50,6 +79,8 @@ const Placar = () => {
   ];
   const { paginaAtual, itensPorPagina, setPaginaAtual, setItensPorPagina, primeiraPagina, ultimaPagina } =
     usePaginacao();
+
+  const [modalPlacarJogadoresPartidas, setModalPlacarJogadoresPartidas] = useState(false);
 
   //
   //
@@ -341,7 +372,7 @@ const Placar = () => {
               <TColumn w="10%">{item.partidas}</TColumn>
               <TColumn w="10%">{formatarData(item.data_inicio)}</TColumn>
               <TColumn w="10%">{item.data_fim ? formatarData(item.data_fim) : '-'}</TColumn>
-              <TColumn w="10%" alignItems="center">
+              <TColumn w="7%" alignItems="center">
                 <Text
                   fontSize="12px"
                   mr="5px"
@@ -353,13 +384,8 @@ const Placar = () => {
                 </Text>
                 {item.status}
               </TColumn>
-              <TColumnButtons w="5%">
-                <HStack
-                  pt={{ md: '0px', sm: '5px' }}
-                  spacing="20px"
-                  justifyContent={{ md: 'center', sm: 'space-between' }}
-                  w="100%"
-                >
+              <TColumnButtons w="8%">
+                <HStack pt={{ md: '0px', sm: '5px' }} justifyContent={{ md: 'center', sm: 'space-between' }} w="100%">
                   <IconButton
                     size="sm"
                     colorScheme="blue"
@@ -367,6 +393,14 @@ const Placar = () => {
                     aria-label="Editar Jogo"
                     icon={<FaEdit />}
                     onClick={() => handleAbrirEdicaoPlacar(item)}
+                  />
+                  <IconButton
+                    size="sm"
+                    colorScheme="blue"
+                    variant="ghost"
+                    aria-label="Histórico de Partidas"
+                    icon={<FaHistory />}
+                    onClick={() => handleAbrirModal(item)}
                   />
                 </HStack>
               </TColumnButtons>
@@ -384,106 +418,153 @@ const Placar = () => {
   //
   //
   //
+  function handleAbrirModal(item?: IPlacaresProps) {
+    onOpen();
+    setModalPlacarJogadoresPartidas(true);
+    handleAbrirHistoricoPlacar(item);
+  }
+  function handleFecharModal() {
+    setModalPlacarJogadoresPartidas(false);
+    handleFecharHistoricoPlacar();
+  }
+  const ModalPlacarJogadoresPartidas = () => {
+    return (
+      <Modal
+        isOpen={isOpen}
+        size="6xl"
+        onClose={handleFecharModal}
+        motionPreset="slideInBottom"
+        scrollBehavior="inside"
+        isCentered
+      >
+        <ModalOverlay
+          onClick={() => {
+            handleFecharModal;
+            onClose();
+          }}
+        />
+        <ModalContent>
+          <ModalHeader>Histórico de Partidas</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>{PartidasPlacarAtivo}</ModalBody>
+          <ModalFooter>
+            <HStack w="100%" justifyContent="center">
+              <Button colorScheme="blue" px="30px" onClick={() => handleFecharModal()}>
+                Fechar
+              </Button>
+            </HStack>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    );
+  };
+  //
+  //
+  //
   return (
-    <Flex
-      w={{ lg: '1300px', md: '100%', sm: '100%' }}
-      maxW="100%"
-      minH="60vh"
-      alignItems="center"
-      flexDirection="column"
-      py={{ md: '20px', sm: '10px' }}
-      m="0 auto"
-    >
-      <Flex justifyContent="space-between" align="center" w="100%">
-        <Flex alignItems="center" w="60%">
-          <Heading fontWeight="bold" fontSize={{ md: '32px', sm: '20px' }}>
-            Placar
-          </Heading>
-          <Popover title={`O que é o Placar?`}>
-            Aqui é possível gerenciar o placar das partidas, adicionando jogadores e marcando a quantidade de partidas
-            jogadas, conforme os jogadores vão ganhando partidas o quadro é atualizado para informar a colocação deles.
-            <br /> Pode ser utilizado para pequenos campeonatos.
-          </Popover>
+    <>
+      {modalPlacarJogadoresPartidas && ModalPlacarJogadoresPartidas()}
+      <Flex
+        w={{ lg: '1300px', md: '100%', sm: '100%' }}
+        maxW="100%"
+        minH="60vh"
+        alignItems="center"
+        flexDirection="column"
+        py={{ md: '20px', sm: '10px' }}
+        m="0 auto"
+      >
+        <Flex justifyContent="space-between" align="center" w="100%">
+          <Flex alignItems="center" w="60%">
+            <Heading fontWeight="bold" fontSize={{ md: '32px', sm: '20px' }}>
+              Placar
+            </Heading>
+            <Popover title={`O que é o Placar?`}>
+              Aqui é possível gerenciar o placar das partidas, adicionando jogadores e marcando a quantidade de partidas
+              jogadas, conforme os jogadores vão ganhando partidas o quadro é atualizado para informar a colocação
+              deles.
+              <br /> Pode ser utilizado para pequenos campeonatos.
+            </Popover>
+          </Flex>
+          <Flex alignItems="center" justifyContent="flex-end" w="40%">
+            <IconButton
+              display={{ md: 'none', sm: 'flex' }}
+              aria-label="Criar Placar"
+              icon={<FaPlus />}
+              colorScheme="blue"
+              size="sm"
+              onClick={() => handleAbrirEdicaoPlacar()}
+            />
+            <Button
+              display={{ md: 'flex', sm: 'none' }}
+              leftIcon={<FaPlus />}
+              colorScheme="blue"
+              size="sm"
+              onClick={() => handleAbrirEdicaoPlacar()}
+            >
+              Criar Placar
+            </Button>
+          </Flex>
         </Flex>
-        <Flex alignItems="center" justifyContent="flex-end" w="40%">
-          <IconButton
-            display={{ md: 'none', sm: 'flex' }}
-            aria-label="Criar Placar"
-            icon={<FaPlus />}
-            colorScheme="blue"
-            size="sm"
-            onClick={() => handleAbrirEdicaoPlacar()}
-          />
-          <Button
-            display={{ md: 'flex', sm: 'none' }}
-            leftIcon={<FaPlus />}
-            colorScheme="blue"
-            size="sm"
-            onClick={() => handleAbrirEdicaoPlacar()}
-          >
-            Criar Placar
-          </Button>
+        <Flex mt={{ md: '40px', sm: '10px' }} w="100%">
+          <Tabs w="100%" variant="enclosed-colored">
+            <TabList>
+              <Tab>
+                <Text mr="5px" color="green.500">
+                  <FaTrophy />
+                </Text>
+                Placar Ativo
+              </Tab>
+              <Tab>
+                <Text mr="5px" color="orange.500">
+                  <FaCogs />
+                </Text>
+                Controle dos Placares
+              </Tab>
+            </TabList>
+            <TabPanels>
+              <TabPanel px="0">
+                {PlacarAtivo}
+                {PartidasPlacarAtivo}
+              </TabPanel>
+              <TabPanel px="0">
+                <Box overflowX="auto" w="100%">
+                  <Table>
+                    <THeader display={{ md: 'flex', sm: 'none' }}>
+                      <THead w="15%" ordenarPor="nome">
+                        Nome
+                      </THead>
+                      <THead w="15%" ordenarPor="jogo">
+                        Jogo
+                      </THead>
+                      <THead w="25%" ordenarPor="jogadores">
+                        Jogadores
+                      </THead>
+                      <THead w="10%" ordenarPor="partidas">
+                        Partidas
+                      </THead>
+                      <THead w="10%" ordenarPor="data_inicio">
+                        Data Início
+                      </THead>
+                      <THead w="10%" ordenarPor="data_fim">
+                        Data Fim
+                      </THead>
+                      <THead w="7%" ordenarPor="status">
+                        Status
+                      </THead>
+                      <THeadButtons w="8%">Ações</THeadButtons>
+                    </THeader>
+                    <TBody>{PlacarHistorico}</TBody>
+                    <TFooter>
+                      <OrdenadorTabela listagemOrdenacao={listagemOrdenacao} />
+                    </TFooter>
+                  </Table>
+                </Box>
+              </TabPanel>
+            </TabPanels>
+          </Tabs>
         </Flex>
       </Flex>
-      <Flex mt={{ md: '40px', sm: '10px' }} w="100%">
-        <Tabs w="100%" variant="enclosed-colored">
-          <TabList>
-            <Tab>
-              <Text mr="5px" color="green.500">
-                <FaTrophy />
-              </Text>
-              Placar Ativo
-            </Tab>
-            <Tab>
-              <Text mr="5px" color="orange.500">
-                <FaCogs />
-              </Text>
-              Controle dos Placares
-            </Tab>
-          </TabList>
-          <TabPanels>
-            <TabPanel px="0">
-              {PlacarAtivo}
-              {PartidasPlacarAtivo}
-            </TabPanel>
-            <TabPanel px="0">
-              <Box overflowX="auto" w="100%">
-                <Table>
-                  <THeader display={{ md: 'flex', sm: 'none' }}>
-                    <THead w="15%" ordenarPor="nome">
-                      Nome
-                    </THead>
-                    <THead w="15%" ordenarPor="jogo">
-                      Jogo
-                    </THead>
-                    <THead w="25%" ordenarPor="jogadores">
-                      Jogadores
-                    </THead>
-                    <THead w="10%" ordenarPor="partidas">
-                      Partidas
-                    </THead>
-                    <THead w="10%" ordenarPor="data_inicio">
-                      Data Início
-                    </THead>
-                    <THead w="10%" ordenarPor="data_fim">
-                      Data Fim
-                    </THead>
-                    <THead w="10%" ordenarPor="status">
-                      Status
-                    </THead>
-                    <THeadButtons w="5%">Ações</THeadButtons>
-                  </THeader>
-                  <TBody>{PlacarHistorico}</TBody>
-                  <TFooter>
-                    <OrdenadorTabela listagemOrdenacao={listagemOrdenacao} />
-                  </TFooter>
-                </Table>
-              </Box>
-            </TabPanel>
-          </TabPanels>
-        </Tabs>
-      </Flex>
-    </Flex>
+    </>
   );
 };
 

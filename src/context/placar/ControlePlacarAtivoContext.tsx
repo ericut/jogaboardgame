@@ -33,7 +33,7 @@ import {
 // componentes
 import { Table, THeader, THead, TBody, TRow, TColumn, TColumnButtons } from '../../components/Table/Table';
 // icones
-import { FaSave, FaTrash } from 'react-icons/fa';
+import { FaSave } from 'react-icons/fa';
 import { GiLaurelCrown } from 'react-icons/gi';
 // utilitários
 import { novaData, formatarData } from '../../utils/formatarData';
@@ -58,6 +58,8 @@ interface IControlePlacarAtivoContextProps {
   placarAtivo: IPlacaresProps;
   handleAbrirEdicaoPartida: (object?: IPartidaPlacarProps) => void;
   handleRemoverPartida: (item?: any, nome?: any) => void;
+  handleAbrirHistoricoPlacar: (item?: any) => void;
+  handleFecharHistoricoPlacar: () => void;
 }
 
 interface IControlePlacarAtivoProviderProps {
@@ -101,11 +103,11 @@ export function ControlePlacarAtivoProvider({ children }: IControlePlacarAtivoPr
   }, []);
 
   useEffect(() => {
-    setPlacarAtivo(
-      listagemPlacaresData.find((item) => {
-        return item.status === 'Ativo';
-      })
-    );
+    let placarAtivo = listagemPlacaresData.find((item) => {
+      return item.status === 'Ativo';
+    });
+    setPlacarAtivo(placarAtivo);
+    localStorageSetPlacarAtivo(placarAtivo);
   }, [listagemPlacaresData]);
 
   useEffect(() => {
@@ -142,6 +144,10 @@ export function ControlePlacarAtivoProvider({ children }: IControlePlacarAtivoPr
   useEffect(() => {
     localStorageSetListagemPartidasPlacar();
   }, [listagemPartidasPlacaresData]);
+
+  function localStorageSetPlacarAtivo(item: any) {
+    localStorage.setItem('placarAtivo', JSON.stringify(item));
+  }
 
   function localStorageSetListagemPartidasPlacar() {
     localStorage.setItem('listagemPartidasPlacar', JSON.stringify(listagemPartidasPlacaresData));
@@ -272,6 +278,15 @@ export function ControlePlacarAtivoProvider({ children }: IControlePlacarAtivoPr
     handleAtualizarPartidasPlacarAtivo(placarAtivo.id_placar, listagemPartidasPlacarAtivoData.length - 1);
   }
 
+  function handleAbrirHistoricoPlacar(item: IPlacaresProps) {
+    setPlacarAtivo(item);
+  }
+
+  function handleFecharHistoricoPlacar() {
+    let placarAtivo = JSON.parse(localStorage.getItem('placarAtivo') || '');
+    setPlacarAtivo(placarAtivo);
+  }
+
   const ModalRemoverPartida = () => {
     return (
       <Modal isOpen={isOpen} onClose={handleFecharModal} motionPreset="slideInBottom" isCentered>
@@ -394,6 +409,8 @@ export function ControlePlacarAtivoProvider({ children }: IControlePlacarAtivoPr
         placarAtivo,
         handleAbrirEdicaoPartida,
         handleRemoverPartida,
+        handleAbrirHistoricoPlacar,
+        handleFecharHistoricoPlacar,
       }}
     >
       {children}
